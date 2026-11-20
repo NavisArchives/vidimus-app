@@ -1,0 +1,316 @@
+[
+ {
+  "n": 1,
+  "id": "home#5",
+  "page": "home",
+  "index": 5,
+  "tag": "h2",
+  "fr": "Emprunter un livre",
+  "nl": "Emprunter un livre",
+  "category": "untranslated",
+  "severity": "high",
+  "sources": [
+   "claude",
+   "lt",
+   "qa"
+  ],
+  "title": "Kop staat nog in het Frans",
+  "mine": {
+   "suggestion": "Een boek lenen",
+   "note": "De tekst eronder is wel vertaald; alleen de kop is blijven staan.",
+   "category": "untranslated",
+   "lt": [],
+   "pdf": "still"
+  },
+  "others": [
+   {
+    "key": "lt",
+    "name": "LanguageTool",
+    "prio": "spelling",
+    "why": "«Emprunter», «un», «livre»",
+    "variants": []
+   },
+   {
+    "key": "qa",
+    "name": "Localisatie-QA",
+    "prio": "QA P0",
+    "why": "Kop staat in het Frans op een verder Nederlandse pagina.",
+    "variants": [
+     [
+      "Localisatie-QA A",
+      "Een boek ontlenen"
+     ],
+     [
+      "Localisatie-QA B",
+      "Boeken lenen"
+     ]
+    ]
+   }
+  ],
+  "filter": "",
+  "suggestion": "Een boek lenen"
+ },
+ {
+  "n": 2,
+  "id": "home#6",
+  "page": "home",
+  "index": 6,
+  "tag": "p",
+  "fr": "Chaque membre peut emprunter jusqu'à cinq documents pour une durée de 14 jours.",
+  "nl": "Elk lid kan tot vijf documenten lenen voor een periode van 14 weken.",
+  "category": "meaning",
+  "severity": "high",
+  "sources": [
+   "claude",
+   "qa"
+  ],
+  "title": "14 dagen is 14 weken geworden",
+  "mine": {
+   "suggestion": "Elk lid kan tot vijf documenten lenen voor een periode van 14 dagen.",
+   "note": "Het Frans zegt « 14 jours »; zo staat het ook in het reglement.",
+   "category": "meaning",
+   "lt": [],
+   "pdf": "still"
+  },
+  "others": [
+   {
+    "key": "qa",
+    "name": "Localisatie-QA",
+    "prio": "QA P0",
+    "why": "Uitleentermijn klopt niet met de bron (14 jours). Inhoudelijke fout in een regel die leden volgen.",
+    "variants": []
+   }
+  ],
+  "filter": "",
+  "suggestion": "Elk lid kan tot vijf documenten lenen voor een periode van 14 dagen."
+ },
+ {
+  "n": 3,
+  "id": "rules#7",
+  "page": "rules",
+  "index": 7,
+  "tag": "h2",
+  "fr": "Article 2 — Prêt et retour",
+  "nl": "Artikel 2 — Ontlening en terugbrenging",
+  "category": "style",
+  "severity": "low",
+  "sources": [
+   "claude"
+  ],
+  "title": "Twee woorden voor hetzelfde: ontlening en uitlening",
+  "mine": {
+   "suggestion": "Artikel 2 — Uitlening en terugbrengen",
+   "note": "De homepage en artikel 2 zelf zeggen « uitlening ». Eén term houdt het reglement eenduidig.",
+   "category": "style",
+   "lt": [],
+   "pdf": "still"
+  },
+  "others": [],
+  "filter": "",
+  "suggestion": "Artikel 2 — Uitlening en terugbrengen"
+ },
+ {
+  "n": 4,
+  "id": "rules#8",
+  "page": "rules",
+  "index": 8,
+  "tag": "p",
+  "fr": "Les documents doivent être rendus à la date indiquée sur le ticket de prêt.",
+  "nl": "De documenten moeten worden teruggebracht op de datum vermeld op het ticket de prêt.",
+  "category": "untranslated",
+  "severity": "high",
+  "sources": [
+   "claude",
+   "lt",
+   "qa"
+  ],
+  "title": "Franse woorden midden in de zin",
+  "mine": {
+   "suggestion": "De documenten moeten worden teruggebracht op de datum die op het uitleenbewijs staat.",
+   "note": "« ticket de prêt » is niet vertaald.",
+   "category": "untranslated",
+   "lt": [],
+   "pdf": "still"
+  },
+  "others": [
+   {
+    "key": "lt",
+    "name": "LanguageTool",
+    "prio": "spelling",
+    "why": "«prêt»",
+    "variants": []
+   },
+   {
+    "key": "qa",
+    "name": "Localisatie-QA",
+    "prio": "QA P0",
+    "why": "Franse term midden in de zin.",
+    "variants": [
+     [
+      "Localisatie-QA A",
+      "De documenten moeten worden teruggebracht op de datum vermeld op het uitleenticket."
+     ],
+     [
+      "Localisatie-QA B",
+      "Breng de documenten terug op de datum op je uitleenbon."
+     ]
+    ]
+   }
+  ],
+  "filter": "",
+  "suggestion": "De documenten moeten worden teruggebracht op de datum die op het uitleenbewijs staat."
+ },
+ {
+  "n": 5,
+  "id": "rules#10",
+  "page": "rules",
+  "index": 10,
+  "tag": "h2",
+  "fr": "Article 3 — Retards",
+  "nl": "Artikel 3 — Vertragingen",
+  "category": "register",
+  "severity": "medium",
+  "sources": [
+   "qa"
+  ],
+  "title": "« Vertraging » leest als uitstel; het artikel gaat over te laat terugbrengen",
+  "mine": null,
+  "others": [
+   {
+    "key": "qa",
+    "name": "Localisatie-QA",
+    "prio": "QA P1",
+    "why": "« Vertraging » leest als uitstel; het artikel gaat over te laat terugbrengen.",
+    "variants": [
+     [
+      "Localisatie-QA B",
+      "Artikel 3 — Te laat terugbrengen"
+     ]
+    ]
+   }
+  ],
+  "filter": "",
+  "suggestion": "Artikel 3 — Laattijdige teruggave"
+ },
+ {
+  "n": 6,
+  "id": "rules#16",
+  "page": "rules",
+  "index": 16,
+  "tag": "p",
+  "fr": "Vous pouvez poser vos questions à l'accueil.",
+  "nl": "Je kan je vragen stellen aan het onthaal.",
+  "category": "register",
+  "severity": "medium",
+  "sources": [
+   "claude",
+   "lt",
+   "qa"
+  ],
+  "title": "« je » waar de rest van de site « u » zegt",
+  "mine": {
+   "suggestion": "U kunt uw vragen stellen aan het onthaal.",
+   "note": "Het Frans zegt « vous »; elke andere zin spreekt de lezer met « u » aan.",
+   "category": "register",
+   "lt": [],
+   "pdf": "still"
+  },
+  "others": [
+   {
+    "key": "lt",
+    "name": "LanguageTool",
+    "prio": "stijl",
+    "why": "Velen vinden dat “kun” netter is als ‘je’ het onderwerp is. ‘Kan’ mag echter ook («kan»)",
+    "variants": []
+   },
+   {
+    "key": "qa",
+    "name": "Localisatie-QA",
+    "prio": "QA P1",
+    "why": "Wisselt naar « je »; de rest van het reglement gebruikt « u ».",
+    "variants": []
+   }
+  ],
+  "filter": "",
+  "suggestion": "U kunt uw vragen stellen aan het onthaal."
+ },
+ {
+  "n": 7,
+  "id": "privacy#8",
+  "page": "privacy",
+  "index": 8,
+  "tag": "li",
+  "fr": "Historique des prêts des 12 derniers mois",
+  "nl": "Ontleengeschiedenis van de laatste 12 maanden",
+  "category": "grammar",
+  "severity": "medium",
+  "sources": [
+   "lt"
+  ],
+  "title": "Er is een mogelijke spelfout gevonden",
+  "mine": null,
+  "others": [
+   {
+    "key": "lt",
+    "name": "LanguageTool",
+    "prio": "spelling",
+    "why": "«Ontleengeschiedenis»",
+    "variants": []
+   }
+  ],
+  "filter": "",
+  "suggestion": "Ontleengeschiedenis van de laatste 12 maanden"
+ },
+ {
+  "n": 8,
+  "id": "privacy#10",
+  "page": "privacy",
+  "index": 10,
+  "tag": "p",
+  "fr": "Vos données sont supprimées deux ans après la fin de votre inscription.",
+  "nl": "Uw gegevens worden verwijderd twee jaar na het einde van uw inschrijving.",
+  "category": "style",
+  "severity": "low",
+  "sources": [
+   "qa"
+  ],
+  "title": "Woordvolgorde volgt het Frans; in het Nederlands staat het voltooid deelwoord achteraan",
+  "mine": null,
+  "others": [
+   {
+    "key": "qa",
+    "name": "Localisatie-QA",
+    "prio": "QA P2",
+    "why": "Woordvolgorde volgt het Frans; in het Nederlands staat het voltooid deelwoord achteraan.",
+    "variants": []
+   }
+  ],
+  "filter": "",
+  "suggestion": "Uw gegevens worden twee jaar na het einde van uw inschrijving verwijderd."
+ },
+ {
+  "n": 9,
+  "id": "privacy#13",
+  "page": "privacy",
+  "index": 13,
+  "tag": "p",
+  "fr": "Pour toute question, écrivez à l'adresse indiquée à l'accueil.",
+  "nl": "Voor alle vragen, schrijf naar het adres dat aan het onthaal vermeld staat.",
+  "category": "grammar",
+  "severity": "medium",
+  "sources": [
+   "claude"
+  ],
+  "title": "Hoofdzin zonder onderwerp",
+  "mine": {
+   "suggestion": "Voor vragen kunt u schrijven naar het adres dat aan het onthaal vermeld staat.",
+   "note": "Na « Voor alle vragen, » volgt een gebiedende wijs; dat leest stroef en wijkt af van « u ».",
+   "category": "grammar",
+   "lt": [],
+   "pdf": "still"
+  },
+  "others": [],
+  "filter": "",
+  "suggestion": "Voor vragen kunt u schrijven naar het adres dat aan het onthaal vermeld staat."
+ }
+]

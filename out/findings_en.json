@@ -1,0 +1,203 @@
+[
+ {
+  "n": 1,
+  "id": "home#4",
+  "page": "home",
+  "index": 4,
+  "tag": "p",
+  "fr": "Ouverte du mardi au samedi, de 10 h à 18 h.",
+  "en": "The library are open from Tuesday to Saturday, 10 am to 6 pm.",
+  "category": "grammar",
+  "severity": "high",
+  "sources": [
+   "claude",
+   "qa"
+  ],
+  "title": "Subject and verb do not agree",
+  "mine": {
+   "suggestion": "The library is open from Tuesday to Saturday, 10 am to 6 pm.",
+   "note": "« The library » is singular.",
+   "category": "grammar",
+   "lt": [],
+   "pdf": "still"
+  },
+  "others": [
+   {
+    "key": "qa",
+    "name": "Engelse QA",
+    "prio": "QA P0",
+    "why": "Singular subject with a plural verb.",
+    "variants": []
+   }
+  ],
+  "filter": "",
+  "suggestion": "The library is open from Tuesday to Saturday, 10 am to 6 pm."
+ },
+ {
+  "n": 2,
+  "id": "home#10",
+  "page": "home",
+  "index": 10,
+  "tag": "li",
+  "fr": "Accès gratuit à Internet",
+  "en": "Free internet acces",
+  "category": "grammar",
+  "severity": "medium",
+  "sources": [
+   "claude",
+   "lt"
+  ],
+  "title": "Spelling: « acces »",
+  "mine": {
+   "suggestion": "Free internet access",
+   "note": "",
+   "category": "grammar",
+   "lt": [],
+   "pdf": "still"
+  },
+  "others": [
+   {
+    "key": "lt",
+    "name": "LanguageTool",
+    "prio": "spelling",
+    "why": "«acces»",
+    "variants": []
+   }
+  ],
+  "filter": "",
+  "suggestion": "Free internet access"
+ },
+ {
+  "n": 3,
+  "id": "home#12",
+  "page": "home",
+  "index": 12,
+  "tag": "button",
+  "fr": "Devenir membre",
+  "en": "Devenir membre",
+  "category": "untranslated",
+  "severity": "high",
+  "sources": [
+   "claude",
+   "lt"
+  ],
+  "title": "Button text is still in French",
+  "mine": {
+   "suggestion": "Become a member",
+   "note": "The navigation and every heading are translated; only the button is not.",
+   "category": "untranslated",
+   "lt": [],
+   "pdf": "still"
+  },
+  "others": [
+   {
+    "key": "lt",
+    "name": "LanguageTool",
+    "prio": "spelling",
+    "why": "«Devenir», «membre»",
+    "variants": []
+   }
+  ],
+  "filter": "",
+  "suggestion": "Become a member"
+ },
+ {
+  "n": 4,
+  "id": "rules#6",
+  "page": "rules",
+  "index": 6,
+  "tag": "p",
+  "fr": "La carte de membre est personnelle et ne peut être prêtée.",
+  "en": "The membership card is personal and may not be lend.",
+  "category": "grammar",
+  "severity": "high",
+  "sources": [
+   "claude",
+   "lt",
+   "qa"
+  ],
+  "title": "Wrong form of the verb after « be »",
+  "mine": {
+   "suggestion": "The membership card is personal and may not be lent.",
+   "note": "The past participle of « lend » is « lent ».",
+   "category": "grammar",
+   "lt": [],
+   "pdf": "still"
+  },
+  "others": [
+   {
+    "key": "lt",
+    "name": "LanguageTool",
+    "prio": "grammatica",
+    "why": "Consider using either the past participle “lent” or the present participle “lending” here («lend»)",
+    "variants": []
+   },
+   {
+    "key": "qa",
+    "name": "Engelse QA",
+    "prio": "QA P0",
+    "why": "Infinitive used where the past participle is needed.",
+    "variants": []
+   }
+  ],
+  "filter": "",
+  "suggestion": "The membership card is personal and may not be lent."
+ },
+ {
+  "n": 5,
+  "id": "privacy#8",
+  "page": "privacy",
+  "index": 8,
+  "tag": "li",
+  "fr": "Historique des prêts des 12 derniers mois",
+  "en": "Loan history for the last 12 month",
+  "category": "grammar",
+  "severity": "medium",
+  "sources": [
+   "claude"
+  ],
+  "title": "Plural missing after « 12 »",
+  "mine": {
+   "suggestion": "Loan history for the last 12 months",
+   "note": "",
+   "category": "grammar",
+   "lt": [],
+   "pdf": "still"
+  },
+  "others": [],
+  "filter": "",
+  "suggestion": "Loan history for the last 12 months"
+ },
+ {
+  "n": 6,
+  "id": "privacy#13",
+  "page": "privacy",
+  "index": 13,
+  "tag": "p",
+  "fr": "Pour toute question, écrivez à l'adresse indiquée à l'accueil.",
+  "en": "For any question, write to the address shown at the front desk.",
+  "category": "style",
+  "severity": "low",
+  "sources": [
+   "qa"
+  ],
+  "title": "« For any question » reads as a calque of « Pour toute question »",
+  "mine": null,
+  "others": [
+   {
+    "key": "qa",
+    "name": "Engelse QA",
+    "prio": "QA P2",
+    "why": "« For any question » reads as a calque of « Pour toute question ».",
+    "variants": [
+     [
+      "Engelse QA B",
+      "If you have a question, write to the address shown at the front desk."
+     ]
+    ]
+   }
+  ],
+  "filter": "",
+  "suggestion": "For any questions, write to the address shown at the front desk."
+ }
+]

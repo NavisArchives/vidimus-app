@@ -1,0 +1,206 @@
+Quartier Nord, Frans en Nederlands naast elkaar
+Elk blok: FR dan NL. Identieke regels = nog niet vertaald.
+
+
+==============================================================================
+PAGINA: Accueil / Home
+==============================================================================
+
+[home#0] <a>
+FR: Accueil
+NL: Home
+
+[home#1] <a>
+FR: Règlement
+NL: Reglement
+
+[home#2] <a>
+FR: Confidentialité
+NL: Privacy
+
+[home#3] <h1>
+FR: Bienvenue à la bibliothèque du quartier
+NL: Welkom in de buurtbibliotheek
+
+[home#4] <p>
+FR: Ouverte du mardi au samedi, de 10 h à 18 h.
+NL: Open van dinsdag tot zaterdag, van 10 tot 18 uur.
+
+[home#5] <h2>   <-- IDENTIEK
+FR: Emprunter un livre
+NL: Emprunter un livre
+
+[home#6] <p>
+FR: Chaque membre peut emprunter jusqu'à cinq documents pour une durée de 14 jours.
+NL: Elk lid kan tot vijf documenten lenen voor een periode van 14 weken.
+
+[home#7] <p>
+FR: L'inscription est gratuite pour les moins de 18 ans.
+NL: Inschrijving is gratis voor jongeren onder 18 jaar.
+
+[home#8] <h2>
+FR: Nos services
+NL: Onze diensten
+
+[home#9] <li>
+FR: Prêt de livres, de BD et de films
+NL: Uitlening van boeken, strips en films
+
+[home#10] <li>
+FR: Accès gratuit à Internet
+NL: Gratis toegang tot het internet
+
+[home#11] <li>
+FR: Ateliers de lecture pour enfants
+NL: Leesateliers voor kinderen
+
+[home#12] <button>
+FR: Devenir membre
+NL: Lid worden
+
+[home#13] <p>
+FR: Document fictif, créé pour une démonstration.
+NL: Fictief document, gemaakt voor een demonstratie.
+
+
+==============================================================================
+PAGINA: Règlement / Reglement
+==============================================================================
+
+[rules#0] <a>
+FR: Accueil
+NL: Home
+
+[rules#1] <a>
+FR: Règlement
+NL: Reglement
+
+[rules#2] <a>
+FR: Confidentialité
+NL: Privacy
+
+[rules#3] <h1>
+FR: Règlement d'utilisation
+NL: Gebruiksreglement
+
+[rules#4] <h2>
+FR: Article 1 — Inscription
+NL: Artikel 1 — Inschrijving
+
+[rules#5] <p>
+FR: Toute personne peut s'inscrire sur présentation d'une pièce d'identité.
+NL: Iedereen kan zich inschrijven op vertoon van een identiteitsbewijs.
+
+[rules#6] <p>
+FR: La carte de membre est personnelle et ne peut être prêtée.
+NL: De lidkaart is persoonlijk en mag niet worden uitgeleend.
+
+[rules#7] <h2>
+FR: Article 2 — Prêt et retour
+NL: Artikel 2 — Ontlening en terugbrenging
+
+[rules#8] <p>
+FR: Les documents doivent être rendus à la date indiquée sur le ticket de prêt.
+NL: De documenten moeten worden teruggebracht op de datum vermeld op het ticket de prêt.
+
+[rules#9] <p>
+FR: Un prêt peut être prolongé une fois, sauf si le document est réservé.
+NL: Een uitlening kan eenmaal worden verlengd, tenzij het document gereserveerd is.
+
+[rules#10] <h2>
+FR: Article 3 — Retards
+NL: Artikel 3 — Vertragingen
+
+[rules#11] <p>
+FR: En cas de retard, un rappel est envoyé par courriel. Aucune amende n'est appliquée.
+NL: Bij vertraging wordt een herinnering per e-mail gestuurd. Er wordt geen boete aangerekend.
+
+[rules#12] <p>
+FR: Les documents perdus ou abîmés sont remplacés aux frais du membre.
+NL: Verloren of beschadigde documenten worden vervangen op kosten van het lid.
+
+[rules#13] <h2>
+FR: Article 4 — Comportement
+NL: Artikel 4 — Gedrag
+
+[rules#14] <p>
+FR: Merci de respecter le calme des salles de lecture.
+NL: Gelieve de rust in de leeszalen te respecteren.
+
+[rules#15] <p>
+FR: Les boissons sont autorisées uniquement dans l'espace café.
+NL: Dranken zijn enkel toegelaten in de cafetaria.
+
+[rules#16] <p>
+FR: Vous pouvez poser vos questions à l'accueil.
+NL: Je kan je vragen stellen aan het onthaal.
+
+[rules#17] <p>
+FR: Document fictif, créé pour une démonstration.
+NL: Fictief document, gemaakt voor een demonstratie.
+
+
+==============================================================================
+PAGINA: Confidentialité / Privacy
+==============================================================================
+
+[privacy#0] <a>
+FR: Accueil
+NL: Home
+
+[privacy#1] <a>
+FR: Règlement
+NL: Reglement
+
+[privacy#2] <a>
+FR: Confidentialité
+NL: Privacy
+
+[privacy#3] <h1>
+FR: Politique de confidentialité
+NL: Privacybeleid
+
+[privacy#4] <p>
+FR: La bibliothèque traite vos données personnelles uniquement pour gérer votre inscription et vos prêts.
+NL: De bibliotheek verwerkt uw persoonsgegevens enkel om uw inschrijving en uw uitleningen te beheren.
+
+[privacy#5] <h2>
+FR: Quelles données ?
+NL: Welke gegevens?
+
+[privacy#6] <li>
+FR: Nom, prénom et date de naissance
+NL: Naam, voornaam en geboortedatum
+
+[privacy#7] <li>
+FR: Adresse e-mail, pour les rappels
+NL: E-mailadres, voor de herinneringen
+
+[privacy#8] <li>
+FR: Historique des prêts des 12 derniers mois
+NL: Ontleengeschiedenis van de laatste 12 maanden
+
+[privacy#9] <h2>
+FR: Durée de conservation
+NL: Bewaartermijn
+
+[privacy#10] <p>
+FR: Vos données sont supprimées deux ans après la fin de votre inscription.
+NL: Uw gegevens worden verwijderd twee jaar na het einde van uw inschrijving.
+
+[privacy#11] <h2>
+FR: Vos droits
+NL: Uw rechten
+
+[privacy#12] <p>
+FR: Vous pouvez demander l'accès, la rectification ou l'effacement de vos données à tout moment.
+NL: U kunt op elk moment inzage, verbetering of wissing van uw gegevens vragen.
+
+[privacy#13] <p>
+FR: Pour toute question, écrivez à l'adresse indiquée à l'accueil.
+NL: Voor alle vragen, schrijf naar het adres dat aan het onthaal vermeld staat.
+
+[privacy#14] <p>
+FR: Document fictif, créé pour une démonstration.
+NL: Fictief document, gemaakt voor een demonstratie.
+

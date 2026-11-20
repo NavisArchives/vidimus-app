@@ -1,0 +1,52 @@
+{
+ "_about": "An invented neighbourhood library: a home page, its rules of use and its privacy notice, in French (the reference) with a Dutch and an English translation. The translations carry deliberate mistakes for the checks to find. Every name and rule is fictitious.",
+ "nav": [
+  ["Accueil", "Home", "Home"],
+  ["Règlement", "Reglement", "Rules of use"],
+  ["Confidentialité", "Privacy", "Privacy"]
+ ],
+ "footer": ["Document fictif, créé pour une démonstration.", "Fictief document, gemaakt voor een demonstratie.", "Fictitious document, made for a demonstration."],
+ "pages": {
+  "home": [
+   ["h1", "Bienvenue à la bibliothèque du quartier", "Welkom in de buurtbibliotheek", "Welcome to the neighbourhood library"],
+   ["p", "Ouverte du mardi au samedi, de 10 h à 18 h.", "Open van dinsdag tot zaterdag, van 10 tot 18 uur.", "The library are open from Tuesday to Saturday, 10 am to 6 pm."],
+   ["h2", "Emprunter un livre", "Emprunter un livre", "Borrowing a book"],
+   ["p", "Chaque membre peut emprunter jusqu'à cinq documents pour une durée de 14 jours.", "Elk lid kan tot vijf documenten lenen voor een periode van 14 weken.", "Each member can borrow up to five items for 14 days."],
+   ["p", "L'inscription est gratuite pour les moins de 18 ans.", "Inschrijving is gratis voor jongeren onder 18 jaar.", "Registration is free for under-18s."],
+   ["h2", "Nos services", "Onze diensten", "Our services"],
+   ["li", "Prêt de livres, de BD et de films", "Uitlening van boeken, strips en films", "Loans of books, comics and films"],
+   ["li", "Accès gratuit à Internet", "Gratis toegang tot het internet", "Free internet acces"],
+   ["li", "Ateliers de lecture pour enfants", "Leesateliers voor kinderen", "Reading workshops for children"],
+   ["button", "Devenir membre", "Lid worden", "Devenir membre"]
+  ],
+  "rules": [
+   ["h1", "Règlement d'utilisation", "Gebruiksreglement", "Rules of use"],
+   ["h2", "Article 1 — Inscription", "Artikel 1 — Inschrijving", "Article 1 — Registration"],
+   ["p", "Toute personne peut s'inscrire sur présentation d'une pièce d'identité.", "Iedereen kan zich inschrijven op vertoon van een identiteitsbewijs.", "Anyone can register by showing an identity document."],
+   ["p", "La carte de membre est personnelle et ne peut être prêtée.", "De lidkaart is persoonlijk en mag niet worden uitgeleend.", "The membership card is personal and may not be lend."],
+   ["h2", "Article 2 — Prêt et retour", "Artikel 2 — Ontlening en terugbrenging", "Article 2 — Loans and returns"],
+   ["p", "Les documents doivent être rendus à la date indiquée sur le ticket de prêt.", "De documenten moeten worden teruggebracht op de datum vermeld op het ticket de prêt.", "Items must be returned by the date shown on the loan receipt."],
+   ["p", "Un prêt peut être prolongé une fois, sauf si le document est réservé.", "Een uitlening kan eenmaal worden verlengd, tenzij het document gereserveerd is.", "A loan can be renewed once, unless the item is reserved."],
+   ["h2", "Article 3 — Retards", "Artikel 3 — Vertragingen", "Article 3 — Late returns"],
+   ["p", "En cas de retard, un rappel est envoyé par courriel. Aucune amende n'est appliquée.", "Bij vertraging wordt een herinnering per e-mail gestuurd. Er wordt geen boete aangerekend.", "If an item is late, a reminder is sent by email. No fine is charged."],
+   ["p", "Les documents perdus ou abîmés sont remplacés aux frais du membre.", "Verloren of beschadigde documenten worden vervangen op kosten van het lid.", "Lost or damaged items are replaced at the member's expense."],
+   ["h2", "Article 4 — Comportement", "Artikel 4 — Gedrag", "Article 4 — Conduct"],
+   ["p", "Merci de respecter le calme des salles de lecture.", "Gelieve de rust in de leeszalen te respecteren.", "Please respect the quiet of the reading rooms."],
+   ["p", "Les boissons sont autorisées uniquement dans l'espace café.", "Dranken zijn enkel toegelaten in de cafetaria.", "Drinks are only allowed in the café area."],
+   ["p", "Vous pouvez poser vos questions à l'accueil.", "Je kan je vragen stellen aan het onthaal.", "You can ask your questions at the front desk."]
+  ],
+  "privacy": [
+   ["h1", "Politique de confidentialité", "Privacybeleid", "Privacy policy"],
+   ["p", "La bibliothèque traite vos données personnelles uniquement pour gérer votre inscription et vos prêts.", "De bibliotheek verwerkt uw persoonsgegevens enkel om uw inschrijving en uw uitleningen te beheren.", "The library processes your personal data only to manage your membership and your loans."],
+   ["h2", "Quelles données ?", "Welke gegevens?", "What data?"],
+   ["li", "Nom, prénom et date de naissance", "Naam, voornaam en geboortedatum", "Surname, first name and date of birth"],
+   ["li", "Adresse e-mail, pour les rappels", "E-mailadres, voor de herinneringen", "Email address, for reminders"],
+   ["li", "Historique des prêts des 12 derniers mois", "Ontleengeschiedenis van de laatste 12 maanden", "Loan history for the last 12 month"],
+   ["h2", "Durée de conservation", "Bewaartermijn", "How long we keep it"],
+   ["p", "Vos données sont supprimées deux ans après la fin de votre inscription.", "Uw gegevens worden verwijderd twee jaar na het einde van uw inschrijving.", "Your data is deleted two years after your membership ends."],
+   ["h2", "Vos droits", "Uw rechten", "Your rights"],
+   ["p", "Vous pouvez demander l'accès, la rectification ou l'effacement de vos données à tout moment.", "U kunt op elk moment inzage, verbetering of wissing van uw gegevens vragen.", "You can ask to access, correct or erase your data at any time."],
+   ["p", "Pour toute question, écrivez à l'adresse indiquée à l'accueil.", "Voor alle vragen, schrijf naar het adres dat aan het onthaal vermeld staat.", "For any question, write to the address shown at the front desk."]
+  ]
+ }
+}

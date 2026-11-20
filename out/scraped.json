@@ -1,0 +1,770 @@
+{
+ "home": {
+  "label": "Accueil / Home",
+  "slug": "",
+  "langs": {
+   "fr": {
+    "url": "http://127.0.0.1:8899/",
+    "blocks": [
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[0]",
+      "text": "Accueil"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[1]",
+      "text": "Règlement"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[2]",
+      "text": "Confidentialité"
+     },
+     {
+      "tag": "h1",
+      "sig": "body[0]/main[0]/h1[0]",
+      "text": "Bienvenue à la bibliothèque du quartier"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[0]",
+      "text": "Ouverte du mardi au samedi, de 10 h à 18 h."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[0]",
+      "text": "Emprunter un livre"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[1]",
+      "text": "Chaque membre peut emprunter jusqu'à cinq documents pour une durée de 14 jours."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[2]",
+      "text": "L'inscription est gratuite pour les moins de 18 ans."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[1]",
+      "text": "Nos services"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[0]",
+      "text": "Prêt de livres, de BD et de films"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[1]",
+      "text": "Accès gratuit à Internet"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[2]",
+      "text": "Ateliers de lecture pour enfants"
+     },
+     {
+      "tag": "button",
+      "sig": "body[0]/main[0]/button[0]",
+      "text": "Devenir membre"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/footer[0]/p[0]",
+      "text": "Document fictif, créé pour une démonstration."
+     }
+    ]
+   },
+   "nl": {
+    "url": "http://127.0.0.1:8899/nl/",
+    "blocks": [
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[0]",
+      "text": "Home"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[1]",
+      "text": "Reglement"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[2]",
+      "text": "Privacy"
+     },
+     {
+      "tag": "h1",
+      "sig": "body[0]/main[0]/h1[0]",
+      "text": "Welkom in de buurtbibliotheek"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[0]",
+      "text": "Open van dinsdag tot zaterdag, van 10 tot 18 uur."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[0]",
+      "text": "Emprunter un livre"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[1]",
+      "text": "Elk lid kan tot vijf documenten lenen voor een periode van 14 weken."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[2]",
+      "text": "Inschrijving is gratis voor jongeren onder 18 jaar."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[1]",
+      "text": "Onze diensten"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[0]",
+      "text": "Uitlening van boeken, strips en films"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[1]",
+      "text": "Gratis toegang tot het internet"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[2]",
+      "text": "Leesateliers voor kinderen"
+     },
+     {
+      "tag": "button",
+      "sig": "body[0]/main[0]/button[0]",
+      "text": "Lid worden"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/footer[0]/p[0]",
+      "text": "Fictief document, gemaakt voor een demonstratie."
+     }
+    ]
+   },
+   "en": {
+    "url": "http://127.0.0.1:8899/en/",
+    "blocks": [
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[0]",
+      "text": "Home"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[1]",
+      "text": "Rules of use"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[2]",
+      "text": "Privacy"
+     },
+     {
+      "tag": "h1",
+      "sig": "body[0]/main[0]/h1[0]",
+      "text": "Welcome to the neighbourhood library"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[0]",
+      "text": "The library are open from Tuesday to Saturday, 10 am to 6 pm."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[0]",
+      "text": "Borrowing a book"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[1]",
+      "text": "Each member can borrow up to five items for 14 days."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[2]",
+      "text": "Registration is free for under-18s."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[1]",
+      "text": "Our services"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[0]",
+      "text": "Loans of books, comics and films"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[1]",
+      "text": "Free internet acces"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[2]",
+      "text": "Reading workshops for children"
+     },
+     {
+      "tag": "button",
+      "sig": "body[0]/main[0]/button[0]",
+      "text": "Devenir membre"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/footer[0]/p[0]",
+      "text": "Fictitious document, made for a demonstration."
+     }
+    ]
+   }
+  }
+ },
+ "rules": {
+  "label": "Règlement / Reglement",
+  "slug": "reglement",
+  "langs": {
+   "fr": {
+    "url": "http://127.0.0.1:8899/reglement/",
+    "blocks": [
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[0]",
+      "text": "Accueil"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[1]",
+      "text": "Règlement"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[2]",
+      "text": "Confidentialité"
+     },
+     {
+      "tag": "h1",
+      "sig": "body[0]/main[0]/h1[0]",
+      "text": "Règlement d'utilisation"
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[0]",
+      "text": "Article 1 — Inscription"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[0]",
+      "text": "Toute personne peut s'inscrire sur présentation d'une pièce d'identité."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[1]",
+      "text": "La carte de membre est personnelle et ne peut être prêtée."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[1]",
+      "text": "Article 2 — Prêt et retour"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[2]",
+      "text": "Les documents doivent être rendus à la date indiquée sur le ticket de prêt."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[3]",
+      "text": "Un prêt peut être prolongé une fois, sauf si le document est réservé."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[2]",
+      "text": "Article 3 — Retards"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[4]",
+      "text": "En cas de retard, un rappel est envoyé par courriel. Aucune amende n'est appliquée."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[5]",
+      "text": "Les documents perdus ou abîmés sont remplacés aux frais du membre."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[3]",
+      "text": "Article 4 — Comportement"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[6]",
+      "text": "Merci de respecter le calme des salles de lecture."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[7]",
+      "text": "Les boissons sont autorisées uniquement dans l'espace café."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[8]",
+      "text": "Vous pouvez poser vos questions à l'accueil."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/footer[0]/p[0]",
+      "text": "Document fictif, créé pour une démonstration."
+     }
+    ]
+   },
+   "nl": {
+    "url": "http://127.0.0.1:8899/nl/reglement/",
+    "blocks": [
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[0]",
+      "text": "Home"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[1]",
+      "text": "Reglement"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[2]",
+      "text": "Privacy"
+     },
+     {
+      "tag": "h1",
+      "sig": "body[0]/main[0]/h1[0]",
+      "text": "Gebruiksreglement"
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[0]",
+      "text": "Artikel 1 — Inschrijving"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[0]",
+      "text": "Iedereen kan zich inschrijven op vertoon van een identiteitsbewijs."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[1]",
+      "text": "De lidkaart is persoonlijk en mag niet worden uitgeleend."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[1]",
+      "text": "Artikel 2 — Ontlening en terugbrenging"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[2]",
+      "text": "De documenten moeten worden teruggebracht op de datum vermeld op het ticket de prêt."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[3]",
+      "text": "Een uitlening kan eenmaal worden verlengd, tenzij het document gereserveerd is."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[2]",
+      "text": "Artikel 3 — Vertragingen"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[4]",
+      "text": "Bij vertraging wordt een herinnering per e-mail gestuurd. Er wordt geen boete aangerekend."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[5]",
+      "text": "Verloren of beschadigde documenten worden vervangen op kosten van het lid."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[3]",
+      "text": "Artikel 4 — Gedrag"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[6]",
+      "text": "Gelieve de rust in de leeszalen te respecteren."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[7]",
+      "text": "Dranken zijn enkel toegelaten in de cafetaria."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[8]",
+      "text": "Je kan je vragen stellen aan het onthaal."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/footer[0]/p[0]",
+      "text": "Fictief document, gemaakt voor een demonstratie."
+     }
+    ]
+   },
+   "en": {
+    "url": "http://127.0.0.1:8899/en/reglement/",
+    "blocks": [
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[0]",
+      "text": "Home"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[1]",
+      "text": "Rules of use"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[2]",
+      "text": "Privacy"
+     },
+     {
+      "tag": "h1",
+      "sig": "body[0]/main[0]/h1[0]",
+      "text": "Rules of use"
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[0]",
+      "text": "Article 1 — Registration"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[0]",
+      "text": "Anyone can register by showing an identity document."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[1]",
+      "text": "The membership card is personal and may not be lend."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[1]",
+      "text": "Article 2 — Loans and returns"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[2]",
+      "text": "Items must be returned by the date shown on the loan receipt."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[3]",
+      "text": "A loan can be renewed once, unless the item is reserved."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[2]",
+      "text": "Article 3 — Late returns"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[4]",
+      "text": "If an item is late, a reminder is sent by email. No fine is charged."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[5]",
+      "text": "Lost or damaged items are replaced at the member's expense."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[3]",
+      "text": "Article 4 — Conduct"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[6]",
+      "text": "Please respect the quiet of the reading rooms."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[7]",
+      "text": "Drinks are only allowed in the café area."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[8]",
+      "text": "You can ask your questions at the front desk."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/footer[0]/p[0]",
+      "text": "Fictitious document, made for a demonstration."
+     }
+    ]
+   }
+  }
+ },
+ "privacy": {
+  "label": "Confidentialité / Privacy",
+  "slug": "confidentialite",
+  "langs": {
+   "fr": {
+    "url": "http://127.0.0.1:8899/confidentialite/",
+    "blocks": [
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[0]",
+      "text": "Accueil"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[1]",
+      "text": "Règlement"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[2]",
+      "text": "Confidentialité"
+     },
+     {
+      "tag": "h1",
+      "sig": "body[0]/main[0]/h1[0]",
+      "text": "Politique de confidentialité"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[0]",
+      "text": "La bibliothèque traite vos données personnelles uniquement pour gérer votre inscription et vos prêts."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[0]",
+      "text": "Quelles données ?"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[0]",
+      "text": "Nom, prénom et date de naissance"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[1]",
+      "text": "Adresse e-mail, pour les rappels"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[2]",
+      "text": "Historique des prêts des 12 derniers mois"
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[1]",
+      "text": "Durée de conservation"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[1]",
+      "text": "Vos données sont supprimées deux ans après la fin de votre inscription."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[2]",
+      "text": "Vos droits"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[2]",
+      "text": "Vous pouvez demander l'accès, la rectification ou l'effacement de vos données à tout moment."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[3]",
+      "text": "Pour toute question, écrivez à l'adresse indiquée à l'accueil."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/footer[0]/p[0]",
+      "text": "Document fictif, créé pour une démonstration."
+     }
+    ]
+   },
+   "nl": {
+    "url": "http://127.0.0.1:8899/nl/confidentialite/",
+    "blocks": [
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[0]",
+      "text": "Home"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[1]",
+      "text": "Reglement"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[2]",
+      "text": "Privacy"
+     },
+     {
+      "tag": "h1",
+      "sig": "body[0]/main[0]/h1[0]",
+      "text": "Privacybeleid"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[0]",
+      "text": "De bibliotheek verwerkt uw persoonsgegevens enkel om uw inschrijving en uw uitleningen te beheren."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[0]",
+      "text": "Welke gegevens?"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[0]",
+      "text": "Naam, voornaam en geboortedatum"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[1]",
+      "text": "E-mailadres, voor de herinneringen"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[2]",
+      "text": "Ontleengeschiedenis van de laatste 12 maanden"
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[1]",
+      "text": "Bewaartermijn"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[1]",
+      "text": "Uw gegevens worden verwijderd twee jaar na het einde van uw inschrijving."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[2]",
+      "text": "Uw rechten"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[2]",
+      "text": "U kunt op elk moment inzage, verbetering of wissing van uw gegevens vragen."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[3]",
+      "text": "Voor alle vragen, schrijf naar het adres dat aan het onthaal vermeld staat."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/footer[0]/p[0]",
+      "text": "Fictief document, gemaakt voor een demonstratie."
+     }
+    ]
+   },
+   "en": {
+    "url": "http://127.0.0.1:8899/en/confidentialite/",
+    "blocks": [
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[0]",
+      "text": "Home"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[1]",
+      "text": "Rules of use"
+     },
+     {
+      "tag": "a",
+      "sig": "body[0]/header[0]/a[2]",
+      "text": "Privacy"
+     },
+     {
+      "tag": "h1",
+      "sig": "body[0]/main[0]/h1[0]",
+      "text": "Privacy policy"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[0]",
+      "text": "The library processes your personal data only to manage your membership and your loans."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[0]",
+      "text": "What data?"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[0]",
+      "text": "Surname, first name and date of birth"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[1]",
+      "text": "Email address, for reminders"
+     },
+     {
+      "tag": "li",
+      "sig": "body[0]/main[0]/ul[0]/li[2]",
+      "text": "Loan history for the last 12 month"
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[1]",
+      "text": "How long we keep it"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[1]",
+      "text": "Your data is deleted two years after your membership ends."
+     },
+     {
+      "tag": "h2",
+      "sig": "body[0]/main[0]/h2[2]",
+      "text": "Your rights"
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[2]",
+      "text": "You can ask to access, correct or erase your data at any time."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/main[0]/p[3]",
+      "text": "For any question, write to the address shown at the front desk."
+     },
+     {
+      "tag": "p",
+      "sig": "body[0]/footer[0]/p[0]",
+      "text": "Fictitious document, made for a demonstration."
+     }
+    ]
+   }
+  }
+ }
+}

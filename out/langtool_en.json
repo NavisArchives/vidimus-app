@@ -1,0 +1,160 @@
+{
+ "home": {
+  "9": [
+   {
+    "msg": "The serial comma (Oxford comma, Harvard comma) is missing.",
+    "frag": "comics and",
+    "offset": 16,
+    "len": 10,
+    "rule": "SERIAL_COMMA_ON",
+    "cat": "Style",
+    "type": "style",
+    "fix": [
+     "comics, and"
+    ]
+   }
+  ],
+  "10": [
+   {
+    "msg": "Possible spelling mistake found.",
+    "frag": "acces",
+    "offset": 14,
+    "len": 5,
+    "rule": "MORFOLOGIK_RULE_EN_GB",
+    "cat": "Possible Typo",
+    "type": "misspelling",
+    "fix": [
+     "access",
+     "acts",
+     "acres"
+    ]
+   }
+  ],
+  "12": [
+   {
+    "msg": "Possible spelling mistake found.",
+    "frag": "Devenir",
+    "offset": 0,
+    "len": 7,
+    "rule": "MORFOLOGIK_RULE_EN_GB",
+    "cat": "Possible Typo",
+    "type": "misspelling",
+    "fix": [
+     "Deventer",
+     "Devoir",
+     "Evener"
+    ]
+   },
+   {
+    "msg": "Possible spelling mistake found.",
+    "frag": "membre",
+    "offset": 8,
+    "len": 6,
+    "rule": "MORFOLOGIK_RULE_EN_GB",
+    "cat": "Possible Typo",
+    "type": "misspelling",
+    "fix": [
+     "member"
+    ]
+   }
+  ]
+ },
+ "rules": {
+  "6": [
+   {
+    "msg": "Consider using either the past participle “lent” or the present participle “lending” here.",
+    "frag": "lend",
+    "offset": 47,
+    "len": 4,
+    "rule": "BEEN_PART_AGREEMENT",
+    "cat": "Grammar",
+    "type": "grammar",
+    "fix": [
+     "lent",
+     "lending"
+    ]
+   }
+  ]
+ },
+ "privacy": {},
+ "_detected": {
+  "home": {
+   "4": {
+    "code": "en",
+    "confidence": 0.99
+   },
+   "6": {
+    "code": "en",
+    "confidence": 0.99
+   },
+   "13": {
+    "code": "en",
+    "confidence": 1.0
+   }
+  },
+  "rules": {
+   "5": {
+    "code": "en",
+    "confidence": 0.99
+   },
+   "6": {
+    "code": "en",
+    "confidence": 0.99
+   },
+   "8": {
+    "code": "en",
+    "confidence": 0.99
+   },
+   "9": {
+    "code": "en",
+    "confidence": 0.99
+   },
+   "11": {
+    "code": "en",
+    "confidence": 0.99
+   },
+   "12": {
+    "code": "en",
+    "confidence": 0.99
+   },
+   "14": {
+    "code": "en",
+    "confidence": 1.0
+   },
+   "15": {
+    "code": "en",
+    "confidence": 1.0
+   },
+   "16": {
+    "code": "en",
+    "confidence": 1.0
+   },
+   "17": {
+    "code": "en",
+    "confidence": 1.0
+   }
+  },
+  "privacy": {
+   "4": {
+    "code": "en",
+    "confidence": 0.99
+   },
+   "10": {
+    "code": "en",
+    "confidence": 0.99
+   },
+   "12": {
+    "code": "en",
+    "confidence": 0.99
+   },
+   "13": {
+    "code": "en",
+    "confidence": 0.99
+   },
+   "14": {
+    "code": "en",
+    "confidence": 1.0
+   }
+  }
+ }
+}

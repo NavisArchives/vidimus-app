@@ -1,0 +1,29 @@
+[
+ {
+  "id": "home#4",
+  "page": "home",
+  "index": 4,
+  "prio": "P0",
+  "why": "Singular subject with a plural verb.",
+  "a": "The library is open from Tuesday to Saturday, 10 am to 6 pm.",
+  "b": ""
+ },
+ {
+  "id": "rules#6",
+  "page": "rules",
+  "index": 6,
+  "prio": "P0",
+  "why": "Infinitive used where the past participle is needed.",
+  "a": "The membership card is personal and may not be lent.",
+  "b": ""
+ },
+ {
+  "id": "privacy#13",
+  "page": "privacy",
+  "index": 13,
+  "prio": "P2",
+  "why": "« For any question » reads as a calque of « Pour toute question ».",
+  "a": "For any questions, write to the address shown at the front desk.",
+  "b": "If you have a question, write to the address shown at the front desk."
+ }
+]

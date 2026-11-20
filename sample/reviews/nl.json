@@ -1,0 +1,14 @@
+[
+ {"id": "home#5", "category": "untranslated", "severity": "high", "title": "Kop staat nog in het Frans",
+  "suggestion": "Een boek lenen", "note": "De tekst eronder is wel vertaald; alleen de kop is blijven staan.", "contains": "Emprunter"},
+ {"id": "home#6", "category": "meaning", "severity": "high", "title": "14 dagen is 14 weken geworden",
+  "suggestion": "Elk lid kan tot vijf documenten lenen voor een periode van 14 dagen.", "note": "Het Frans zegt « 14 jours »; zo staat het ook in het reglement.", "contains": "14 weken"},
+ {"id": "rules#7", "category": "style", "severity": "low", "title": "Twee woorden voor hetzelfde: ontlening en uitlening",
+  "suggestion": "Artikel 2 — Uitlening en terugbrengen", "note": "De homepage en artikel 2 zelf zeggen « uitlening ». Eén term houdt het reglement eenduidig.", "contains": "Ontlening"},
+ {"id": "rules#8", "category": "untranslated", "severity": "high", "title": "Franse woorden midden in de zin",
+  "suggestion": "De documenten moeten worden teruggebracht op de datum die op het uitleenbewijs staat.", "note": "« ticket de prêt » is niet vertaald.", "contains": "ticket de prêt"},
+ {"id": "rules#16", "category": "register", "severity": "medium", "title": "« je » waar de rest van de site « u » zegt",
+  "suggestion": "U kunt uw vragen stellen aan het onthaal.", "note": "Het Frans zegt « vous »; elke andere zin spreekt de lezer met « u » aan.", "contains": "Je kan"},
+ {"id": "privacy#13", "category": "grammar", "severity": "medium", "title": "Hoofdzin zonder onderwerp",
+  "suggestion": "Voor vragen kunt u schrijven naar het adres dat aan het onthaal vermeld staat.", "note": "Na « Voor alle vragen, » volgt een gebiedende wijs; dat leest stroef en wijkt af van « u ».", "contains": "schrijf naar"}
+]

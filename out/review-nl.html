@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vidimus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* HQ palettes: Forest (default) and Marine. Dark only, as in Headquarters. */
+:root{
+  color-scheme:dark;
+  --ground:#101613; --card:#18211C; --soft:#1D2922; --soft-2:#18211C;
+  --ink:#E6EEE8; --ink-2:#B7C7BC; --muted:#8A9C90;
+  --line:#27332B; --line-soft:#1F2A23;
+  --green:#6FBF8F; --green-deep:#A7DBBB; --green-soft:#172E22; --on-green:#0E1611;
+  --amber:#D9A741; --amber-soft:#2E2510;
+  --red:#E08A84; --red-soft:#2F1918;
+  --idle:#8A9C90; --idle-soft:#1F2A23;
+  --r:20px; --r-sm:12px;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.8);
+  --gap:16px; --gap-lg:30px; --micro:12px;
+  --sans:'Instrument Sans',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+:root[data-theme="marine"]{
+  --ground:#0B1626; --card:#122238; --soft:#182D48; --soft-2:#122238;
+  --ink:#E9EFF7; --ink-2:#BCC9DC; --muted:#8A9DB8;
+  --line:#24395A; --line-soft:#1B2E4A;
+  --green:#8FC5F2; --green-deep:#B9DDF9; --green-soft:#15324D; --on-green:#081522;
+  --amber:#E2B457; --amber-soft:#33290F;
+  --red:#E89A93; --red-soft:#3A1E22;
+  --idle:#8A9DB8; --idle-soft:#1B2E4A;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 30px -18px rgba(0,0,0,.85);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;
+  line-height:1.5;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;overflow:hidden}
+a{color:var(--green)}
+:focus-visible{outline:2px solid var(--green);outline-offset:3px;border-radius:6px}
+
+/* ---------- top bar ---------- */
+.topbar{background:color-mix(in srgb, var(--ground) 90%, transparent);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line-soft);flex:none;padding:12px 24px}
+.topline{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;align-items:flex-start;gap:1px;margin-right:6px}
+.brand b{font-size:17px;font-weight:600;letter-spacing:-.02em}
+.brand i{font-family:var(--mono);font-size:var(--micro);font-style:normal;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted)}
+.spacer{flex:1}
+nav.pills{display:flex;gap:2px;background:var(--card);border:1px solid var(--line);
+  border-radius:999px;padding:4px;max-width:100%;overflow-x:auto;scrollbar-width:none}
+nav.pills::-webkit-scrollbar{display:none}
+nav.pills button{font:inherit;font-size:13.5px;color:var(--ink-2);background:none;border:0;
+  border-radius:999px;padding:7px 15px;cursor:pointer;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:7px}
+nav.pills button:hover{color:var(--ink)}
+nav.pills button[aria-current="true"]{background:var(--green);color:var(--on-green)}
+nav.pills button .n{font-family:var(--mono);font-size:var(--micro);opacity:.7}
+.chip-btn{display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:13px;
+  color:var(--ink-2);background:var(--card);border:1px solid var(--line);border-radius:999px;
+  padding:7px 14px;cursor:pointer;white-space:nowrap}
+.chip-btn:hover{border-color:var(--green);color:var(--green)}
+.chip-btn[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:var(--on-green)}
+.chip-btn.cat[aria-pressed="true"]{background:var(--card);border-color:var(--line);color:var(--ink-2)}
+.chip-btn.cat[aria-pressed="true"]:hover{border-color:var(--green);color:var(--green)}
+.chip-btn.cat[aria-pressed="false"]{opacity:.4;background:transparent}
+.chip-btn.cat[aria-pressed="false"] .dot7{background:var(--muted) !important}
+.chip-btn .n{font-family:var(--mono);font-size:var(--micro);opacity:.75}
+.counter{font-family:var(--mono);font-size:var(--micro);letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.btn{font:inherit;font-family:var(--sans);letter-spacing:normal;text-transform:none;font-size:13px;
+  border-radius:999px;padding:7px 15px;cursor:pointer;background:transparent;
+  border:1px solid var(--line);color:var(--ink-2)}
+.btn:hover{border-color:var(--muted);color:var(--ink)}
+.btn.primary{background:var(--green);border-color:var(--green);color:var(--on-green)}
+.btn.primary:hover{background:var(--green-deep)}
+.btn.small{font-size:12.5px;padding:5px 12px}
+.icon-btn{width:30px;height:30px;border-radius:50%;flex:none;border:1px solid var(--line);
+  background:none;color:inherit;cursor:pointer;font-size:13px;display:grid;place-items:center}
+.icon-btn:hover{border-color:var(--green)}
+.subline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.rule{width:1px;height:20px;background:var(--line);margin:0 4px}
+.dot7{width:7px;height:7px;border-radius:50%;flex:none}
+
+/* ---------- layout ---------- */
+main{flex:1;display:flex;min-height:0}
+#leftcol{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
+#doc{flex:1;overflow-y:auto;padding:0 0 40vh}
+#resizer{width:7px;flex:none;cursor:col-resize;background:var(--line-soft);
+  border-left:1px solid var(--line-soft);border-right:1px solid var(--line-soft)}
+#resizer:hover,#resizer.on{background:var(--green)}
+aside{width:var(--aside,560px);flex:none;background:var(--ground);
+  overflow-y:auto;padding:0 0 40vh;min-width:0}
+.hidden{display:none !important}
+
+/* the switch now sits directly above what it switches */
+.lefthead{padding:11px 24px;border-bottom:1px solid var(--line-soft);display:flex;
+  align-items:center;gap:10px;flex-wrap:wrap;flex:none}
+
+/* ---------- document ---------- */
+.pagehead{position:sticky;top:0;z-index:5;background:var(--ground);padding:16px 24px 12px;
+  border-bottom:1px solid var(--line-soft);font-family:var(--mono);font-size:var(--micro);
+  letter-spacing:.13em;text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.lk{font-family:var(--mono);font-size:var(--micro);text-decoration:none;color:var(--green);
+  background:var(--green-soft);border-radius:8px;padding:5px 10px;letter-spacing:.04em}
+.lk:hover{background:var(--green);color:var(--on-green)}
+.blk{display:grid;grid-template-columns:30px minmax(0,1fr) minmax(0,1fr);gap:0 22px;
+  padding:9px 24px;border-radius:var(--r-sm);scroll-margin-top:64px}
+.blk:hover{background:var(--soft-2)}
+.blk.sel{background:var(--card);box-shadow:inset 0 0 0 1px var(--green)}
+.gutter{display:flex;align-items:flex-start;padding-top:2px}
+.pin{width:20px;height:20px;border-radius:50%;border:0;color:var(--on-green);
+  font-family:var(--mono);font-size:10.5px;font-weight:500;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;background:var(--green)}
+.pin.s-high{background:var(--red);color:#2F1918}
+.pin.s-medium{background:var(--amber);color:#2E2510}
+.pin.s-low{background:var(--idle);color:var(--ground)}
+.pin:hover{transform:scale(1.15)}
+.pin.done{opacity:.3}
+.tx{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.5}
+.tx.fr{color:var(--muted)}
+.tx.nl{color:var(--ink-2)}
+.blk.sel .tx.nl{color:var(--ink)}
+.tx.fixed{color:var(--green)}
+.h1 .tx{font-size:21px;font-weight:600;letter-spacing:-.025em}
+.h2 .tx{font-size:17.5px;font-weight:600;letter-spacing:-.02em}
+.h3 .tx{font-size:15.5px;font-weight:600;letter-spacing:-.015em}
+.h4 .tx{font-size:14.5px;font-weight:500}
+
+/* ---------- sidebar ---------- */
+.sbhead{position:sticky;top:0;background:var(--ground);z-index:4;padding:16px 20px 12px;
+  border-bottom:1px solid var(--line-soft);font-family:var(--mono);font-size:var(--micro);
+  letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.wrapcards{padding:var(--gap) 16px;display:grid;gap:var(--gap)}
+.card{background:var(--card);border:1px solid var(--line-soft);border-radius:var(--r);
+  padding:20px 22px;cursor:pointer;transition:border-color .12s,transform .12s;scroll-margin-top:60px}
+.card:hover{border-color:var(--green);transform:translateY(-1px)}
+.card.sel{border-color:var(--green);box-shadow:var(--shadow)}
+.card.approved{border-color:var(--green-deep);background:var(--green-soft)}
+.card.rejected{opacity:.4}
+.ctop{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.num{font-family:var(--mono);font-size:var(--micro);border-radius:999px;padding:3px 9px;flex:none}
+.tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:var(--micro);
+  letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.t-untranslated{color:var(--red);background:var(--red-soft)}
+.t-grammar{color:var(--amber);background:var(--amber-soft)}
+.t-meaning{color:var(--green);background:var(--green-soft)}
+.t-register{color:var(--idle);background:var(--idle-soft)}
+.t-style{color:var(--ink-2);background:var(--soft)}
+.src{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;
+  border:1px solid var(--line);color:var(--muted)}
+.src.on{border-color:var(--green);color:var(--green)}
+.variant{margin-top:8px;border:1px solid var(--line-soft);border-radius:var(--r-sm);overflow:hidden}
+.variant > button{display:block;width:100%;text-align:left;font:inherit;font-size:13.5px;
+  transition:background .25s;
+  line-height:1.55;padding:10px 13px;background:var(--soft-2);color:var(--ink-2);
+  border:0;border-top:1px solid var(--line-soft);cursor:pointer}
+.variant > button:first-child{border-top:0}
+.variant > button:hover{background:var(--card);color:var(--ink)}
+.variant .vh{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);display:block;margin-bottom:4px}
+.whyqa{font-size:13px;color:var(--ink-2);margin-top:10px;line-height:1.55;
+  border-left:2px solid var(--green-soft);padding-left:11px}
+.t-pdf{color:var(--muted);background:transparent;border:1px dashed var(--line)}
+.loc{font-family:var(--mono);font-size:var(--micro);color:var(--muted);margin-left:auto}
+.ctitle{font-size:16.5px;font-weight:600;letter-spacing:-.015em;line-height:1.35;margin-bottom:14px}
+.label{font-family:var(--mono);font-size:var(--micro);letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);margin:12px 0 6px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.label .lk{letter-spacing:.04em;text-transform:none;padding:3px 8px;border:0}
+.box{background:var(--soft-2);border:1px solid var(--line-soft);border-radius:var(--r-sm);
+  padding:13px 15px;font-size:15px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.box.fr{color:var(--muted)}
+.card.copied{box-shadow:inset 0 0 0 1px var(--green)}
+.variant button.copied{background:var(--green-soft);border-color:var(--green)}
+textarea.text-input{display:block;width:100%;font:inherit;font-size:15px;line-height:1.6;
+  color:var(--ink);background:var(--soft-2);border:1px solid var(--green);border-radius:var(--r-sm);
+  padding:13px 15px;resize:vertical;min-height:92px;field-sizing:content}
+textarea.text-input:focus-visible{outline:none;border-color:var(--green-deep)}
+.note{font-size:14px;color:var(--ink-2);margin-top:14px;line-height:1.55}
+.lt{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-top:12px;
+  border-left:1px solid var(--line);padding-left:10px;line-height:1.6}
+.acts{display:flex;gap:8px;margin-top:14px}
+.acts .btn{flex:1;justify-content:center;text-align:center}
+.acts .btn.cp{flex:0 0 auto}
+.btn.yes[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:var(--on-green)}
+.btn.no[aria-pressed="true"]{background:var(--idle-soft);border-color:var(--idle);color:var(--ink)}
+.empty{padding:40px 20px;color:var(--muted);font-size:13.5px;text-align:center}
+
+/* ---------- PDF view ---------- */
+#pdfview{flex:1;display:flex;flex-direction:column;min-height:0}
+.pdfbar{padding:12px 24px;border-bottom:1px solid var(--line-soft);display:flex;
+  align-items:center;gap:10px;flex-wrap:wrap}
+.pdfpanes{flex:1;display:grid;grid-template-columns:repeat(var(--panes,2),minmax(0,1fr));
+  grid-auto-rows:minmax(0,1fr);gap:1px;background:var(--line-soft);min-height:0;overflow:hidden}
+/* min-height:0 matters: a grid/flex item defaults to min-height:auto and would
+   grow to its content, leaving the scroller full-height and unscrollable. */
+.pane{display:flex;flex-direction:column;background:var(--ground);
+  min-width:0;min-height:0;overflow:hidden}
+.panehead{padding:9px 14px;border-bottom:1px solid var(--line-soft);display:flex;
+  align-items:center;gap:10px;font-family:var(--mono);font-size:var(--micro);
+  letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.panehead select{font:inherit;font-family:var(--mono);font-size:var(--micro);color:var(--ink);
+  background:var(--soft-2);border:1px solid var(--line-soft);border-radius:8px;padding:5px 9px}
+.docframe{flex:1;width:100%;border:0;background:#fff;min-height:0}
+.pdfscroll{flex:1;overflow-y:auto;background:#2b2f2d;padding:12px;display:flex;
+  flex-direction:column;align-items:center;gap:12px;min-height:0}
+.pdfpage{background:#fff;box-shadow:var(--shadow);flex:none;position:relative}
+.hl{position:absolute;pointer-events:none;border-radius:3px;
+  background:rgba(217,167,65,.30);box-shadow:0 0 0 1.5px rgba(217,167,65,.95);
+  animation:hlin .35s ease-out}
+.hl.first::before{content:'';position:absolute;left:-19px;top:50%;width:11px;height:11px;
+  margin-top:-5.5px;border-radius:50%;background:var(--amber);
+  box-shadow:0 0 0 3px rgba(217,167,65,.30)}
+@keyframes hlin{from{background:rgba(217,167,65,.75)}to{background:rgba(217,167,65,.30)}}
+.pdfmiss{font-family:var(--mono);font-size:var(--micro);color:var(--muted);
+  padding:6px 10px;border:1px dashed var(--line);border-radius:999px}
+.pageno{font-variant-numeric:tabular-nums}
+select.text-input{font:inherit;font-size:13px;color:var(--ink);background:var(--soft-2);
+  border:1px solid var(--line-soft);border-radius:999px;padding:7px 13px}
+
+/* ---------- change sets: was / wordt / voorstel ---------- */
+.blk.meta{margin-top:18px;border-top:1px solid var(--line-soft);border-radius:0;padding-top:16px}
+.blk.meta .tx{font-family:var(--mono);font-size:var(--micro);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);font-weight:500}
+.blk.sub{padding-top:2px;padding-bottom:2px}
+.blk.was .tx{color:var(--muted);font-size:13px}
+.blk.prop .tx.nl{color:var(--ink)}
+.blk.prop.ok .tx.nl{color:var(--green)}
+.rowlab{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:3px;white-space:normal}
+.rowlab b{font-weight:500;color:var(--ink-2)}
+.tx ins{text-decoration:none;background:var(--green-soft);color:var(--green-deep);
+  border-radius:3px;padding:0 2px}
+.tx del{color:var(--red);text-decoration:line-through;text-decoration-thickness:1px;opacity:.85}
+.tx .none{color:var(--muted);font-style:italic}
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(90px);
+  background:var(--card);color:var(--ink);border:1px solid var(--green);padding:12px 20px;
+  border-radius:999px;font-size:13.5px;transition:transform .22s;z-index:50;box-shadow:var(--shadow)}
+#toast.on{transform:translateX(-50%) translateY(0)}
+@media(max-width:1180px){aside{width:380px}.blk{grid-template-columns:26px minmax(0,1fr) minmax(0,1fr);gap:0 14px;padding:8px 16px}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topline">
+    <div class="brand"><b id="brandname">Vidimus</b><i id="brandline"></i></div>
+    <a class="lk" id="switch" href="#"></a>
+    <div class="spacer"></div>
+    <span class="counter" id="counter"></span>
+    <button class="icon-btn" id="theme" title="Forest / Marine">◐</button>
+    <button class="btn small" id="reset">Reset</button>
+    <button class="btn primary small" id="copy">Kopieer goedgekeurd</button>
+  </div>
+  <div class="subline" id="pagebar"></div>
+</div>
+
+<main>
+  <div id="leftcol">
+    <div class="lefthead">
+      <nav class="pills" id="modebar"></nav>
+      <div class="rule"></div>
+      <div id="lefttools"></div>
+    </div>
+    <div id="doc"></div>
+    <div id="pdfview" class="hidden"><div class="pdfpanes" id="panes"></div></div>
+  </div>
+  <div id="resizer" title="Sleep om de zijbalk breder te maken"></div>
+  <aside id="side">
+    <div class="sbhead" id="sbhead"></div>
+    <div class="subline" style="padding:10px 16px 0">
+      <button class="chip-btn" id="copypage">Kopieer deze pagina</button>
+      <button class="chip-btn" id="copyopen">Kopieer alleen open</button>
+    </div>
+    <div class="subline" id="filterbar" style="padding:0 16px"></div>
+    <div class="wrapcards" id="list"></div>
+  </aside>
+</main>
+<div id="toast"></div>
+
+<script id="payload" type="application/json">{"pages": [{"key": "home", "label": "Home", "fr_url": "http://127.0.0.1:8899/", "tgt_url": "http://127.0.0.1:8899/nl/", "blocks": [{"tag": "a", "fr": "Accueil", "tgt": "Home"}, {"tag": "a", "fr": "Règlement", "tgt": "Reglement"}, {"tag": "a", "fr": "Confidentialité", "tgt": "Privacy"}, {"tag": "h1", "fr": "Bienvenue à la bibliothèque du quartier", "tgt": "Welkom in de buurtbibliotheek"}, {"tag": "p", "fr": "Ouverte du mardi au samedi, de 10 h à 18 h.", "tgt": "Open van dinsdag tot zaterdag, van 10 tot 18 uur."}, {"tag": "h2", "fr": "Emprunter un livre", "tgt": "Emprunter un livre"}, {"tag": "p", "fr": "Chaque membre peut emprunter jusqu'à cinq documents pour une durée de 14 jours.", "tgt": "Elk lid kan tot vijf documenten lenen voor een periode van 14 weken."}, {"tag": "p", "fr": "L'inscription est gratuite pour les moins de 18 ans.", "tgt": "Inschrijving is gratis voor jongeren onder 18 jaar."}, {"tag": "h2", "fr": "Nos services", "tgt": "Onze diensten"}, {"tag": "li", "fr": "Prêt de livres, de BD et de films", "tgt": "Uitlening van boeken, strips en films"}, {"tag": "li", "fr": "Accès gratuit à Internet", "tgt": "Gratis toegang tot het internet"}, {"tag": "li", "fr": "Ateliers de lecture pour enfants", "tgt": "Leesateliers voor kinderen"}, {"tag": "button", "fr": "Devenir membre", "tgt": "Lid worden"}, {"tag": "p", "fr": "Document fictif, créé pour une démonstration.", "tgt": "Fictief document, gemaakt voor een demonstratie."}]}, {"key": "rules", "label": "Reglement", "fr_url": "http://127.0.0.1:8899/reglement/", "tgt_url": "http://127.0.0.1:8899/nl/reglement/", "blocks": [{"tag": "a", "fr": "Accueil", "tgt": "Home"}, {"tag": "a", "fr": "Règlement", "tgt": "Reglement"}, {"tag": "a", "fr": "Confidentialité", "tgt": "Privacy"}, {"tag": "h1", "fr": "Règlement d'utilisation", "tgt": "Gebruiksreglement"}, {"tag": "h2", "fr": "Article 1 — Inscription", "tgt": "Artikel 1 — Inschrijving"}, {"tag": "p", "fr": "Toute personne peut s'inscrire sur présentation d'une pièce d'identité.", "tgt": "Iedereen kan zich inschrijven op vertoon van een identiteitsbewijs."}, {"tag": "p", "fr": "La carte de membre est personnelle et ne peut être prêtée.", "tgt": "De lidkaart is persoonlijk en mag niet worden uitgeleend."}, {"tag": "h2", "fr": "Article 2 — Prêt et retour", "tgt": "Artikel 2 — Ontlening en terugbrenging"}, {"tag": "p", "fr": "Les documents doivent être rendus à la date indiquée sur le ticket de prêt.", "tgt": "De documenten moeten worden teruggebracht op de datum vermeld op het ticket de prêt."}, {"tag": "p", "fr": "Un prêt peut être prolongé une fois, sauf si le document est réservé.", "tgt": "Een uitlening kan eenmaal worden verlengd, tenzij het document gereserveerd is."}, {"tag": "h2", "fr": "Article 3 — Retards", "tgt": "Artikel 3 — Vertragingen"}, {"tag": "p", "fr": "En cas de retard, un rappel est envoyé par courriel. Aucune amende n'est appliquée.", "tgt": "Bij vertraging wordt een herinnering per e-mail gestuurd. Er wordt geen boete aangerekend."}, {"tag": "p", "fr": "Les documents perdus ou abîmés sont remplacés aux frais du membre.", "tgt": "Verloren of beschadigde documenten worden vervangen op kosten van het lid."}, {"tag": "h2", "fr": "Article 4 — Comportement", "tgt": "Artikel 4 — Gedrag"}, {"tag": "p", "fr": "Merci de respecter le calme des salles de lecture.", "tgt": "Gelieve de rust in de leeszalen te respecteren."}, {"tag": "p", "fr": "Les boissons sont autorisées uniquement dans l'espace café.", "tgt": "Dranken zijn enkel toegelaten in de cafetaria."}, {"tag": "p", "fr": "Vous pouvez poser vos questions à l'accueil.", "tgt": "Je kan je vragen stellen aan het onthaal."}, {"tag": "p", "fr": "Document fictif, créé pour une démonstration.", "tgt": "Fictief document, gemaakt voor een demonstratie."}]}, {"key": "privacy", "label": "Privacy", "fr_url": "http://127.0.0.1:8899/confidentialite/", "tgt_url": "http://127.0.0.1:8899/nl/confidentialite/", "blocks": [{"tag": "a", "fr": "Accueil", "tgt": "Home"}, {"tag": "a", "fr": "Règlement", "tgt": "Reglement"}, {"tag": "a", "fr": "Confidentialité", "tgt": "Privacy"}, {"tag": "h1", "fr": "Politique de confidentialité", "tgt": "Privacybeleid"}, {"tag": "p", "fr": "La bibliothèque traite vos données personnelles uniquement pour gérer votre inscription et vos prêts.", "tgt": "De bibliotheek verwerkt uw persoonsgegevens enkel om uw inschrijving en uw uitleningen te beheren."}, {"tag": "h2", "fr": "Quelles données ?", "tgt": "Welke gegevens?"}, {"tag": "li", "fr": "Nom, prénom et date de naissance", "tgt": "Naam, voornaam en geboortedatum"}, {"tag": "li", "fr": "Adresse e-mail, pour les rappels", "tgt": "E-mailadres, voor de herinneringen"}, {"tag": "li", "fr": "Historique des prêts des 12 derniers mois", "tgt": "Ontleengeschiedenis van de laatste 12 maanden"}, {"tag": "h2", "fr": "Durée de conservation", "tgt": "Bewaartermijn"}, {"tag": "p", "fr": "Vos données sont supprimées deux ans après la fin de votre inscription.", "tgt": "Uw gegevens worden verwijderd twee jaar na het einde van uw inschrijving."}, {"tag": "h2", "fr": "Vos droits", "tgt": "Uw rechten"}, {"tag": "p", "fr": "Vous pouvez demander l'accès, la rectification ou l'effacement de vos données à tout moment.", "tgt": "U kunt op elk moment inzage, verbetering of wissing van uw gegevens vragen."}, {"tag": "p", "fr": "Pour toute question, écrivez à l'adresse indiquée à l'accueil.", "tgt": "Voor alle vragen, schrijf naar het adres dat aan het onthaal vermeld staat."}, {"tag": "p", "fr": "Document fictif, créé pour une démonstration.", "tgt": "Fictief document, gemaakt voor een demonstratie."}]}], "findings": [{"n": 1, "id": "home#5", "page": "home", "index": 5, "tag": "h2", "fr": "Emprunter un livre", "nl": "Emprunter un livre", "category": "untranslated", "severity": "high", "sources": ["claude", "lt", "qa"], "title": "Kop staat nog in het Frans", "mine": {"suggestion": "Een boek lenen", "note": "De tekst eronder is wel vertaald; alleen de kop is blijven staan.", "category": "untranslated", "lt": [], "pdf": "still"}, "others": [{"key": "lt", "name": "LanguageTool", "prio": "spelling", "why": "«Emprunter», «un», «livre»", "variants": []}, {"key": "qa", "name": "Localisatie-QA", "prio": "QA P0", "why": "Kop staat in het Frans op een verder Nederlandse pagina.", "variants": [["Localisatie-QA A", "Een boek ontlenen"], ["Localisatie-QA B", "Boeken lenen"]]}], "filter": "", "suggestion": "Een boek lenen", "tgt": "Emprunter un livre"}, {"n": 2, "id": "home#6", "page": "home", "index": 6, "tag": "p", "fr": "Chaque membre peut emprunter jusqu'à cinq documents pour une durée de 14 jours.", "nl": "Elk lid kan tot vijf documenten lenen voor een periode van 14 weken.", "category": "meaning", "severity": "high", "sources": ["claude", "qa"], "title": "14 dagen is 14 weken geworden", "mine": {"suggestion": "Elk lid kan tot vijf documenten lenen voor een periode van 14 dagen.", "note": "Het Frans zegt « 14 jours »; zo staat het ook in het reglement.", "category": "meaning", "lt": [], "pdf": "still"}, "others": [{"key": "qa", "name": "Localisatie-QA", "prio": "QA P0", "why": "Uitleentermijn klopt niet met de bron (14 jours). Inhoudelijke fout in een regel die leden volgen.", "variants": []}], "filter": "", "suggestion": "Elk lid kan tot vijf documenten lenen voor een periode van 14 dagen.", "tgt": "Elk lid kan tot vijf documenten lenen voor een periode van 14 weken."}, {"n": 3, "id": "rules#7", "page": "rules", "index": 7, "tag": "h2", "fr": "Article 2 — Prêt et retour", "nl": "Artikel 2 — Ontlening en terugbrenging", "category": "style", "severity": "low", "sources": ["claude"], "title": "Twee woorden voor hetzelfde: ontlening en uitlening", "mine": {"suggestion": "Artikel 2 — Uitlening en terugbrengen", "note": "De homepage en artikel 2 zelf zeggen « uitlening ». Eén term houdt het reglement eenduidig.", "category": "style", "lt": [], "pdf": "still"}, "others": [], "filter": "", "suggestion": "Artikel 2 — Uitlening en terugbrengen", "tgt": "Artikel 2 — Ontlening en terugbrenging"}, {"n": 4, "id": "rules#8", "page": "rules", "index": 8, "tag": "p", "fr": "Les documents doivent être rendus à la date indiquée sur le ticket de prêt.", "nl": "De documenten moeten worden teruggebracht op de datum vermeld op het ticket de prêt.", "category": "untranslated", "severity": "high", "sources": ["claude", "lt", "qa"], "title": "Franse woorden midden in de zin", "mine": {"suggestion": "De documenten moeten worden teruggebracht op de datum die op het uitleenbewijs staat.", "note": "« ticket de prêt » is niet vertaald.", "category": "untranslated", "lt": [], "pdf": "still"}, "others": [{"key": "lt", "name": "LanguageTool", "prio": "spelling", "why": "«prêt»", "variants": []}, {"key": "qa", "name": "Localisatie-QA", "prio": "QA P0", "why": "Franse term midden in de zin.", "variants": [["Localisatie-QA A", "De documenten moeten worden teruggebracht op de datum vermeld op het uitleenticket."], ["Localisatie-QA B", "Breng de documenten terug op de datum op je uitleenbon."]]}], "filter": "", "suggestion": "De documenten moeten worden teruggebracht op de datum die op het uitleenbewijs staat.", "tgt": "De documenten moeten worden teruggebracht op de datum vermeld op het ticket de prêt."}, {"n": 5, "id": "rules#10", "page": "rules", "index": 10, "tag": "h2", "fr": "Article 3 — Retards", "nl": "Artikel 3 — Vertragingen", "category": "register", "severity": "medium", "sources": ["qa"], "title": "« Vertraging » leest als uitstel; het artikel gaat over te laat terugbrengen", "mine": null, "others": [{"key": "qa", "name": "Localisatie-QA", "prio": "QA P1", "why": "« Vertraging » leest als uitstel; het artikel gaat over te laat terugbrengen.", "variants": [["Localisatie-QA B", "Artikel 3 — Te laat terugbrengen"]]}], "filter": "", "suggestion": "Artikel 3 — Laattijdige teruggave", "tgt": "Artikel 3 — Vertragingen"}, {"n": 6, "id": "rules#16", "page": "rules", "index": 16, "tag": "p", "fr": "Vous pouvez poser vos questions à l'accueil.", "nl": "Je kan je vragen stellen aan het onthaal.", "category": "register", "severity": "medium", "sources": ["claude", "lt", "qa"], "title": "« je » waar de rest van de site « u » zegt", "mine": {"suggestion": "U kunt uw vragen stellen aan het onthaal.", "note": "Het Frans zegt « vous »; elke andere zin spreekt de lezer met « u » aan.", "category": "register", "lt": [], "pdf": "still"}, "others": [{"key": "lt", "name": "LanguageTool", "prio": "stijl", "why": "Velen vinden dat “kun” netter is als ‘je’ het onderwerp is. ‘Kan’ mag echter ook («kan»)", "variants": []}, {"key": "qa", "name": "Localisatie-QA", "prio": "QA P1", "why": "Wisselt naar « je »; de rest van het reglement gebruikt « u ».", "variants": []}], "filter": "", "suggestion": "U kunt uw vragen stellen aan het onthaal.", "tgt": "Je kan je vragen stellen aan het onthaal."}, {"n": 7, "id": "privacy#8", "page": "privacy", "index": 8, "tag": "li", "fr": "Historique des prêts des 12 derniers mois", "nl": "Ontleengeschiedenis van de laatste 12 maanden", "category": "grammar", "severity": "medium", "sources": ["lt"], "title": "Er is een mogelijke spelfout gevonden", "mine": null, "others": [{"key": "lt", "name": "LanguageTool", "prio": "spelling", "why": "«Ontleengeschiedenis»", "variants": []}], "filter": "", "suggestion": "Ontleengeschiedenis van de laatste 12 maanden", "tgt": "Ontleengeschiedenis van de laatste 12 maanden"}, {"n": 8, "id": "privacy#10", "page": "privacy", "index": 10, "tag": "p", "fr": "Vos données sont supprimées deux ans après la fin de votre inscription.", "nl": "Uw gegevens worden verwijderd twee jaar na het einde van uw inschrijving.", "category": "style", "severity": "low", "sources": ["qa"], "title": "Woordvolgorde volgt het Frans; in het Nederlands staat het voltooid deelwoord achteraan", "mine": null, "others": [{"key": "qa", "name": "Localisatie-QA", "prio": "QA P2", "why": "Woordvolgorde volgt het Frans; in het Nederlands staat het voltooid deelwoord achteraan.", "variants": []}], "filter": "", "suggestion": "Uw gegevens worden twee jaar na het einde van uw inschrijving verwijderd.", "tgt": "Uw gegevens worden verwijderd twee jaar na het einde van uw inschrijving."}, {"n": 9, "id": "privacy#13", "page": "privacy", "index": 13, "tag": "p", "fr": "Pour toute question, écrivez à l'adresse indiquée à l'accueil.", "nl": "Voor alle vragen, schrijf naar het adres dat aan het onthaal vermeld staat.", "category": "grammar", "severity": "medium", "sources": ["claude"], "title": "Hoofdzin zonder onderwerp", "mine": {"suggestion": "Voor vragen kunt u schrijven naar het adres dat aan het onthaal vermeld staat.", "note": "Na « Voor alle vragen, » volgt een gebiedende wijs; dat leest stroef en wijkt af van « u ».", "category": "grammar", "lt": [], "pdf": "still"}, "others": [], "filter": "", "suggestion": "Voor vragen kunt u schrijven naar het adres dat aan het onthaal vermeld staat.", "tgt": "Voor alle vragen, schrijf naar het adres dat aan het onthaal vermeld staat."}], "pdfs": [{"key": "nl", "label": "Nederlands", "file": "pdf/nl.pdf", "pages": 3, "starts": {"home": 1, "rules": 2, "privacy": 3}}, {"key": "en", "label": "Engels", "file": "pdf/en.pdf", "pages": 3, "starts": {"home": 1, "rules": 2, "privacy": 3}}, {"key": "fr", "label": "Frans (bron)", "file": "pdf/fr.pdf", "pages": 3, "starts": {"home": 1, "rules": 2, "privacy": 3}}], "project": {"name": "Bibliothèque du Quartier Nord", "short": "Quartier Nord", "version": "sample"}, "target": {"code": "nl", "short": "NL", "name": "Nederlands", "store": "vidimus-quartier-nord-nl-v1", "docKey": "vidimus-doc-nl", "panesKey": "vidimus-panes-nl", "panes": ["nl", "en", "fr"], "checked": "gecontroleerd tegen de NL-PDF", "switch": {"label": "EN-nalezing ↗", "href": "review-en.html"}, "title": null}, "sources": [{"key": "claude", "name": "Reviewer", "short": "Reviewer"}, {"key": "lt", "name": "LanguageTool", "short": "LanguageTool"}, {"key": "qa", "name": "Localisatie-QA", "short": "Localisatie-QA"}], "ltSkip": ["GEDACHTESTREEPJE", "OPTIONAL_HYPHEN"], "migrate": {"tag": "", "map": {}}}</script>
+<script>
+const D = JSON.parse(document.getElementById('payload').textContent);
+const PAGES = D.pages, FINDINGS = D.findings, PDFS = D.pdfs, T = D.target;
+const PROJ = D.project || {name: 'Vidimus', short: 'Vidimus', version: ''};
+document.getElementById('brandname').textContent = PROJ.short;
+document.title = PROJ.short + ' nalezing FR → ' + T.short;
+document.getElementById('brandline').textContent = (T.title ? T.title + ' · FR → ' + T.short : 'Nalezing FR → ' + T.short + ' · ' + D.sources.length + ' bronnen');
+if (T.title) document.title = PROJ.short + ' ' + T.title + ' ' + T.short;
+document.getElementById('switch').onclick = e => {
+  e.preventDefault(); location.href = T.switch.href + '#' + page;
+};
+document.getElementById('switch').href = T.switch.href;
+document.getElementById('switch').textContent = T.switch.label;
+const CATS = {untranslated:'Onvertaald', grammar:'Grammatica', meaning:'Betekenis',
+              register:'Register', style:'Stijl'};
+const SRCS = Object.fromEntries(D.sources.map(s => [s.key, s.name]));
+const SRC_KEYS = D.sources.map(s => s.key);
+const SEVS = {high:'hoog', medium:'midden', low:'laag'};
+const KEY = T.store;
+const byId = Object.fromEntries(FINDINGS.map(f => [f.id, f]));
+
+let state = load(), page = 'home', sel = null, mode = 'review';
+let catOn = new Set(Object.keys(CATS)), statusOn = 'all', onlyFlagged = false;
+let srcOn = 'all';   // all | claude | qa | both
+let autoCopy = true;
+try { autoCopy = localStorage.getItem('vidimus-autocopy') !== 'off'; } catch(e){}
+function setAutoCopy(v){
+  autoCopy = v;
+  try { localStorage.setItem('vidimus-autocopy', v ? 'on' : 'off'); } catch(e){}
+}
+/* One clipboard path for the whole page, so every copy behaves the same and
+   a blocked clipboard degrades to selecting the text instead of failing mute. */
+function copy(text, label, el){
+  if (!text) return;
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      toast(label + ' gekopieerd');
+      if (el){ el.classList.add('copied'); setTimeout(() => el.classList.remove('copied'), 450); }
+    })
+    .catch(() => {
+      if (el){ const r = document.createRange(); r.selectNodeContents(el);
+               const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+      toast('Kon niet kopiëren, tekst is geselecteerd');
+    });
+}
+
+/* Saved reviews are keyed by block id. When a rescrape inserts blocks (a
+   form's dropdown options, say) the ids after them shift, so a saved review is
+   moved to its new id once, all keys in one pass so no two moves collide. */
+function load(){
+  let s;
+  try { s = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ s = {}; }
+  const M = D.migrate;
+  if (M && M.tag){
+    const flag = KEY + ':' + M.tag;
+    let done = false;
+    try { done = localStorage.getItem(flag) === '1'; } catch(e){}
+    if (!done){
+      const out = {};
+      for (const [k, v] of Object.entries(s)) out[M.map[k] || k] = v;
+      s = out;
+      try { localStorage.setItem(KEY, JSON.stringify(s)); localStorage.setItem(flag, '1'); } catch(e){}
+    }
+  }
+  return s;
+}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+function st(id){ return state[id] || {status:'pending', text:byId[id].suggestion}; }
+function setSt(id, patch){ state[id] = Object.assign({}, st(id), patch); save(); render(); }
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'), 2000); }
+
+function visible(f){
+  if (f.page !== page || !catOn.has(f.category)) return false;
+  if (srcOn === 'both'  && f.sources.length < 2) return false;
+  if (srcOn !== 'all' && srcOn !== 'both' && !f.sources.includes(srcOn)) return false;
+  const s = st(f.id).status;
+  return statusOn === 'all' || s === statusOn;
+}
+
+/* ---------------- bars ---------------- */
+function bars(){
+  const mb = document.getElementById('modebar'); mb.innerHTML = '';
+  for (const [k,label] of [['review','Nalezing'],['pdf','PDF naast elkaar']]){
+    const b = document.createElement('button');
+    b.textContent = label;
+    b.setAttribute('aria-current', mode===k ? 'true':'false');
+    b.onclick = () => { mode = k; render(); };
+    mb.appendChild(b);
+  }
+  const reviewing = mode === 'review';
+  document.getElementById('doc').classList.toggle('hidden', !reviewing);
+  document.getElementById('pdfview').classList.toggle('hidden', reviewing);
+
+  // tools that belong to the current left pane
+  const lt = document.getElementById('lefttools'); lt.innerHTML = '';
+  lt.style.cssText = 'display:flex;align-items:center;gap:10px;flex-wrap:wrap';
+  if (reviewing){
+    const of_ = document.createElement('button');
+    of_.className = 'chip-btn'; of_.setAttribute('aria-pressed', onlyFlagged ? 'true':'false');
+    of_.textContent = 'Alleen gemarkeerd';
+    of_.onclick = () => { onlyFlagged = !onlyFlagged; render(); };
+    lt.appendChild(of_);
+    const p = PAGES.find(x => x.key === page);
+    if (p.fr_url) lt.insertAdjacentHTML('beforeend',
+      `<a class="lk" href="${p.fr_url}" target="_blank" rel="noopener">FR \u2197</a>
+       <a class="lk" href="${p.tgt_url}" target="_blank" rel="noopener">${T.short} \u2197</a>`);
+  } else {
+    for (const n of [2,3]){
+      const b = document.createElement('button');
+      b.className = 'chip-btn'; b.setAttribute('aria-pressed', paneCount===n ? 'true':'false');
+      b.textContent = n + ' panelen';
+      b.onclick = () => { paneCount = n; savePanes(); render(); };
+      lt.appendChild(b);
+    }
+    const link = document.createElement('button');
+    link.className = 'chip-btn'; link.setAttribute('aria-pressed', linked ? 'true':'false');
+    link.textContent = linked ? 'Gekoppeld scrollen' : 'Los scrollen';
+    link.onclick = () => { linked = !linked; savePanes(); render(); };
+    lt.appendChild(link);
+    for (const [lbl, z] of [['−', -0.15], ['+', 0.15]]){
+      const b = document.createElement('button');
+      b.className = 'chip-btn'; b.textContent = lbl;
+      b.onclick = () => { zoom = Math.max(0.5, Math.min(2.5, zoom + z));
+                          savePanes(); builtAs = ''; pdfview(); };
+      lt.appendChild(b);
+    }
+    lt.insertAdjacentHTML('beforeend',
+      `<a class="lk" href="${docUrl()}" target="_blank" rel="noopener">Doc openen \u2197</a>`);
+  }
+
+  // page pills drive both the document and which PDF page the panes show
+  const pb = document.getElementById('pagebar'); pb.innerHTML = '';
+  const nav = document.createElement('nav'); nav.className = 'pills';
+  for (const p of PAGES){
+    const open = FINDINGS.filter(f => f.page===p.key && st(f.id).status==='pending').length;
+    const tot  = FINDINGS.filter(f => f.page===p.key).length;
+    const b = document.createElement('button');
+    b.innerHTML = esc(p.label) + ` <span class="n">${open}/${tot}</span>`;
+    b.setAttribute('aria-current', p.key===page ? 'true':'false');
+    b.onclick = () => { page = p.key; sel = null;
+                        try { history.replaceState(null, '', '#' + p.key); } catch(e){}
+                        render();
+                        document.getElementById('doc').scrollTop = 0; };
+    nav.appendChild(b);
+  }
+  pb.appendChild(nav);
+
+  const fb = document.getElementById('filterbar'); fb.innerHTML = '';
+  for (const [k,label] of Object.entries(CATS)){
+    const n = FINDINGS.filter(f => f.page===page && f.category===k).length;
+    const b = document.createElement('button');
+    b.className = 'chip-btn cat'; b.setAttribute('aria-pressed', catOn.has(k) ? 'true':'false');
+    b.innerHTML = `<span class="dot7" style="background:var(--${k==='untranslated'?'red':k==='grammar'?'amber':k==='meaning'?'green':k==='register'?'idle':'ink-2'})"></span>${label} <span class="n">${n}</span>`;
+    b.onclick = () => { catOn.has(k) ? catOn.delete(k) : catOn.add(k); render(); };
+    fb.appendChild(b);
+  }
+  fb.appendChild(Object.assign(document.createElement('div'), {className:'rule'}));
+  for (const [k,label] of [['all', D.sources.length > 2 ? 'Alle bronnen' : 'Beide bronnen']].concat(D.sources.map(s => [s.key, s.short]), [['both','Waar ze samenvallen']])){
+    const n = FINDINGS.filter(f => f.page===page && (
+      k==='all' ? true : k==='both' ? f.sources.length>=2 : f.sources.includes(k))).length;
+    const b = document.createElement('button');
+    b.className = 'chip-btn'; b.setAttribute('aria-pressed', srcOn===k ? 'true':'false');
+    b.innerHTML = `${label} <span class="n">${n}</span>`;
+    b.onclick = () => { srcOn = k; render(); };
+    fb.appendChild(b);
+  }
+  fb.appendChild(Object.assign(document.createElement('div'), {className:'rule'}));
+  for (const [k,label] of [['all','Alle'],['pending','Open'],['approved','Akkoord'],['rejected','Afgewezen']]){
+    const b = document.createElement('button');
+    b.className = 'chip-btn'; b.setAttribute('aria-pressed', statusOn===k ? 'true':'false');
+    b.textContent = label;
+    b.onclick = () => { statusOn = k; render(); };
+    fb.appendChild(b);
+  }
+
+  const done = FINDINGS.filter(f => st(f.id).status!=='pending').length;
+  const ok   = FINDINGS.filter(f => st(f.id).status==='approved').length;
+  document.getElementById('counter').textContent = `${done}/${FINDINGS.length} behandeld · ${ok} akkoord`;
+}
+
+/* ---------------- document ---------------- */
+/* ---------- word diff ----------
+   Longest common subsequence over words and the spaces between them, so a
+   change reads as struck-through old words and highlighted new ones. */
+function toks(s){ return String(s || '').split(/(\s+)/).filter(x => x !== ''); }
+function wdiff(a, b){
+  const A = toks(a), B = toks(b), n = A.length, m = B.length;
+  const L = Array.from({length: n + 1}, () => new Uint16Array(m + 1));
+  for (let i = n - 1; i >= 0; i--)
+    for (let j = m - 1; j >= 0; j--)
+      L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const out = []; let i = 0, j = 0;
+  while (i < n && j < m){
+    if (A[i] === B[j]){ out.push(['=', A[i]]); i++; j++; }
+    else if (L[i + 1][j] >= L[i][j + 1]) out.push(['-', A[i++]]);
+    else out.push(['+', B[j++]]);
+  }
+  while (i < n) out.push(['-', A[i++]]);
+  while (j < m) out.push(['+', B[j++]]);
+  return out;
+}
+/* mode 'del': show a, strike what b dropped. 'ins': show b, mark what it added.
+   'both': show the edit from a to b in one line. */
+function diffHTML(a, b, mode){
+  const html = wdiff(a, b).map(([op, t]) => {
+    const space = /^\s+$/.test(t);
+    if (op === '=') return esc(t);
+    if (op === '-') return mode === 'ins' ? '' : space ? ' ' : `<del>${esc(t)}</del>`;
+    return mode === 'del' ? '' : space ? ' ' : `<ins>${esc(t)}</ins>`;
+  }).join('');
+  return html.replace(/ {2,}/g, ' ');
+}
+function countEdits(a, b){ return wdiff(a, b).filter(([op, t]) => op !== '=' && /\S/.test(t)).length; }
+
+/* The third row of a change: what we propose, measured against the author's text.
+   It follows the card live: editing the box or picking a variant redraws it. */
+function propHTML(b, f){
+  if (!f) return {cls: 'ok', lab: 'Voorstel · <b>geen opmerking</b>',
+                  html: '<span class="none">Kan zo, zoals voorgesteld.</span>'};
+  const s = st(f.id);
+  const txt = s.text || '';
+  if (s.status === 'rejected')
+    return {cls: '', lab: 'Voorstel · <b>afgewezen</b>, de voorgestelde tekst blijft',
+            html: esc(b.tgt)};
+  const n = countEdits(b.tgt, txt);
+  const lab = (s.status === 'approved' ? 'Voorstel · <b>akkoord</b>' : 'Voorstel · <b>open</b>')
+            + ` · ${n} woord${n === 1 ? '' : 'en'} anders`;
+  return {cls: s.status === 'approved' ? 'ok' : '', lab, html: diffHTML(b.tgt, txt, 'both')};
+}
+function updateProp(id){
+  const f = byId[id], el = document.getElementById('prop-' + id.replace('#', '-'));
+  if (!f || !el) return;
+  const b = PAGES.find(p => p.key === f.page).blocks[f.index];
+  const r = propHTML(b, f);
+  el.className = 'blk sub prop ' + (b.tag || '') + ' ' + r.cls;
+  el.querySelector('.rowlab.tgt').innerHTML = r.lab;
+  el.querySelector('.tx.nl .body').innerHTML = r.html;
+}
+
+function subRow(cls, gutter, frLab, frHTML, tgLab, tgHTML, id){
+  const row = document.createElement('div');
+  row.className = 'blk sub ' + cls;
+  if (id) row.id = id;
+  row.innerHTML = `<div class="gutter">${gutter || ''}</div>
+    <div class="tx fr"><span class="rowlab">${frLab}</span><span class="body">${frHTML}</span></div>
+    <div class="tx nl"><span class="rowlab tgt">${tgLab}</span><span class="body">${tgHTML}</span></div>`;
+  return row;
+}
+
+function doc(){
+  const host = document.getElementById('doc'); host.innerHTML = '';
+  const p = PAGES.find(x => x.key === page);
+  const head = document.createElement('div');
+  head.className = 'pagehead';
+  head.innerHTML = `<span>${esc(p.label)}</span>
+    <span style="margin-left:auto">Frans · referentie &nbsp;|&nbsp; ${esc(T.name)} · te controleren</span>`;
+  host.appendChild(head);
+
+  p.blocks.forEach((b, i) => {
+    const f = byId[page + '#' + i];
+    const shown = f && visible(f);
+    if (b.meta){
+      // a change's heading: keep it whenever its change is shown
+      const nf = byId[page + '#' + (i + 1)];
+      if (onlyFlagged && !(nf && visible(nf))) return;
+      const row = document.createElement('div');
+      row.className = 'blk meta';
+      row.innerHTML = `<div class="gutter"></div><div class="tx fr">${esc(b.fr)}</div><div class="tx nl">${esc(b.tgt)}</div>`;
+      host.appendChild(row);
+      return;
+    }
+    if (onlyFlagged && !shown) return;
+    const change = b.old_tgt !== undefined;
+    if (change){
+      host.appendChild(subRow('was', '', 'Was', diffHTML(b.old_fr, b.fr, 'del'),
+                              'Was', diffHTML(b.old_tgt, b.tgt, 'del')));
+    }
+    const row = document.createElement('div');
+    row.className = 'blk ' + b.tag + (f && sel===f.id ? ' sel' : '');
+    row.id = 'b-' + page + '-' + i;
+    const g = document.createElement('div'); g.className = 'gutter';
+    if (shown){
+      const d = document.createElement('button');
+      d.className = 'pin s-' + f.severity + (st(f.id).status!=='pending' ? ' done' : '');
+      d.textContent = f.n; d.title = f.title;
+      d.onclick = e => { e.stopPropagation(); pick(f.id, 'doc'); };
+      g.appendChild(d);
+    }
+    row.appendChild(g);
+    const fr = document.createElement('div'); fr.className='tx fr';
+    const nl = document.createElement('div'); nl.className='tx nl';
+    const s = f ? st(f.id) : null;
+    if (change){
+      const nFr = countEdits(b.old_fr, b.fr), nTg = countEdits(b.old_tgt, b.tgt);
+      fr.innerHTML = `<span class="rowlab">Wordt · ${nFr} woord${nFr === 1 ? '' : 'en'} anders</span>`
+                   + diffHTML(b.old_fr, b.fr, 'ins');
+      nl.innerHTML = `<span class="rowlab">Wordt · ${nTg} woord${nTg === 1 ? '' : 'en'} anders</span>`
+                   + diffHTML(b.old_tgt, b.tgt, 'ins');
+    } else {
+      fr.textContent = b.fr;
+      if (s && s.status==='approved' && s.text){ nl.textContent = s.text; nl.classList.add('fixed'); }
+      else nl.textContent = b.tgt;
+    }
+    row.appendChild(fr); row.appendChild(nl);
+    if (shown) row.onclick = () => pick(f.id, 'doc');
+    host.appendChild(row);
+    if (change){
+      const r = propHTML(b, f);
+      const pr = subRow('prop ' + r.cls, '', 'Frans', '<span class="none">blijft zoals het is</span>',
+                        r.lab, r.html, 'prop-' + page + '-' + i);
+      if (shown) pr.onclick = () => pick(f.id, 'doc');
+      host.appendChild(pr);
+    }
+  });
+  if (!host.querySelector('.blk')) host.insertAdjacentHTML('beforeend','<div class="empty">Geen blokken met deze filters.</div>');
+}
+
+/* ---------------- sidebar ---------------- */
+function side(){
+  const list = document.getElementById('list'); list.innerHTML = '';
+  const fs = FINDINGS.filter(visible);
+  document.getElementById('sbhead').textContent =
+    `${fs.length} opmerking${fs.length===1?'':'en'} · ${PAGES.find(x=>x.key===page).label}`;
+  wireBatch(fs);
+  if (!fs.length){ list.innerHTML = '<div class="empty">Niets te tonen met deze filters.</div>'; return; }
+
+  const SKIP = D.ltSkip || [];
+  for (const f of fs){
+    const s = st(f.id);
+    const c = document.createElement('div');
+    c.className = 'card ' + s.status + (sel===f.id ? ' sel' : '');
+    c.id = 'c-' + f.id.replace('#','-');
+    const lt = ((f.mine && f.mine.lt) || []).filter(m => !SKIP.includes(m.rule))
+                 .map(m => `“${esc(m.frag)}”`).join(', ');
+    const sevColor = f.severity==='high'?'red':f.severity==='medium'?'amber':'idle';
+    const srcChips = SRC_KEYS.map(s =>
+      `<span class="src${f.sources.includes(s)?' on':''}">${SRCS[s]}</span>`).join('');
+    const variants = [];
+    if (f.mine) variants.push([SRCS.claude || 'Reviewer', f.mine.suggestion]);
+    for (const o of (f.others || [])) for (const v of o.variants) variants.push(v);
+    c.innerHTML = `
+      <div class="ctop">
+        <span class="num" style="background:var(--${sevColor}-soft);color:var(--${sevColor})">${f.n}</span>
+        <span class="tag t-${f.category}">${CATS[f.category]}</span>
+        ${(f.others || []).filter(o => o.prio).map(o => `<span class="tag t-pdf">${esc(o.prio)}</span>`).join('')}
+        ${f.mine && f.mine.pdf==='still' ? '<span class="tag t-pdf" title="Staat ook zo in de ${T.short}-PDF">in PDF</span>' : ''}
+        <span class="loc">${esc(f.id)}</span>
+      </div>
+      <div class="ctop" style="margin:-4px 0 10px">${srcChips}</div>
+      <div class="ctitle">${esc(f.title)}</div>
+      <div class="label">Frans (referentie)</div>
+      <div class="box fr">${esc(f.fr)}</div>
+      <div class="label">${esc(T.name)} nu</div>
+      <div class="box">${esc(f.tgt)}</div>
+      <div class="label">Voorstel (aanpasbaar)</div>
+      <textarea class="text-input" rows="3">${esc(s.text || '')}</textarea>
+      ${variants.length > 1 ? `<div class="variant">` + variants.map((v,i) =>
+        `<button data-v="${i}"><span class="vh">${esc(v[0])}</span>${esc(v[1])}</button>`).join('') + `</div>` : ''}
+      ${f.mine && f.mine.note ? `<div class="note">${esc(f.mine.note)}</div>` : ''}
+      ${(f.others || []).filter(o => o.why).map(o => `<div class="whyqa"><b>${esc(o.name)}:</b> ${esc(o.why)}</div>`).join('')}
+      ${f.filter ? `<div class="lt">Niet overgenomen: ${esc(f.filter)}</div>` : ''}
+      <div class="lt">Voor de klant: ${esc(brief(primaryReason(f)) || '(geen toelichting nodig)')}</div>
+      ${lt ? `<div class="lt">LanguageTool markeert hier ook: ${lt}</div>` : ''}
+      <div class="acts">
+        <button class="btn yes" aria-pressed="${s.status==='approved'}">Akkoord</button>
+        <button class="btn no"  aria-pressed="${s.status==='rejected'}">Afwijzen</button>
+        <button class="btn cp">Kopieer</button>
+      </div>`;
+    const ta = c.querySelector('textarea');
+    ta.oninput = () => { state[f.id] = Object.assign({}, st(f.id), {text: ta.value}); save(); updateProp(f.id); };
+    ta.onclick = e => e.stopPropagation();
+    c.querySelectorAll('.variant button').forEach(btn => {
+      btn.onclick = e => {
+        e.stopPropagation();
+        const [name, txt] = variants[+btn.dataset.v];
+        ta.value = txt;
+        state[f.id] = Object.assign({}, st(f.id), {text: txt}); save(); updateProp(f.id);
+        toast(name + ' overgenomen');
+      };
+    });
+    const copyText = () => {
+      // read the box, so an edit that has not been saved yet still copies
+      const saved = st(f.id).text;
+      state[f.id] = Object.assign({}, st(f.id), {text: ta.value});
+      const out = blockText(f);
+      state[f.id] = Object.assign({}, st(f.id), {text: saved});
+      return out;
+    };
+    c.querySelector('.cp').onclick = e => { e.stopPropagation(); copy(copyText(), 'Gekopieerd', c); };
+    const [yes, no] = c.querySelectorAll('.acts .btn');
+    yes.onclick = e => {
+      e.stopPropagation();
+      const now = s.status === 'approved' ? 'pending' : 'approved';
+      setSt(f.id, {status: now, text: ta.value});
+    };
+    no.onclick  = e => { e.stopPropagation(); setSt(f.id, {status: s.status==='rejected'?'pending':'rejected', text: ta.value}); };
+    c.onclick = () => pick(f.id, 'side');
+    list.appendChild(c);
+  }
+}
+
+/* A pasted comment has to stand on its own for whoever reads it in Drive:
+   what is wrong, what it should say, and why. In that order. */
+const TYPE_NL = {
+  untranslated: 'Niet vertaald',
+  grammar:      'Taalfout',
+  meaning:      'Betekenis wijkt af van het Frans',
+  register:     'Terminologie en consistentie',
+  style:        'Stijl (niet natuurlijk ' + T.name + ')',
+};
+
+/* The client gets one reason, not every reviewer's: the first source that has
+   something to say beyond repeating the type line. */
+function primaryReason(f){
+  const cands = [];
+  if (f.mine && f.mine.note) cands.push(f.mine.note);
+  // LanguageTool's messages are generic machine text, so they stay on the card
+  for (const o of (f.others || [])) if (o.why && o.key !== 'lt') cands.push(o.why);
+  for (const c of cands){
+    const w = c.trim();
+    if (!w || /^(niet vertaald|onvertaald)\.?$/i.test(w)) continue;
+    return w;
+  }
+  return '';
+}
+
+/* At most two sentences and about two to three lines in a Google Doc. A sentence
+   ends at . ! ? followed by a space and a capital, so "38.3" or "e.g. the" stay whole. */
+const BRIEF_MAX = 240;
+function brief(s){
+  s = String(s || '').replace(/\s+/g, ' ').trim();
+  if (!s) return '';
+  const sents = s.split(/(?<=[.!?]['’")]?)\s+(?=['‘“"(]?[A-Z0-9])/);
+  let out = sents[0];
+  if (sents[1] && out.length + 1 + sents[1].length <= BRIEF_MAX) out += ' ' + sents[1];
+  if (out.length > BRIEF_MAX){
+    const cut = out.lastIndexOf(' ', BRIEF_MAX - 1);
+    out = out.slice(0, cut > 80 ? cut : BRIEF_MAX - 1).replace(/[\s,;:(—–-]+$/, '') + '…';
+  }
+  return out;
+}
+function reasons(f){
+  const b = brief(primaryReason(f));
+  return b ? [b] : [];
+}
+
+/* Lowercase the opening letter so the bracketed detail reads as part of the
+   sentence, but leave an acronym like GDPR or AVG alone. */
+function lowerFirst(s){
+  if (!s) return s;
+  if (/^[A-Z]{2,}/.test(s)) return s;
+  // Dutch keeps the capital on names of languages and nationalities
+  if (/^(Frans|Franse|Engels|Engelse|Nederlands|Nederlandse|Duits|Duitse|Belgisch|Belgische)\b/.test(s)) return s;
+  return s.charAt(0).toLowerCase() + s.slice(1);
+}
+
+function blockText(f){
+  const lines = [];
+  const why = reasons(f);
+  // when the heading is just the opening of the reason, the type alone is enough
+  const dup = f.title && why.some(w => w.startsWith(f.title.replace(/\u2026$/, '')));
+  const type = TYPE_NL[f.category] || f.category;
+  lines.push(dup || !f.title ? `Reden: ${type}`
+                             : `Reden: ${type} (${lowerFirst(f.title)})`);
+  lines.push('');
+  lines.push(`Voorstel: ${st(f.id).text}`);
+  if (why.length){
+    lines.push('');
+    lines.push(`Toelichting: ${why.join(' ')}`);
+  }
+  return lines.join('\n');
+}
+
+function wireBatch(fs){
+  const p = PAGES.find(x => x.key === page);
+  const put = (list, what) => {
+    if (!list.length) return toast('Niets om te kopiëren.');
+    const txt = [`${PROJ.short}, ${p.label} (${what})`, p.tgt_url].filter(Boolean)
+      .concat(list.map(blockText)).join('\n\n__________\n\n');
+    navigator.clipboard.writeText(txt)
+      .then(() => toast(`${list.length} opmerkingen gekopieerd.`))
+      .catch(() => toast('Kopiëren geweigerd door de browser.'));
+  };
+  document.getElementById('copypage').onclick = () => put(fs, 'alle getoonde');
+  document.getElementById('copyopen').onclick = () =>
+    put(fs.filter(f => st(f.id).status === 'pending'), 'nog open');
+}
+
+function pick(id, from){
+  sel = id; render();
+  const f = byId[id];
+  if (mode === 'pdf') markInPanes(f);
+  if (from !== 'doc' && mode === 'review'){
+    const el = document.getElementById('b-' + f.page + '-' + f.index);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+  if (from !== 'side'){
+    const el = document.getElementById('c-' + id.replace('#','-'));
+    if (el) el.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+}
+
+/* ---------------- PDF panes ---------------- */
+const DOC_DEFAULT = '';   // set with « Ander document »
+function docUrl(){
+  try { return localStorage.getItem(T.docKey) || DOC_DEFAULT; } catch(e){ return DOC_DEFAULT; }
+}
+/* A Google Doc, unlike Drive's PDF viewer, sends no X-Frame-Options and no
+   frame-ancestors, so it embeds and stays fully editable when signed in. */
+function docEmbed(u){
+  const m = String(u).match(/\/document\/d\/([-\w]{20,})/);
+  if (!m) return null;
+  return `https://docs.google.com/document/d/${m[1]}/edit?embedded=true&rm=demo`;
+}
+
+/* ---------------- PDF panes ----------------
+   Rendered with a local copy of PDF.js rather than <iframe src="x.pdf">.
+   The built-in viewer exposes no scroll position, so two iframes can never be
+   kept in step; rendering the pages ourselves is what makes the panes match. */
+let paneCount = 2, paneChoice = T.panes.slice(), linked = true, zoom = 1;
+try {
+  const s = JSON.parse(localStorage.getItem(T.panesKey) || 'null');
+  if (s && Array.isArray(s.choice)){
+    paneChoice = s.choice; paneCount = s.count || 2;
+    linked = s.linked !== false; zoom = s.zoom || 1;
+  }
+} catch(e){}
+function savePanes(){
+  try { localStorage.setItem(T.panesKey,
+        JSON.stringify({choice:paneChoice, count:paneCount, linked, zoom})); } catch(e){}
+}
+
+let pdfjs = null;
+const docCache = new Map();          // file -> PDFDocumentProxy
+let mounted = [];                    // one entry per live pane
+
+async function lib(){
+  if (!pdfjs){
+    pdfjs = await import('../desk/vendor/pdf.min.mjs');
+    pdfjs.GlobalWorkerOptions.workerSrc = '../desk/vendor/pdf.worker.min.mjs';
+  }
+  return pdfjs;
+}
+async function openDoc(file){
+  if (!docCache.has(file)){
+    const p = await lib();
+    docCache.set(file, await p.getDocument(file).promise);
+  }
+  return docCache.get(file);
+}
+
+/* Lay out one document as a column of page boxes, painting a box only when it
+   comes near the viewport - 14 pages at full size in three panes is otherwise
+   a lot of canvas for nothing. */
+async function mount(pane, src){
+  const scroller = pane.querySelector('.pdfscroll');
+  scroller.innerHTML = '';
+  const doc = await openDoc(src.file);
+  const width = Math.max(120, scroller.clientWidth - 24);
+  const first = await doc.getPage(1);
+  const unit  = first.getViewport({scale: 1});
+  const scale = (width / unit.width) * zoom;
+
+  const boxes = [];
+  for (let n = 1; n <= doc.numPages; n++){
+    const vp  = first.getViewport({scale});      // every page shares one size here
+    const box = document.createElement('div');
+    box.className = 'pdfpage';
+    box.style.width  = Math.round(vp.width) + 'px';
+    box.style.height = Math.round(vp.height) + 'px';
+    box.dataset.n = n;
+    scroller.appendChild(box);
+    boxes.push(box);
+  }
+
+  const painted = new Set();
+  const io = new IntersectionObserver(entries => {
+    for (const e of entries){
+      if (!e.isIntersecting) continue;
+      const box = e.target, n = +box.dataset.n;
+      if (painted.has(n)) continue;
+      painted.add(n);
+      doc.getPage(n).then(pg => {
+        const vp = pg.getViewport({scale});
+        const cv = document.createElement('canvas');
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        cv.width = Math.round(vp.width * dpr);
+        cv.height = Math.round(vp.height * dpr);
+        cv.style.width = '100%'; cv.style.height = '100%';
+        box.appendChild(cv);
+        const ctx = cv.getContext('2d');
+        ctx.scale(dpr, dpr);
+        pg.render({canvasContext: ctx, viewport: vp});
+      });
+    }
+  }, {root: scroller, rootMargin: '600px 0px'});
+  boxes.forEach(b => io.observe(b));
+
+  return {pane, scroller, boxes, doc, src, io, scale};
+}
+
+/* A page's text, flattened, so a finding can be found in it. Whitespace is
+   dropped entirely: the PDF breaks lines wherever it likes, and the site text
+   we search for does not. Every kept character maps back to the item it came
+   from, which is what gives us the boxes to draw. */
+function compactMap(items){
+  let s = '', map = [];
+  items.forEach((it, i) => {
+    for (const ch of (it.str || '')){
+      if (/\s/.test(ch)) continue;
+      s += fold(ch);
+      map.push(i);
+    }
+  });
+  return {s, map};
+}
+function fold(ch){
+  const c = ch.normalize('NFKC')
+    .replace(/[’‘ʼ]/g, "'").replace(/[“”„]/g, '"')
+    .replace(/[   ]/g, ' ').replace(/‑/g, '-');
+  return c.toLowerCase();
+}
+function compactText(s){ return [...s].map(fold).filter(c => !/\s/.test(c)).join(''); }
+
+async function buildIndex(m){
+  if (m.index) return m.index;
+  const p = await lib();
+  m.index = [];
+  for (let n = 1; n <= m.doc.numPages; n++){
+    const pg = await m.doc.getPage(n);
+    const tc = await pg.getTextContent();
+    const vp = pg.getViewport({scale: m.scale});
+    const items = tc.items.map(it => {
+      const tr = p.Util.transform(vp.transform, it.transform);
+      const h = Math.hypot(tr[2], tr[3]) || 10;
+      return {str: it.str, x: tr[4], y: tr[5] - h, w: (it.width || 0) * m.scale, h};
+    });
+    m.index.push(Object.assign({items}, compactMap(items)));
+  }
+  return m.index;
+}
+
+/* Where does this text sit? Returns the page and the boxes covering it. */
+async function locate(m, text){
+  const idx = await buildIndex(m);
+  let needle = compactText(text);
+  if (needle.length < 6) return null;
+  if (needle.length > 90) needle = needle.slice(0, 90);   // an opening is enough
+  for (let n = 0; n < idx.length; n++){
+    const at = idx[n].s.indexOf(needle);
+    if (at < 0) continue;
+    const from = idx[n].map[at], to = idx[n].map[Math.min(at + needle.length - 1, idx[n].map.length - 1)];
+    const boxes = idx[n].items.slice(from, to + 1).filter(b => b.w > 0);
+    // merge boxes that sit on the same line
+    const lines = [];
+    for (const b of boxes){
+      const hit = lines.find(l => Math.abs(l.y - b.y) < b.h * 0.6);
+      if (hit){ hit.x = Math.min(hit.x, b.x); hit.r = Math.max(hit.r, b.x + b.w);
+                hit.h = Math.max(hit.h, b.h); }
+      else lines.push({x: b.x, r: b.x + b.w, y: b.y, h: b.h});
+    }
+    return {page: n, lines};
+  }
+  return null;
+}
+
+/* A page box's offsetTop is measured from its nearest positioned ancestor, not
+   from the scroller, so it cannot be used as a scroll target. Measure instead. */
+function topOf(m, box){
+  return box.getBoundingClientRect().top
+       - m.scroller.getBoundingClientRect().top
+       + m.scroller.scrollTop;
+}
+
+function clearMarks(){
+  document.querySelectorAll('.hl').forEach(e => e.remove());
+  document.querySelectorAll('.pdfmiss').forEach(e => e.remove());
+}
+
+/* Draw the marker in every pane that can find the text, and scroll there. */
+async function markInPanes(f){
+  if (mode !== 'pdf' || !mounted.length) return;
+  clearMarks();
+  let scrolled = false;
+  for (const m of mounted){
+    let spot = null;
+    try { spot = await locate(m, f.tgt); } catch(e){ spot = null; }
+    if (!spot){
+      const head = m.pane.querySelector('.panehead');
+      if (head && !head.querySelector('.pdfmiss')){
+        const tag = document.createElement('span');
+        tag.className = 'pdfmiss'; tag.textContent = 'niet gevonden';
+        head.appendChild(tag);
+      }
+      continue;
+    }
+    const box = m.boxes[spot.page];
+    spot.lines.forEach((l, i) => {
+      const d = document.createElement('div');
+      d.className = 'hl' + (i === 0 ? ' first' : '');
+      d.style.left = (l.x - 2) + 'px';
+      d.style.top = (l.y - 2) + 'px';
+      d.style.width = (l.r - l.x + 4) + 'px';
+      d.style.height = (l.h + 4) + 'px';
+      box.appendChild(d);
+    });
+    if (!scrolled){
+      syncing = true;
+      const top = topOf(m, box) + spot.lines[0].y - m.scroller.clientHeight / 3;
+      for (const o of mounted) o.scroller.scrollTop = Math.max(0, top);
+      requestAnimationFrame(() => { syncing = false; showPage(); });
+      scrolled = true;
+    }
+  }
+}
+
+/* Keep the panes in step. Identical page counts (NL and EN are both 14) scroll
+   one-to-one; a document that paginates differently follows by fraction. */
+let syncing = false;
+function linkScroll(){
+  for (const m of mounted){
+    m.scroller.onscroll = () => {
+      if (!linked || syncing) return;
+      syncing = true;
+      const a = m.scroller;
+      for (const o of mounted){
+        if (o === m) continue;
+        const b = o.scroller;
+        b.scrollTop = (o.doc.numPages === m.doc.numPages)
+          ? a.scrollTop
+          : (a.scrollTop / Math.max(1, a.scrollHeight - a.clientHeight))
+            * Math.max(0, b.scrollHeight - b.clientHeight);
+      }
+      requestAnimationFrame(() => { syncing = false; });
+      showPage();
+    };
+  }
+}
+function showPage(){
+  for (const m of mounted){
+    const top = m.scroller.scrollTop;
+    let n = 1;
+    for (const b of m.boxes){ if (topOf(m, b) - 12 <= top + 40) n = +b.dataset.n; }
+    const el = m.pane.querySelector('.pageno');
+    if (el) el.textContent = n + ' / ' + m.doc.numPages;
+  }
+}
+function jumpTo(sitePage){
+  for (const m of mounted){
+    const n = (m.src.starts && m.src.starts[sitePage]) || 1;
+    const box = m.boxes[n - 1];
+    if (box){ syncing = true; m.scroller.scrollTop = topOf(m, box) - 8; }
+  }
+  requestAnimationFrame(() => { syncing = false; showPage(); });
+}
+
+function paneSignature(){ return paneChoice.slice(0, paneCount).join('|') + '@' + zoom; }
+let builtAs = '';
+
+async function pdfview(){
+  const host = document.getElementById('panes');
+  host.style.setProperty('--panes', paneCount);
+
+  // the three PDFs, plus the live Google Doc, which is an iframe rather than
+  // something we render ourselves
+  const SOURCES = PDFS.map(p => Object.assign({kind: 'pdf'}, p)).concat([
+    {key: 'doc', kind: 'doc', label: 'Google Doc (live, bewerkbaar)',
+     file: null, pages: '', starts: {}},
+  ]);
+
+  if (builtAs !== paneSignature()){
+    builtAs = paneSignature();
+    mounted.forEach(m => m.io.disconnect());
+    mounted = [];
+    host.innerHTML = '';
+    const panes = [];
+    for (let i = 0; i < paneCount; i++){
+      const src = SOURCES.find(p => p.key === paneChoice[i]) || SOURCES[0];
+      const pane = document.createElement('div');
+      pane.className = 'pane'; pane.dataset.key = src.key;
+      const head = document.createElement('div'); head.className = 'panehead';
+      const sel = document.createElement('select');
+      for (const p of SOURCES){
+        const o = document.createElement('option');
+        o.value = p.key; o.textContent = p.label; o.selected = p.key === src.key;
+        sel.appendChild(o);
+      }
+      sel.onchange = () => { paneChoice[i] = sel.value; savePanes(); builtAs = ''; pdfview(); };
+      head.appendChild(sel);
+      if (src.kind === 'doc'){
+        const a = document.createElement('a');
+        a.className = 'lk'; a.href = docUrl(); a.target = '_blank'; a.rel = 'noopener';
+        a.textContent = 'In tabblad openen';
+        head.appendChild(a);
+        const edit = document.createElement('button');
+        edit.className = 'lk'; edit.style.cursor = 'pointer'; edit.textContent = 'Ander document';
+        edit.onclick = () => {
+          const u = prompt('Link naar de Google Doc:', docUrl());
+          if (u && docEmbed(u)){ try { localStorage.setItem(T.docKey, u); } catch(e){}
+                                 builtAs = ''; pdfview(); }
+          else if (u) alert('Geen geldige Google Doc-link.');
+        };
+        head.appendChild(edit);
+        const fr = document.createElement('iframe');
+        fr.className = 'docframe'; fr.title = src.label;
+        fr.src = docEmbed(docUrl()) || 'about:blank';
+        pane.appendChild(head); pane.appendChild(fr);
+        host.appendChild(pane);
+        continue;                       // no PDF scroller, no scroll sync
+      }
+      head.insertAdjacentHTML('beforeend', '<span class="pageno">…</span>');
+      const a = document.createElement('a');
+      a.className = 'lk'; a.href = src.file; a.download = ''; a.textContent = 'Bewaar';
+      head.appendChild(a);
+      const scroll = document.createElement('div'); scroll.className = 'pdfscroll';
+      pane.appendChild(head); pane.appendChild(scroll);
+      host.appendChild(pane);
+      panes.push([pane, src]);
+    }
+    mounted = await Promise.all(panes.map(([pane, src]) => mount(pane, src)));
+    linkScroll();
+  }
+  if (sel && byId[sel] && byId[sel].page === page) markInPanes(byId[sel]);
+  else { clearMarks(); jumpTo(page); }
+}
+
+function render(){ bars(); side(); if (mode==='review') doc(); else pdfview(); }
+
+/* ---------------- export ---------------- */
+document.getElementById('copy').onclick = () => {
+  const ok = FINDINGS.filter(f => st(f.id).status === 'approved');
+  if (!ok.length) return toast('Nog niets goedgekeurd.');
+  const lines = [`# ${PROJ.short}, goedgekeurde correcties ${T.short}${PROJ.version ? ' (' + PROJ.version + ')' : ''}`,
+    `Frans = live site (referentie). ${T.name} = ${T.checked}.`, ''];
+  for (const p of PAGES){
+    const g = ok.filter(f => f.page === p.key);
+    if (!g.length) continue;
+    lines.push(`## ${p.label}`, ...(p.tgt_url ? [p.tgt_url] : []), '');
+    for (const f of g){
+      lines.push(`### ${f.n}. ${f.title}`);
+      lines.push(`Locatie: ${f.id} <${f.tag}> · bron: ${f.sources.map(s=>SRCS[s]).join(' + ')}`);
+      lines.push(`Frans: ${f.fr}`);
+      lines.push(`${T.name} nu: ${f.tgt}`);
+      lines.push('');
+      lines.push(blockText(f));
+      lines.push('');
+    }
+  }
+  const txt = lines.join('\n');
+  navigator.clipboard.writeText(txt)
+    .then(() => toast(`${ok.length} correcties gekopieerd.`))
+    .catch(() => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([txt], {type:'text/markdown'}));
+      a.download = 'vidimus-correcties-' + T.code + '.md'; a.click();
+      toast('Gedownload als bestand.');
+    });
+};
+document.getElementById('reset').onclick = () => {
+  if (confirm('Alle beoordelingen en aangepaste voorstellen wissen?')){ state={}; save(); sel=null; render(); }
+};
+document.getElementById('theme').onclick = () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  cur === 'marine' ? document.documentElement.removeAttribute('data-theme')
+                   : document.documentElement.setAttribute('data-theme','marine');
+  try { localStorage.setItem('vidimus-theme', cur === 'marine' ? '' : 'marine'); } catch(e){}
+};
+try { if (localStorage.getItem('vidimus-theme') === 'marine')
+        document.documentElement.setAttribute('data-theme','marine'); } catch(e){}
+
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'TEXTAREA') return;
+  const fs = FINDINGS.filter(visible); if (!fs.length) return;
+  const i = fs.findIndex(f => f.id === sel);
+  if (e.key === 'j'){ e.preventDefault(); pick((fs[Math.min(i+1, fs.length-1)] || fs[0]).id, ''); }
+  if (e.key === 'k'){ e.preventDefault(); pick((fs[Math.max(i-1, 0)] || fs[0]).id, ''); }
+  if (sel && e.key === 'a'){ e.preventDefault(); setSt(sel, {status: st(sel).status==='approved'?'pending':'approved'}); }
+  if (sel && e.key === 'x'){ e.preventDefault(); setSt(sel, {status: st(sel).status==='rejected'?'pending':'rejected'}); }
+});
+/* ---------------- resizable sidebar ---------------- */
+(function(){
+  const aside = document.getElementById('side'), bar = document.getElementById('resizer');
+  const MIN = 380, MAX = 1100;
+  const set = w => {
+    w = Math.max(MIN, Math.min(MAX, w));
+    document.documentElement.style.setProperty('--aside', w + 'px');
+    try { localStorage.setItem('vidimus-aside', w); } catch(e){}
+  };
+  try { const w = +localStorage.getItem('vidimus-aside'); if (w) set(w); } catch(e){}
+  bar.addEventListener('pointerdown', e => {
+    e.preventDefault(); bar.classList.add('on'); bar.setPointerCapture(e.pointerId);
+    const move = ev => set(window.innerWidth - ev.clientX);
+    const up = () => { bar.classList.remove('on');
+      bar.removeEventListener('pointermove', move); bar.removeEventListener('pointerup', up); };
+    bar.addEventListener('pointermove', move); bar.addEventListener('pointerup', up);
+  });
+  bar.addEventListener('dblclick', () => set(560));
+})();
+
+if (!PAGES.some(p => p.key === page)) page = PAGES[0].key;
+{ const h = decodeURIComponent(location.hash.slice(1)); if (PAGES.some(p => p.key === h)) page = h; }
+render();
+</script>
+</body>
+</html>

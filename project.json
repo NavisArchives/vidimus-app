@@ -1,0 +1,27 @@
+{
+  "name": "Bibliothèque du Quartier Nord",
+  "short": "Quartier Nord",
+  "version": "sample",
+  "base": "http://127.0.0.1:8899",
+  "source": "fr",
+  "langs": {"fr": "", "nl": "nl/", "en": "en/"},
+  "pages": [
+    {"key": "home",    "slug": "",                "label": "Accueil / Home",            "ui": "Home"},
+    {"key": "rules",   "slug": "reglement",       "label": "Règlement / Reglement",     "ui": "Reglement"},
+    {"key": "privacy", "slug": "confidentialite", "label": "Confidentialité / Privacy", "ui": "Privacy"}
+  ],
+  "targets": {
+    "nl": {
+      "name": "Nederlands", "variant": "nl", "panes": ["nl", "en", "fr"],
+      "review": "sample/reviews/nl.json", "qa": "sample/qa/nl.txt", "qaName": "Localisatie-QA",
+      "ltSkip": ["GEDACHTESTREEPJE", "OPTIONAL_HYPHEN"]
+    },
+    "en": {
+      "name": "Engels", "variant": "en-GB", "panes": ["en", "fr", "nl"],
+      "review": "sample/reviews/en.json", "qa": "sample/qa/en.txt", "qaName": "Engelse QA",
+      "ltSkip": ["OXFORD_SPELLING_Z_NOT_S", "SERIAL_COMMA_ON"]
+    }
+  },
+  "known": ["Quartier", "Nord", "BD"],
+  "pdf": {"width_pt": 960, "height_pt": 1358}
+}

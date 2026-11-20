@@ -1,0 +1,70 @@
+Quartier Nord, Nederlands
+=========================
+Bibliothèque du Quartier Nord, sample
+Bron: de site (FR = referentie, de andere talen = te controleren)
+
+
+==============================================================================
+PAGINA: Accueil / Home
+http://127.0.0.1:8899/nl/
+==============================================================================
+
+Home
+Reglement
+Privacy
+# Welkom in de buurtbibliotheek
+Open van dinsdag tot zaterdag, van 10 tot 18 uur.
+## Emprunter un livre
+Elk lid kan tot vijf documenten lenen voor een periode van 14 weken.
+Inschrijving is gratis voor jongeren onder 18 jaar.
+## Onze diensten
+Uitlening van boeken, strips en films
+Gratis toegang tot het internet
+Leesateliers voor kinderen
+Lid worden
+Fictief document, gemaakt voor een demonstratie.
+
+==============================================================================
+PAGINA: Règlement / Reglement
+http://127.0.0.1:8899/nl/reglement/
+==============================================================================
+
+Home
+Reglement
+Privacy
+# Gebruiksreglement
+## Artikel 1 — Inschrijving
+Iedereen kan zich inschrijven op vertoon van een identiteitsbewijs.
+De lidkaart is persoonlijk en mag niet worden uitgeleend.
+## Artikel 2 — Ontlening en terugbrenging
+De documenten moeten worden teruggebracht op de datum vermeld op het ticket de prêt.
+Een uitlening kan eenmaal worden verlengd, tenzij het document gereserveerd is.
+## Artikel 3 — Vertragingen
+Bij vertraging wordt een herinnering per e-mail gestuurd. Er wordt geen boete aangerekend.
+Verloren of beschadigde documenten worden vervangen op kosten van het lid.
+## Artikel 4 — Gedrag
+Gelieve de rust in de leeszalen te respecteren.
+Dranken zijn enkel toegelaten in de cafetaria.
+Je kan je vragen stellen aan het onthaal.
+Fictief document, gemaakt voor een demonstratie.
+
+==============================================================================
+PAGINA: Confidentialité / Privacy
+http://127.0.0.1:8899/nl/confidentialite/
+==============================================================================
+
+Home
+Reglement
+Privacy
+# Privacybeleid
+De bibliotheek verwerkt uw persoonsgegevens enkel om uw inschrijving en uw uitleningen te beheren.
+## Welke gegevens?
+Naam, voornaam en geboortedatum
+E-mailadres, voor de herinneringen
+Ontleengeschiedenis van de laatste 12 maanden
+## Bewaartermijn
+Uw gegevens worden verwijderd twee jaar na het einde van uw inschrijving.
+## Uw rechten
+U kunt op elk moment inzage, verbetering of wissing van uw gegevens vragen.
+Voor alle vragen, schrijf naar het adres dat aan het onthaal vermeld staat.
+Fictief document, gemaakt voor een demonstratie.

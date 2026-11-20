@@ -1,0 +1,10 @@
+All rights reserved — shared for review only.
+
+Copyright (c) 2026 Andy Huizenga
+
+The code in this repository is shared so that it can be read and reviewed. No
+licence is granted to copy, modify, distribute or use it, in whole or in part,
+without written permission.
+
+Third-party code keeps its own licence: desk/vendor/ holds PDF.js 4.6.82 by the
+Mozilla Foundation, under the Apache License 2.0 (see desk/vendor/README.md).

@@ -1,0 +1,70 @@
+Quartier Nord, Frans
+====================
+Bibliothèque du Quartier Nord, sample
+Bron: de site (FR = referentie, de andere talen = te controleren)
+
+
+==============================================================================
+PAGINA: Accueil / Home
+http://127.0.0.1:8899/
+==============================================================================
+
+Accueil
+Règlement
+Confidentialité
+# Bienvenue à la bibliothèque du quartier
+Ouverte du mardi au samedi, de 10 h à 18 h.
+## Emprunter un livre
+Chaque membre peut emprunter jusqu'à cinq documents pour une durée de 14 jours.
+L'inscription est gratuite pour les moins de 18 ans.
+## Nos services
+Prêt de livres, de BD et de films
+Accès gratuit à Internet
+Ateliers de lecture pour enfants
+Devenir membre
+Document fictif, créé pour une démonstration.
+
+==============================================================================
+PAGINA: Règlement / Reglement
+http://127.0.0.1:8899/reglement/
+==============================================================================
+
+Accueil
+Règlement
+Confidentialité
+# Règlement d'utilisation
+## Article 1 — Inscription
+Toute personne peut s'inscrire sur présentation d'une pièce d'identité.
+La carte de membre est personnelle et ne peut être prêtée.
+## Article 2 — Prêt et retour
+Les documents doivent être rendus à la date indiquée sur le ticket de prêt.
+Un prêt peut être prolongé une fois, sauf si le document est réservé.
+## Article 3 — Retards
+En cas de retard, un rappel est envoyé par courriel. Aucune amende n'est appliquée.
+Les documents perdus ou abîmés sont remplacés aux frais du membre.
+## Article 4 — Comportement
+Merci de respecter le calme des salles de lecture.
+Les boissons sont autorisées uniquement dans l'espace café.
+Vous pouvez poser vos questions à l'accueil.
+Document fictif, créé pour une démonstration.
+
+==============================================================================
+PAGINA: Confidentialité / Privacy
+http://127.0.0.1:8899/confidentialite/
+==============================================================================
+
+Accueil
+Règlement
+Confidentialité
+# Politique de confidentialité
+La bibliothèque traite vos données personnelles uniquement pour gérer votre inscription et vos prêts.
+## Quelles données ?
+Nom, prénom et date de naissance
+Adresse e-mail, pour les rappels
+Historique des prêts des 12 derniers mois
+## Durée de conservation
+Vos données sont supprimées deux ans après la fin de votre inscription.
+## Vos droits
+Vous pouvez demander l'accès, la rectification ou l'effacement de vos données à tout moment.
+Pour toute question, écrivez à l'adresse indiquée à l'accueil.
+Document fictif, créé pour une démonstration.

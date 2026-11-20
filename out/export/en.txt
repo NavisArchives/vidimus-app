@@ -1,0 +1,70 @@
+Quartier Nord, Engels
+=====================
+Bibliothèque du Quartier Nord, sample
+Bron: de site (FR = referentie, de andere talen = te controleren)
+
+
+==============================================================================
+PAGINA: Accueil / Home
+http://127.0.0.1:8899/en/
+==============================================================================
+
+Home
+Rules of use
+Privacy
+# Welcome to the neighbourhood library
+The library are open from Tuesday to Saturday, 10 am to 6 pm.
+## Borrowing a book
+Each member can borrow up to five items for 14 days.
+Registration is free for under-18s.
+## Our services
+Loans of books, comics and films
+Free internet acces
+Reading workshops for children
+Devenir membre
+Fictitious document, made for a demonstration.
+
+==============================================================================
+PAGINA: Règlement / Reglement
+http://127.0.0.1:8899/en/reglement/
+==============================================================================
+
+Home
+Rules of use
+Privacy
+# Rules of use
+## Article 1 — Registration
+Anyone can register by showing an identity document.
+The membership card is personal and may not be lend.
+## Article 2 — Loans and returns
+Items must be returned by the date shown on the loan receipt.
+A loan can be renewed once, unless the item is reserved.
+## Article 3 — Late returns
+If an item is late, a reminder is sent by email. No fine is charged.
+Lost or damaged items are replaced at the member's expense.
+## Article 4 — Conduct
+Please respect the quiet of the reading rooms.
+Drinks are only allowed in the café area.
+You can ask your questions at the front desk.
+Fictitious document, made for a demonstration.
+
+==============================================================================
+PAGINA: Confidentialité / Privacy
+http://127.0.0.1:8899/en/confidentialite/
+==============================================================================
+
+Home
+Rules of use
+Privacy
+# Privacy policy
+The library processes your personal data only to manage your membership and your loans.
+## What data?
+Surname, first name and date of birth
+Email address, for reminders
+Loan history for the last 12 month
+## How long we keep it
+Your data is deleted two years after your membership ends.
+## Your rights
+You can ask to access, correct or erase your data at any time.
+For any question, write to the address shown at the front desk.
+Fictitious document, made for a demonstration.

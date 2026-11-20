@@ -1,0 +1,169 @@
+[
+ {
+  "n": 1,
+  "id": "home#5",
+  "page": "home",
+  "index": 5,
+  "category": "untranslated",
+  "severity": "high",
+  "title": "Kop staat nog in het Frans",
+  "fr": "Emprunter un livre",
+  "nl": "Emprunter un livre",
+  "suggestion": "Een boek lenen",
+  "note": "De tekst eronder is wel vertaald; alleen de kop is blijven staan.",
+  "tag": "h2",
+  "lt": [
+   {
+    "msg": "Er is een mogelijke spelfout gevonden.",
+    "frag": "Emprunter",
+    "offset": 0,
+    "len": 9,
+    "rule": "MORFOLOGIK_RULE_NL_NL",
+    "cat": "Mogelijke typefouten",
+    "type": "misspelling",
+    "fix": [
+     "Printer",
+     "Sprinter",
+     "Punter"
+    ]
+   },
+   {
+    "msg": "Er is een mogelijke spelfout gevonden.",
+    "frag": "un",
+    "offset": 10,
+    "len": 2,
+    "rule": "MORFOLOGIK_RULE_NL_NL",
+    "cat": "Mogelijke typefouten",
+    "type": "misspelling",
+    "fix": [
+     "Un",
+     "en",
+     "in"
+    ]
+   },
+   {
+    "msg": "Er is een mogelijke spelfout gevonden.",
+    "frag": "livre",
+    "offset": 13,
+    "len": 5,
+    "rule": "MORFOLOGIK_RULE_NL_NL",
+    "cat": "Mogelijke typefouten",
+    "type": "misspelling",
+    "fix": [
+     "live",
+     "libre",
+     "lire"
+    ]
+   }
+  ],
+  "pdf": "still"
+ },
+ {
+  "n": 2,
+  "id": "home#6",
+  "page": "home",
+  "index": 6,
+  "category": "meaning",
+  "severity": "high",
+  "title": "14 dagen is 14 weken geworden",
+  "fr": "Chaque membre peut emprunter jusqu'à cinq documents pour une durée de 14 jours.",
+  "nl": "Elk lid kan tot vijf documenten lenen voor een periode van 14 weken.",
+  "suggestion": "Elk lid kan tot vijf documenten lenen voor een periode van 14 dagen.",
+  "note": "Het Frans zegt « 14 jours »; zo staat het ook in het reglement.",
+  "tag": "p",
+  "lt": [],
+  "pdf": "still"
+ },
+ {
+  "n": 3,
+  "id": "rules#7",
+  "page": "rules",
+  "index": 7,
+  "category": "style",
+  "severity": "low",
+  "title": "Twee woorden voor hetzelfde: ontlening en uitlening",
+  "fr": "Article 2 — Prêt et retour",
+  "nl": "Artikel 2 — Ontlening en terugbrenging",
+  "suggestion": "Artikel 2 — Uitlening en terugbrengen",
+  "note": "De homepage en artikel 2 zelf zeggen « uitlening ». Eén term houdt het reglement eenduidig.",
+  "tag": "h2",
+  "lt": [],
+  "pdf": "still"
+ },
+ {
+  "n": 4,
+  "id": "rules#8",
+  "page": "rules",
+  "index": 8,
+  "category": "untranslated",
+  "severity": "high",
+  "title": "Franse woorden midden in de zin",
+  "fr": "Les documents doivent être rendus à la date indiquée sur le ticket de prêt.",
+  "nl": "De documenten moeten worden teruggebracht op de datum vermeld op het ticket de prêt.",
+  "suggestion": "De documenten moeten worden teruggebracht op de datum die op het uitleenbewijs staat.",
+  "note": "« ticket de prêt » is niet vertaald.",
+  "tag": "p",
+  "lt": [
+   {
+    "msg": "Er is een mogelijke spelfout gevonden.",
+    "frag": "prêt",
+    "offset": 79,
+    "len": 4,
+    "rule": "MORFOLOGIK_RULE_NL_NL",
+    "cat": "Mogelijke typefouten",
+    "type": "misspelling",
+    "fix": [
+     "pret",
+     "Pret",
+     "Prêt"
+    ]
+   }
+  ],
+  "pdf": "still"
+ },
+ {
+  "n": 5,
+  "id": "rules#16",
+  "page": "rules",
+  "index": 16,
+  "category": "register",
+  "severity": "medium",
+  "title": "« je » waar de rest van de site « u » zegt",
+  "fr": "Vous pouvez poser vos questions à l'accueil.",
+  "nl": "Je kan je vragen stellen aan het onthaal.",
+  "suggestion": "U kunt uw vragen stellen aan het onthaal.",
+  "note": "Het Frans zegt « vous »; elke andere zin spreekt de lezer met « u » aan.",
+  "tag": "p",
+  "lt": [
+   {
+    "msg": "Velen vinden dat “kun” netter is als ‘je’ het onderwerp is. ‘Kan’ mag echter ook.",
+    "frag": "kan",
+    "offset": 3,
+    "len": 3,
+    "rule": "KAN_KUN",
+    "cat": "Stijl",
+    "type": "style",
+    "fix": [
+     "kun"
+    ]
+   }
+  ],
+  "pdf": "still"
+ },
+ {
+  "n": 6,
+  "id": "privacy#13",
+  "page": "privacy",
+  "index": 13,
+  "category": "grammar",
+  "severity": "medium",
+  "title": "Hoofdzin zonder onderwerp",
+  "fr": "Pour toute question, écrivez à l'adresse indiquée à l'accueil.",
+  "nl": "Voor alle vragen, schrijf naar het adres dat aan het onthaal vermeld staat.",
+  "suggestion": "Voor vragen kunt u schrijven naar het adres dat aan het onthaal vermeld staat.",
+  "note": "Na « Voor alle vragen, » volgt een gebiedende wijs; dat leest stroef en wijkt af van « u ».",
+  "tag": "p",
+  "lt": [],
+  "pdf": "still"
+ }
+]

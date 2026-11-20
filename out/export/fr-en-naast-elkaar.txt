@@ -1,0 +1,206 @@
+Quartier Nord, Frans en Engels naast elkaar
+Elk blok: FR dan EN. Identieke regels = nog niet vertaald.
+
+
+==============================================================================
+PAGINA: Accueil / Home
+==============================================================================
+
+[home#0] <a>
+FR: Accueil
+EN: Home
+
+[home#1] <a>
+FR: Règlement
+EN: Rules of use
+
+[home#2] <a>
+FR: Confidentialité
+EN: Privacy
+
+[home#3] <h1>
+FR: Bienvenue à la bibliothèque du quartier
+EN: Welcome to the neighbourhood library
+
+[home#4] <p>
+FR: Ouverte du mardi au samedi, de 10 h à 18 h.
+EN: The library are open from Tuesday to Saturday, 10 am to 6 pm.
+
+[home#5] <h2>
+FR: Emprunter un livre
+EN: Borrowing a book
+
+[home#6] <p>
+FR: Chaque membre peut emprunter jusqu'à cinq documents pour une durée de 14 jours.
+EN: Each member can borrow up to five items for 14 days.
+
+[home#7] <p>
+FR: L'inscription est gratuite pour les moins de 18 ans.
+EN: Registration is free for under-18s.
+
+[home#8] <h2>
+FR: Nos services
+EN: Our services
+
+[home#9] <li>
+FR: Prêt de livres, de BD et de films
+EN: Loans of books, comics and films
+
+[home#10] <li>
+FR: Accès gratuit à Internet
+EN: Free internet acces
+
+[home#11] <li>
+FR: Ateliers de lecture pour enfants
+EN: Reading workshops for children
+
+[home#12] <button>   <-- IDENTIEK
+FR: Devenir membre
+EN: Devenir membre
+
+[home#13] <p>
+FR: Document fictif, créé pour une démonstration.
+EN: Fictitious document, made for a demonstration.
+
+
+==============================================================================
+PAGINA: Règlement / Reglement
+==============================================================================
+
+[rules#0] <a>
+FR: Accueil
+EN: Home
+
+[rules#1] <a>
+FR: Règlement
+EN: Rules of use
+
+[rules#2] <a>
+FR: Confidentialité
+EN: Privacy
+
+[rules#3] <h1>
+FR: Règlement d'utilisation
+EN: Rules of use
+
+[rules#4] <h2>
+FR: Article 1 — Inscription
+EN: Article 1 — Registration
+
+[rules#5] <p>
+FR: Toute personne peut s'inscrire sur présentation d'une pièce d'identité.
+EN: Anyone can register by showing an identity document.
+
+[rules#6] <p>
+FR: La carte de membre est personnelle et ne peut être prêtée.
+EN: The membership card is personal and may not be lend.
+
+[rules#7] <h2>
+FR: Article 2 — Prêt et retour
+EN: Article 2 — Loans and returns
+
+[rules#8] <p>
+FR: Les documents doivent être rendus à la date indiquée sur le ticket de prêt.
+EN: Items must be returned by the date shown on the loan receipt.
+
+[rules#9] <p>
+FR: Un prêt peut être prolongé une fois, sauf si le document est réservé.
+EN: A loan can be renewed once, unless the item is reserved.
+
+[rules#10] <h2>
+FR: Article 3 — Retards
+EN: Article 3 — Late returns
+
+[rules#11] <p>
+FR: En cas de retard, un rappel est envoyé par courriel. Aucune amende n'est appliquée.
+EN: If an item is late, a reminder is sent by email. No fine is charged.
+
+[rules#12] <p>
+FR: Les documents perdus ou abîmés sont remplacés aux frais du membre.
+EN: Lost or damaged items are replaced at the member's expense.
+
+[rules#13] <h2>
+FR: Article 4 — Comportement
+EN: Article 4 — Conduct
+
+[rules#14] <p>
+FR: Merci de respecter le calme des salles de lecture.
+EN: Please respect the quiet of the reading rooms.
+
+[rules#15] <p>
+FR: Les boissons sont autorisées uniquement dans l'espace café.
+EN: Drinks are only allowed in the café area.
+
+[rules#16] <p>
+FR: Vous pouvez poser vos questions à l'accueil.
+EN: You can ask your questions at the front desk.
+
+[rules#17] <p>
+FR: Document fictif, créé pour une démonstration.
+EN: Fictitious document, made for a demonstration.
+
+
+==============================================================================
+PAGINA: Confidentialité / Privacy
+==============================================================================
+
+[privacy#0] <a>
+FR: Accueil
+EN: Home
+
+[privacy#1] <a>
+FR: Règlement
+EN: Rules of use
+
+[privacy#2] <a>
+FR: Confidentialité
+EN: Privacy
+
+[privacy#3] <h1>
+FR: Politique de confidentialité
+EN: Privacy policy
+
+[privacy#4] <p>
+FR: La bibliothèque traite vos données personnelles uniquement pour gérer votre inscription et vos prêts.
+EN: The library processes your personal data only to manage your membership and your loans.
+
+[privacy#5] <h2>
+FR: Quelles données ?
+EN: What data?
+
+[privacy#6] <li>
+FR: Nom, prénom et date de naissance
+EN: Surname, first name and date of birth
+
+[privacy#7] <li>
+FR: Adresse e-mail, pour les rappels
+EN: Email address, for reminders
+
+[privacy#8] <li>
+FR: Historique des prêts des 12 derniers mois
+EN: Loan history for the last 12 month
+
+[privacy#9] <h2>
+FR: Durée de conservation
+EN: How long we keep it
+
+[privacy#10] <p>
+FR: Vos données sont supprimées deux ans après la fin de votre inscription.
+EN: Your data is deleted two years after your membership ends.
+
+[privacy#11] <h2>
+FR: Vos droits
+EN: Your rights
+
+[privacy#12] <p>
+FR: Vous pouvez demander l'accès, la rectification ou l'effacement de vos données à tout moment.
+EN: You can ask to access, correct or erase your data at any time.
+
+[privacy#13] <p>
+FR: Pour toute question, écrivez à l'adresse indiquée à l'accueil.
+EN: For any question, write to the address shown at the front desk.
+
+[privacy#14] <p>
+FR: Document fictif, créé pour une démonstration.
+EN: Fictitious document, made for a demonstration.
+

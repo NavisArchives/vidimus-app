@@ -1,0 +1,12 @@
+[
+ {"id": "home#4", "category": "grammar", "severity": "high", "title": "Subject and verb do not agree",
+  "suggestion": "The library is open from Tuesday to Saturday, 10 am to 6 pm.", "note": "« The library » is singular.", "contains": "library are"},
+ {"id": "home#10", "category": "grammar", "severity": "medium", "title": "Spelling: « acces »",
+  "suggestion": "Free internet access", "note": "", "contains": "acces"},
+ {"id": "home#12", "category": "untranslated", "severity": "high", "title": "Button text is still in French",
+  "suggestion": "Become a member", "note": "The navigation and every heading are translated; only the button is not.", "contains": "Devenir"},
+ {"id": "rules#6", "category": "grammar", "severity": "high", "title": "Wrong form of the verb after « be »",
+  "suggestion": "The membership card is personal and may not be lent.", "note": "The past participle of « lend » is « lent ».", "contains": "be lend"},
+ {"id": "privacy#8", "category": "grammar", "severity": "medium", "title": "Plural missing after « 12 »",
+  "suggestion": "Loan history for the last 12 months", "note": "", "contains": "12 month"}
+]

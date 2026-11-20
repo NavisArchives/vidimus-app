@@ -1,0 +1,21 @@
+English QA (sample)
+Format: one item per block, [page#index], then priority, the current text, the reason and one or two proposals.
+
+[home#4]
+P0 — grammar
+CURRENT: The library are open from Tuesday to Saturday, 10 am to 6 pm.
+REASON: Singular subject with a plural verb.
+PROPOSAL A (faithful): The library is open from Tuesday to Saturday, 10 am to 6 pm.
+
+[rules#6]
+P0 — grammar
+CURRENT: The membership card is personal and may not be lend.
+REASON: Infinitive used where the past participle is needed.
+PROPOSAL A (faithful): The membership card is personal and may not be lent.
+
+[privacy#13]
+P2 — style
+CURRENT: For any question, write to the address shown at the front desk.
+REASON: « For any question » reads as a calque of « Pour toute question ».
+PROPOSAL A (faithful): For any questions, write to the address shown at the front desk.
+PROPOSAL B (natural): If you have a question, write to the address shown at the front desk.

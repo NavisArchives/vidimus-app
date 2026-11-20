@@ -1,0 +1,41 @@
+Localisatie-QA, Nederlands (voorbeeld)
+Formaat: één item per blok, [pagina#index], dan prioriteit, de huidige tekst, de reden en één of twee voorstellen.
+
+[home#5]
+P0 — onvertaald
+CURRENT: Emprunter un livre
+REASON: Kop staat in het Frans op een verder Nederlandse pagina.
+PROPOSAL A (brongetrouw): Een boek ontlenen
+PROPOSAL B (natuurlijker): Boeken lenen
+
+[home#6]
+P0 — betekenis
+CURRENT: Elk lid kan tot vijf documenten lenen voor een periode van 14 weken.
+REASON: Uitleentermijn klopt niet met de bron (14 jours). Inhoudelijke fout in een regel die leden volgen.
+PROPOSAL A (brongetrouw): Elk lid kan tot vijf documenten lenen voor een periode van 14 dagen.
+
+[rules#8]
+P0 — onvertaald
+CURRENT: De documenten moeten worden teruggebracht op de datum vermeld op het ticket de prêt.
+REASON: Franse term midden in de zin.
+PROPOSAL A (brongetrouw): De documenten moeten worden teruggebracht op de datum vermeld op het uitleenticket.
+PROPOSAL B (natuurlijker): Breng de documenten terug op de datum op je uitleenbon.
+
+[rules#10]
+P1 — register
+CURRENT: Artikel 3 — Vertragingen
+REASON: « Vertraging » leest als uitstel; het artikel gaat over te laat terugbrengen.
+PROPOSAL A (brongetrouw): Artikel 3 — Laattijdige teruggave
+PROPOSAL B (natuurlijker): Artikel 3 — Te laat terugbrengen
+
+[rules#16]
+P1 — register
+CURRENT: Je kan je vragen stellen aan het onthaal.
+REASON: Wisselt naar « je »; de rest van het reglement gebruikt « u ».
+PROPOSAL A (brongetrouw): U kunt uw vragen stellen aan het onthaal.
+
+[privacy#10]
+P2 — stijl
+CURRENT: Uw gegevens worden verwijderd twee jaar na het einde van uw inschrijving.
+REASON: Woordvolgorde volgt het Frans; in het Nederlands staat het voltooid deelwoord achteraan.
+PROPOSAL A (brongetrouw): Uw gegevens worden twee jaar na het einde van uw inschrijving verwijderd.

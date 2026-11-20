@@ -1,0 +1,56 @@
+[
+ {
+  "id": "home#5",
+  "page": "home",
+  "index": 5,
+  "prio": "P0",
+  "why": "Kop staat in het Frans op een verder Nederlandse pagina.",
+  "a": "Een boek ontlenen",
+  "b": "Boeken lenen"
+ },
+ {
+  "id": "home#6",
+  "page": "home",
+  "index": 6,
+  "prio": "P0",
+  "why": "Uitleentermijn klopt niet met de bron (14 jours). Inhoudelijke fout in een regel die leden volgen.",
+  "a": "Elk lid kan tot vijf documenten lenen voor een periode van 14 dagen.",
+  "b": ""
+ },
+ {
+  "id": "rules#8",
+  "page": "rules",
+  "index": 8,
+  "prio": "P0",
+  "why": "Franse term midden in de zin.",
+  "a": "De documenten moeten worden teruggebracht op de datum vermeld op het uitleenticket.",
+  "b": "Breng de documenten terug op de datum op je uitleenbon."
+ },
+ {
+  "id": "rules#10",
+  "page": "rules",
+  "index": 10,
+  "prio": "P1",
+  "why": "« Vertraging » leest als uitstel; het artikel gaat over te laat terugbrengen.",
+  "a": "Artikel 3 — Laattijdige teruggave",
+  "b": "Artikel 3 — Te laat terugbrengen"
+ },
+ {
+  "id": "rules#16",
+  "page": "rules",
+  "index": 16,
+  "prio": "P1",
+  "why": "Wisselt naar « je »; de rest van het reglement gebruikt « u ».",
+  "a": "U kunt uw vragen stellen aan het onthaal.",
+  "b": ""
+ },
+ {
+  "id": "privacy#10",
+  "page": "privacy",
+  "index": 10,
+  "prio": "P2",
+  "why": "Woordvolgorde volgt het Frans; in het Nederlands staat het voltooid deelwoord achteraan.",
+  "a": "Uw gegevens worden twee jaar na het einde van uw inschrijving verwijderd.",
+  "b": ""
+ }
+]

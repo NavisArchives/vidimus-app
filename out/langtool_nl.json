@@ -1,0 +1,184 @@
+{
+ "home": {
+  "5": [
+   {
+    "msg": "Er is een mogelijke spelfout gevonden.",
+    "frag": "Emprunter",
+    "offset": 0,
+    "len": 9,
+    "rule": "MORFOLOGIK_RULE_NL_NL",
+    "cat": "Mogelijke typefouten",
+    "type": "misspelling",
+    "fix": [
+     "Printer",
+     "Sprinter",
+     "Punter"
+    ]
+   },
+   {
+    "msg": "Er is een mogelijke spelfout gevonden.",
+    "frag": "un",
+    "offset": 10,
+    "len": 2,
+    "rule": "MORFOLOGIK_RULE_NL_NL",
+    "cat": "Mogelijke typefouten",
+    "type": "misspelling",
+    "fix": [
+     "Un",
+     "en",
+     "in"
+    ]
+   },
+   {
+    "msg": "Er is een mogelijke spelfout gevonden.",
+    "frag": "livre",
+    "offset": 13,
+    "len": 5,
+    "rule": "MORFOLOGIK_RULE_NL_NL",
+    "cat": "Mogelijke typefouten",
+    "type": "misspelling",
+    "fix": [
+     "live",
+     "libre",
+     "lire"
+    ]
+   }
+  ]
+ },
+ "rules": {
+  "8": [
+   {
+    "msg": "Er is een mogelijke spelfout gevonden.",
+    "frag": "prêt",
+    "offset": 79,
+    "len": 4,
+    "rule": "MORFOLOGIK_RULE_NL_NL",
+    "cat": "Mogelijke typefouten",
+    "type": "misspelling",
+    "fix": [
+     "pret",
+     "Pret",
+     "Prêt"
+    ]
+   }
+  ],
+  "16": [
+   {
+    "msg": "Velen vinden dat “kun” netter is als ‘je’ het onderwerp is. ‘Kan’ mag echter ook.",
+    "frag": "kan",
+    "offset": 3,
+    "len": 3,
+    "rule": "KAN_KUN",
+    "cat": "Stijl",
+    "type": "style",
+    "fix": [
+     "kun"
+    ]
+   }
+  ]
+ },
+ "privacy": {
+  "8": [
+   {
+    "msg": "Er is een mogelijke spelfout gevonden.",
+    "frag": "Ontleengeschiedenis",
+    "offset": 0,
+    "len": 19,
+    "rule": "MORFOLOGIK_RULE_NL_NL",
+    "cat": "Mogelijke typefouten",
+    "type": "misspelling",
+    "fix": [
+     "Uitleengeschiedenis"
+    ]
+   }
+  ]
+ },
+ "_detected": {
+  "home": {
+   "4": {
+    "code": "nl",
+    "confidence": 1.0
+   },
+   "6": {
+    "code": "nl",
+    "confidence": 0.99
+   },
+   "7": {
+    "code": "nl",
+    "confidence": 0.99
+   },
+   "13": {
+    "code": "nl",
+    "confidence": 1.0
+   }
+  },
+  "rules": {
+   "5": {
+    "code": "nl",
+    "confidence": 0.99
+   },
+   "6": {
+    "code": "nl",
+    "confidence": 0.99
+   },
+   "8": {
+    "code": "nl",
+    "confidence": 0.99
+   },
+   "9": {
+    "code": "nl",
+    "confidence": 0.99
+   },
+   "11": {
+    "code": "nl",
+    "confidence": 0.99
+   },
+   "12": {
+    "code": "nl",
+    "confidence": 0.99
+   },
+   "14": {
+    "code": "nl",
+    "confidence": 1.0
+   },
+   "15": {
+    "code": "nl",
+    "confidence": 1.0
+   },
+   "16": {
+    "code": "nl",
+    "confidence": 1.0
+   },
+   "17": {
+    "code": "nl",
+    "confidence": 1.0
+   }
+  },
+  "privacy": {
+   "4": {
+    "code": "nl",
+    "confidence": 0.99
+   },
+   "8": {
+    "code": "nl",
+    "confidence": 1.0
+   },
+   "10": {
+    "code": "nl",
+    "confidence": 0.99
+   },
+   "12": {
+    "code": "nl",
+    "confidence": 0.99
+   },
+   "13": {
+    "code": "nl",
+    "confidence": 0.99
+   },
+   "14": {
+    "code": "nl",
+    "confidence": 1.0
+   }
+  }
+ }
+}

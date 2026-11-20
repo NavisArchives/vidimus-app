@@ -1,0 +1,17 @@
+{
+ "fr": {
+  "home": 1,
+  "rules": 2,
+  "privacy": 3
+ },
+ "nl": {
+  "home": 1,
+  "rules": 2,
+  "privacy": 3
+ },
+ "en": {
+  "home": 1,
+  "rules": 2,
+  "privacy": 3
+ }
+}

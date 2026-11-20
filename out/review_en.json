@@ -1,0 +1,138 @@
+[
+ {
+  "n": 1,
+  "id": "home#4",
+  "page": "home",
+  "index": 4,
+  "category": "grammar",
+  "severity": "high",
+  "title": "Subject and verb do not agree",
+  "fr": "Ouverte du mardi au samedi, de 10 h à 18 h.",
+  "en": "The library are open from Tuesday to Saturday, 10 am to 6 pm.",
+  "suggestion": "The library is open from Tuesday to Saturday, 10 am to 6 pm.",
+  "note": "« The library » is singular.",
+  "tag": "p",
+  "lt": [],
+  "pdf": "still"
+ },
+ {
+  "n": 2,
+  "id": "home#10",
+  "page": "home",
+  "index": 10,
+  "category": "grammar",
+  "severity": "medium",
+  "title": "Spelling: « acces »",
+  "fr": "Accès gratuit à Internet",
+  "en": "Free internet acces",
+  "suggestion": "Free internet access",
+  "note": "",
+  "tag": "li",
+  "lt": [
+   {
+    "msg": "Possible spelling mistake found.",
+    "frag": "acces",
+    "offset": 14,
+    "len": 5,
+    "rule": "MORFOLOGIK_RULE_EN_GB",
+    "cat": "Possible Typo",
+    "type": "misspelling",
+    "fix": [
+     "access",
+     "acts",
+     "acres"
+    ]
+   }
+  ],
+  "pdf": "still"
+ },
+ {
+  "n": 3,
+  "id": "home#12",
+  "page": "home",
+  "index": 12,
+  "category": "untranslated",
+  "severity": "high",
+  "title": "Button text is still in French",
+  "fr": "Devenir membre",
+  "en": "Devenir membre",
+  "suggestion": "Become a member",
+  "note": "The navigation and every heading are translated; only the button is not.",
+  "tag": "button",
+  "lt": [
+   {
+    "msg": "Possible spelling mistake found.",
+    "frag": "Devenir",
+    "offset": 0,
+    "len": 7,
+    "rule": "MORFOLOGIK_RULE_EN_GB",
+    "cat": "Possible Typo",
+    "type": "misspelling",
+    "fix": [
+     "Deventer",
+     "Devoir",
+     "Evener"
+    ]
+   },
+   {
+    "msg": "Possible spelling mistake found.",
+    "frag": "membre",
+    "offset": 8,
+    "len": 6,
+    "rule": "MORFOLOGIK_RULE_EN_GB",
+    "cat": "Possible Typo",
+    "type": "misspelling",
+    "fix": [
+     "member"
+    ]
+   }
+  ],
+  "pdf": "still"
+ },
+ {
+  "n": 4,
+  "id": "rules#6",
+  "page": "rules",
+  "index": 6,
+  "category": "grammar",
+  "severity": "high",
+  "title": "Wrong form of the verb after « be »",
+  "fr": "La carte de membre est personnelle et ne peut être prêtée.",
+  "en": "The membership card is personal and may not be lend.",
+  "suggestion": "The membership card is personal and may not be lent.",
+  "note": "The past participle of « lend » is « lent ».",
+  "tag": "p",
+  "lt": [
+   {
+    "msg": "Consider using either the past participle “lent” or the present participle “lending” here.",
+    "frag": "lend",
+    "offset": 47,
+    "len": 4,
+    "rule": "BEEN_PART_AGREEMENT",
+    "cat": "Grammar",
+    "type": "grammar",
+    "fix": [
+     "lent",
+     "lending"
+    ]
+   }
+  ],
+  "pdf": "still"
+ },
+ {
+  "n": 5,
+  "id": "privacy#8",
+  "page": "privacy",
+  "index": 8,
+  "category": "grammar",
+  "severity": "medium",
+  "title": "Plural missing after « 12 »",
+  "fr": "Historique des prêts des 12 derniers mois",
+  "en": "Loan history for the last 12 month",
+  "suggestion": "Loan history for the last 12 months",
+  "note": "",
+  "tag": "li",
+  "lt": [],
+  "pdf": "still"
+ }
+]
