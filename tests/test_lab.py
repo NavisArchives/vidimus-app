@@ -63,7 +63,7 @@ class Sprite(unittest.TestCase):
         sprite = build.sprite()
         have = set(re.findall(r'<symbol id="i-([\w-]+)"', sprite))
         used = set()
-        for name in ["desk.js", "v1/template.html", "v2/template.html"]:
+        for name in ["desk.js"] + [f"{d}/template.html" for d in build.DIRECTIONS]:
             text = read(os.path.join(LAB, name))
             used |= set(re.findall(r"\bic\('([\w-]+)'", text))
             used |= set(re.findall(r'#i-([\w-]+)"', text))
@@ -86,7 +86,7 @@ class BuiltPages(unittest.TestCase):
                 self.assertNotIn(mark, html, f"{d}: {mark}")
 
     def test_copy_has_no_long_dashes(self):
-        for name in ["desk.js", "v1/template.html", "v2/template.html", "sample/findings.json", "sample/note.html"]:
+        for name in ["desk.js", "sample/findings.json", "sample/note.html"] + [f"{d}/template.html" for d in build.DIRECTIONS]:
             text = read(os.path.join(LAB, name))
             self.assertNotRegex(text, "[–—]", name)
 

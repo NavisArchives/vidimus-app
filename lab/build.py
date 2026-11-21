@@ -15,7 +15,7 @@ in the wrong place, so the build stops instead.
 import json, os, re, sys, unicodedata
 
 LAB = os.path.dirname(os.path.abspath(__file__))
-DIRECTIONS = ["v1", "v2"]
+DIRECTIONS = ["v1"]   # v2 « Ledger » was retired once Andy picked « Paper » (21 Nov); it is in git history
 SEVERITIES = {"high", "medium", "low"}
 TYPES = {"figures", "reference", "terminology", "consistency", "language"}
 
