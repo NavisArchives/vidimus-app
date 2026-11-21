@@ -276,7 +276,9 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 .cmt{position:absolute;left:0;right:0;top:0;background:var(--surface);border-radius:var(--r-card);box-shadow:var(--float);
   transition:transform .22s var(--ease),box-shadow .18s var(--ease)}
 .cmt.fresh{transition:none}
-.cmt > .rowbtn{padding:var(--g4) var(--g4) var(--g4) var(--g6);border-radius:var(--r-card)}
+/* folded cards breathe too */
+.cmt > .rowbtn{padding:20px var(--g6);border-radius:var(--r-card)}
+.cmt .rmain{gap:var(--g2)}
 .cmt:hover,.cmt.hover{box-shadow:0 0 0 1px rgba(24,24,27,.16),0 1px 2px rgba(24,24,27,.05),0 10px 28px -14px rgba(24,24,27,.26)}
 .cmt.st-rejected .rtitle{color:var(--muted)}
 /* the number leaves the card's text: a small square badge on the card's top-right corner, in the finding's colour,
@@ -368,7 +370,10 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 #detail .rowbtn{padding:16px 14px 6px 16px}
 #detail .row:hover > .rowbtn,#detail .row.hover > .rowbtn{background:none}
 .card{padding:0 16px 18px 52px;cursor:default}
-.cagents{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:2px 0 14px}
+.cagents{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);margin:2px 0 14px}
+.cagents .agent{display:inline-flex;align-items:center;gap:6px;color:var(--ink-2);font-weight:500}
+.cagents .agent .lg{width:20px;height:20px}
+.cagents .sep{margin-left:-5px}
 .cfield{margin-bottom:12px}
 .clabel{display:block;font-size:12.5px;font-weight:500;color:var(--muted);margin:0 0 6px 2px}
 .cquote,.csugg{font-size:15px;line-height:1.55;border-radius:11px;padding:10px 13px;background:var(--surface);
@@ -1376,7 +1381,7 @@ function votersHTML(f){
   const v = Object.entries(votesOf(f)).sort((a, b) => a[1].at - b[1].at);
   return v.length ? `<span class="rvoters">${v.map(([k, x]) => avatar(k, 'xs v-' + x.v)).join('')}</span>` : '';
 }
-function rowHTML(f, lane){   // lane: a floating card; folded, its status and who decided share one pill, and its tools show only when open
+function rowHTML(f, lane){   // lane: a floating card; folded, its status and who decided share one pill; its tools show in Found by when open
   const s = statusOf(f);
   const chip = s !== 'open' ? `<span class="stat st-${s}${lane ? ' vchip' : ''}">${ic(STATUS_ICON[s])}${STATUS[s]}${lane ? votersHTML(f) : ''}</span>` : '';
   return `<button type="button" class="rowbtn" aria-expanded="${sel === f.id}">
@@ -1386,7 +1391,7 @@ function rowHTML(f, lane){   // lane: a floating card; folded, its status and wh
         <span class="rmeta"><span class="rkey">${f.key}</span><span class="sevw s-${f.severity}">${SEV[f.severity]}</span>${lane ? '' : `<span>${TYPES[f.type]}</span>`}<span>Page ${f.page}</span>${
           chip}${lane ? '' : votersHTML(f)}</span>
       </span>
-      <span class="rside">${!lane || sel === f.id ? logos(agentsOf(f)) : ''}</span>
+      <span class="rside">${lane ? '' : logos(agentsOf(f))}</span>
     </button>`;
 }
 
@@ -1407,7 +1412,10 @@ function cardHTML(f){
     : `<div class="csugg">${diffHTML(f.quote, text)}</div>
        ${ed ? `<p class="cedited">${ic('pencil-simple')}Edited by ${esc(TEAM[ed.by] ? TEAM[ed.by].name : ed.by)}, ${ago(ed.at)}</p>` : ''}`;
   return `
-    <div class="cagents"><span>Found by ${esc(names(ags.map(k => AG[k].name)))}</span></div>
+    <div class="cagents"><span>Found by</span>${(() => {   // each tool with its own logo, next to its name
+      const parts = ags.map(k => `<span class="agent">${logo(k)}${esc(AG[k].name)}</span>`);
+      return parts.length < 2 ? parts.join('') : parts.slice(0, -1).join('<span class="sep">,</span>') + '<span class="and">and</span>' + parts[parts.length - 1];
+    })()}</div>
     <div class="cfield"><div class="clabel">Current text</div><div class="cquote">${esc(f.quote)}</div></div>
     <div class="cfield"><div class="clabel">Suggestion</div>${suggestion}</div>
     ${variants.length && editing !== f.id ? `<div class="cfield"><div class="clabel">Alternative</div>${variants.map((v, i) =>

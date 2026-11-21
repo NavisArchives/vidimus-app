@@ -606,7 +606,7 @@ function votersHTML(f){
   const v = Object.entries(votesOf(f)).sort((a, b) => a[1].at - b[1].at);
   return v.length ? `<span class="rvoters">${v.map(([k, x]) => avatar(k, 'xs v-' + x.v)).join('')}</span>` : '';
 }
-function rowHTML(f, lane){   // lane: a floating card; folded, its status and who decided share one pill, and its tools show only when open
+function rowHTML(f, lane){   // lane: a floating card; folded, its status and who decided share one pill; its tools show in Found by when open
   const s = statusOf(f);
   const chip = s !== 'open' ? `<span class="stat st-${s}${lane ? ' vchip' : ''}">${ic(STATUS_ICON[s])}${STATUS[s]}${lane ? votersHTML(f) : ''}</span>` : '';
   return `<button type="button" class="rowbtn" aria-expanded="${sel === f.id}">
@@ -616,7 +616,7 @@ function rowHTML(f, lane){   // lane: a floating card; folded, its status and wh
         <span class="rmeta"><span class="rkey">${f.key}</span><span class="sevw s-${f.severity}">${SEV[f.severity]}</span>${lane ? '' : `<span>${TYPES[f.type]}</span>`}<span>Page ${f.page}</span>${
           chip}${lane ? '' : votersHTML(f)}</span>
       </span>
-      <span class="rside">${!lane || sel === f.id ? logos(agentsOf(f)) : ''}</span>
+      <span class="rside">${lane ? '' : logos(agentsOf(f))}</span>
     </button>`;
 }
 
@@ -637,7 +637,10 @@ function cardHTML(f){
     : `<div class="csugg">${diffHTML(f.quote, text)}</div>
        ${ed ? `<p class="cedited">${ic('pencil-simple')}Edited by ${esc(TEAM[ed.by] ? TEAM[ed.by].name : ed.by)}, ${ago(ed.at)}</p>` : ''}`;
   return `
-    <div class="cagents"><span>Found by ${esc(names(ags.map(k => AG[k].name)))}</span></div>
+    <div class="cagents"><span>Found by</span>${(() => {   // each tool with its own logo, next to its name
+      const parts = ags.map(k => `<span class="agent">${logo(k)}${esc(AG[k].name)}</span>`);
+      return parts.length < 2 ? parts.join('') : parts.slice(0, -1).join('<span class="sep">,</span>') + '<span class="and">and</span>' + parts[parts.length - 1];
+    })()}</div>
     <div class="cfield"><div class="clabel">Current text</div><div class="cquote">${esc(f.quote)}</div></div>
     <div class="cfield"><div class="clabel">Suggestion</div>${suggestion}</div>
     ${variants.length && editing !== f.id ? `<div class="cfield"><div class="clabel">Alternative</div>${variants.map((v, i) =>
