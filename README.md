@@ -74,10 +74,11 @@ The sample in `out/` was checked against LanguageTool's public API (`LT_SERVER=h
 
 - **One document, mistakes marked in place.** The desk renders the PDF with PDF.js, finds each finding's quoted text in it and tints that text. Numbered markers sit in a gutter beside the page, never on the text. Every finding has a key (`VD-01` …) the team can refer to.
 - **Filters** by severity, type and the tool that found it, with counts, plus a search behind a magnifier (or `/`).
-- **Three cards beside the page:** the filters, the selected finding with its suggestion (the new wording, changes in green), and the other findings folded underneath. Page and zoom controls sit in a small rail at the left edge, off the page.
+- **Findings beside the page, like comments in Google Docs.** Each finding is a card level with its text that scrolls with the document. Folded, it shows its title and who decided; opened, it shows the current text, the suggestion (the new wording, changes in green) and the decisions, and the cards around it move aside. The filters stay pinned at the top of that lane.
+- **One bar under the page** holds the keyboard shortcuts, the page and the zoom. It hides, and a small arrow brings it back.
 - **Team decisions.** Approve, reject or edit a suggestion; each decision records who made it and when, so one finding can be approved by one person and rejected by another.
 - **Export** of every finding (or only the approved ones) with its decision and who made it, as CSV or as a Markdown report.
-- **Screens:** sign in (demo accounts), dashboard, reviews (the history of every finding and decision), documents, agents (connect your tools), the review itself and export, behind a sidebar that stays folded until opened. Interface in English.
+- **Screens:** sign in (demo accounts), dashboard, reviews (the history of every finding and decision), documents, agents (connect your tools), the review itself and export, behind a sidebar that stays folded (its toggle sits under the logo) until opened. Interface in English.
 - A second direction, « Ledger », was retired once « Paper » was chosen; it is in the git history.
 
 **Sample states only.** The sign-in, the « Connect your tools » panel (Claude, ChatGPT, Gemini, Grok, LanguageTool and team review) and every decision are kept in the browser's local storage. Nothing is called, no key is asked for or stored, and nothing leaves the page. The logos name the tools and remain their owners' trademarks; sources and licences are in `lab/assets/NOTICE.md`.

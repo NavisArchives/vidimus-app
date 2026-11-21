@@ -171,7 +171,8 @@ function diffHTML(a, b){
    ===================================================================== */
 const HOME = document.body.dataset.home || 'review';
 const OTHERS = document.body.dataset.list === 'others';      // the selected finding is not repeated in the list
-const AUTO = 'autoselect' in document.body.dataset;          // open the review on the first open finding
+const AUTO = 'autoselect' in document.body.dataset;          // on a phone, the sheet's peek always holds a finding
+const autoSel = () => AUTO && MOBILE.matches;                 // on a desk the findings fold and open like comments
 const NAV_OF = {review: 'documents', export: 'documents'};
 const firstOpen = () => (shown().find(f => tabOf(f) === 'open') || shown()[0] || {}).id || null;
 function route(){
@@ -189,8 +190,8 @@ function route(){
   if (s === 'documents') renderDocuments();
   if (s === 'agents') renderTools();
   if (s === 'review'){
-    if (AUTO && !sel) sel = firstOpen();
-    render(); if (!doc) mount(); else { layout(); if (sel) scrollDocTo(byId[sel]); }
+    if (autoSel() && !sel) sel = firstOpen();
+    render(); if (!doc) mount(); else { layout(); if (sel) focusSel(); }
   }
   const main = $(`#screen-${s}`); if (main) main.scrollTop = 0;
 }
@@ -340,7 +341,7 @@ function renderDocuments(){
    phone it is a drawer over the page that closes on every move. */
 function setNav(open){
   document.body.classList.toggle('nav-open', !!open);
-  if (MOBILE.matches) $('#sidebtn')?.setAttribute('aria-expanded', !!open);
+  $('#navbtn')?.setAttribute('aria-expanded', !!open);
 }
 function setSide(open){
   document.body.classList.toggle('side-open', !!open);
@@ -349,12 +350,22 @@ function setSide(open){
 }
 if ($('#sidebtn')){
   if (lsGet('side', false)) document.body.classList.add('side-open');
-  $('#sidebtn').setAttribute('aria-expanded', !MOBILE.matches && document.body.classList.contains('side-open'));
-  $('#sidebtn').onclick = e => {
-    e.stopPropagation();
-    if (MOBILE.matches) setNav(!document.body.classList.contains('nav-open'));
-    else setSide(!document.body.classList.contains('side-open'));
-  };
+  $('#sidebtn').setAttribute('aria-expanded', document.body.classList.contains('side-open'));
+  $('#sidebtn').onclick = e => { e.stopPropagation(); setSide(!document.body.classList.contains('side-open')); };
+}
+$('#navbtn') && ($('#navbtn').onclick = e => { e.stopPropagation(); setNav(!document.body.classList.contains('nav-open')); });
+
+/* ---------- the bar under the pages: it hides, and a small arrow brings it back ---------- */
+function setDock(on){
+  document.body.classList.toggle('dock-off', !on);
+  lsSet('dock', !!on);
+  $('#dockhide')?.setAttribute('aria-expanded', !!on);
+  $('#dockshow')?.setAttribute('aria-expanded', !!on);
+}
+if ($('#dock')){
+  setDock(lsGet('dock', true) !== false);
+  $('#dockhide').onclick = () => { setDock(false); $('#dockshow').focus(); };
+  $('#dockshow').onclick = () => { setDock(true); $('#dockhide').focus(); };
 }
 $('#wsbtn') && ($('#wsbtn').onclick = e => {
   e.stopPropagation();
@@ -572,7 +583,7 @@ document.addEventListener('pointerdown', e => {
     const el = $(m);
     if (el && !el.hidden && !el.contains(e.target) && !e.target.closest(b)) closeMenus();
   }
-  if (document.body.classList.contains('nav-open') && !e.target.closest('#side,#sidebtn')) setNav(false);
+  if (document.body.classList.contains('nav-open') && !e.target.closest('#side,#navbtn')) setNav(false);
 });
 
 function renderTabs(){
@@ -599,9 +610,9 @@ function rowHTML(f){
       <span class="rmain">
         <span class="rtitle">${esc(f.title)}</span>
         <span class="rmeta"><span class="rkey">${f.key}</span><span class="sevw s-${f.severity}">${SEV[f.severity]}</span><span>${TYPES[f.type]}</span><span>Page ${f.page}</span>${
-          s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : ''}</span>
+          s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : ''}${votersHTML(f)}</span>
       </span>
-      <span class="rside">${logos(agentsOf(f))}${votersHTML(f)}</span>
+      <span class="rside">${logos(agentsOf(f))}</span>
     </button>`;
 }
 
@@ -615,22 +626,14 @@ function decisionsHTML(f){
 function cardHTML(f){
   const ags = agentsOf(f), mine = myVote(f), text = textOf(f), ed = edits[f.id];
   const variants = (f.variants || []).filter(v => conn[v.agent] && v.text !== text);
-  const head = INLINE ? '' : `
-    <header class="chead"><span class="mk-mini s-${f.severity} st-${statusOf(f)}">${f.n}</span><span class="ckey">${f.key}</span>
-      <span class="sevw s-${f.severity}">${SEV[f.severity]}</span><span class="ctype">${TYPES[f.type]}</span>
-      <button type="button" class="cpage" data-show>${ic('crosshair-simple')}Page ${f.page}</button>${
-      'cardnav' in document.body.dataset ? (() => { const fs = shown(), i = fs.findIndex(x => x.id === f.id);
-        return `<span class="cnav"><button type="button" data-step="-1" aria-label="Previous finding (K)"${i <= 0 ? ' disabled' : ''}>${ic('caret-up')}</button>
-          <span>${i + 1} of ${fs.length}</span><button type="button" data-step="1" aria-label="Next finding (J)"${i >= fs.length - 1 ? ' disabled' : ''}>${ic('caret-down')}</button></span>`; })() : ''}</header>
-    <h2 class="ctitle">${esc(f.title)}</h2>`;
   const suggestion = editing === f.id
     ? `<textarea class="cinput" id="ta-${f.id}" rows="2" spellcheck="true" aria-label="Suggestion for ${f.key}">${esc(text)}</textarea>
        <div class="cedit"><button type="button" class="btn small primary" data-save>${ic('check')}<span>Save</span></button>
          <button type="button" class="btn small ghost" data-cancel>Cancel</button><span class="hint">Enter to save, Esc to cancel</span></div>`
     : `<div class="csugg">${diffHTML(f.quote, text)}</div>
        ${ed ? `<p class="cedited">${ic('pencil-simple')}Edited by ${esc(TEAM[ed.by] ? TEAM[ed.by].name : ed.by)}, ${ago(ed.at)}</p>` : ''}`;
-  return `${head}
-    <div class="cagents">${INLINE ? '' : logos(ags)}<span>Found by ${esc(names(ags.map(k => AG[k].name)))}</span></div>
+  return `
+    <div class="cagents"><span>Found by ${esc(names(ags.map(k => AG[k].name)))}</span></div>
     <div class="cfield"><div class="clabel">Current text</div><div class="cquote">${esc(f.quote)}</div></div>
     <div class="cfield"><div class="clabel">Suggestion</div>${suggestion}</div>
     ${variants.length && editing !== f.id ? `<div class="cfield"><div class="clabel">Alternative</div>${variants.map((v, i) =>
@@ -671,14 +674,11 @@ function wireCard(el, f){
   $('.reject', el).onclick = () => vote(f.id, 'rejected');
   $('.edit', el).onclick = () => editing === f.id ? (editing = null, render()) : startEdit(f.id);
   $$('[data-show]', el).forEach(b => b.onclick = () => showInDoc(f));
-  $$('[data-step]', el).forEach(b => b.onclick = () => {
-    const fs = shown(), i = fs.findIndex(x => x.id === f.id), nx = fs[i + +b.dataset.step];
-    if (nx) select(nx.id, 'key');
-  });
 }
 
 function renderList(){
   const host = $('#list'); if (!host) return;
+  if (!MOBILE.matches){ host.innerHTML = ''; listTop = false; return; }
   if (listTop){ host.scrollTop = 0; listTop = false; }
   const fs = shown().filter(f => !(OTHERS && f.id === sel));
   if (!fs.length){
@@ -700,6 +700,7 @@ function renderList(){
 }
 function renderDetail(){
   const host = $('#detail'); if (!host || INLINE) return;
+  if (!MOBILE.matches){ host.innerHTML = ''; return; }
   const f = sel && byId[sel];
   if (!f){
     const next = shown().find(x => tabOf(x) === 'open');
@@ -710,7 +711,10 @@ function renderDetail(){
     const b = $('[data-first]', host); if (b) b.onclick = () => select(next.id, 'detail');
     return;
   }
-  host.innerHTML = `<div class="card" data-id="${f.id}">${cardHTML(f)}</div>`;
+  host.innerHTML = `<div class="row sel st-${statusOf(f)}" data-id="${f.id}">${rowHTML(f)}<div class="card" data-id="${f.id}">${cardHTML(f)}</div></div>`;
+  const rb = $('.rowbtn', host);
+  rb.title = 'Show in the document'; rb.onclick = () => showInDoc(f);
+  rb.onmouseenter = () => hover(f.id, true); rb.onmouseleave = () => hover(f.id, false);
   wireCard($('.card', host), f);
 }
 
@@ -757,12 +761,11 @@ function select(id, from){
   render();
   const f = id && byId[id];
   if (!f) return;
-  if (from !== 'doc' && !(MOBILE.matches && document.body.classList.contains('sheet-open'))) scrollDocTo(f);
+  if (!MOBILE.matches){ revealSel(); return; }
+  const open = document.body.classList.contains('sheet-open');
+  if (from !== 'doc' && !open) scrollDocTo(f);
   // with the phone sheet folded the list is out of sight: leave it (and the peek) where they are
-  if (from !== 'list' && !(MOBILE.matches && !document.body.classList.contains('sheet-open'))){
-    const li = $(`#list .row[data-id="${id}"]`);
-    if (li) li.scrollIntoView({block: INLINE ? 'start' : 'nearest', behavior: 'auto'});
-  }
+  if (open){ const p = $('#panel'); if (p) p.scrollTop = 0; }
 }
 function showInDoc(f){
   if (MOBILE.matches) setSheet(false);
@@ -771,6 +774,7 @@ function showInDoc(f){
 function hover(id, on){
   $$(`[data-fid="${id}"]`).forEach(el => el.classList.toggle('hover', on));
   const li = $(`#list .row[data-id="${id}"]`); if (li) li.classList.toggle('hover', on);
+  const c = $(`#cmts .cmt[data-id="${id}"]`); if (c) c.classList.toggle('hover', on);
 }
 
 /* =====================================================================
@@ -877,10 +881,10 @@ addEventListener('keydown', e => {
     if (openDrop){ openDrop = null; renderFilters(); return; }
     if ($('#usermenu') && !$('#usermenu').hidden){ closeMenus(); $('#avatarbtn')?.focus(); return; }
     if ($('#wsmenu') && !$('#wsmenu').hidden){ closeMenus(); $('#wsbtn')?.focus(); return; }
-    if (document.body.classList.contains('nav-open')){ setNav(false); $('#sidebtn')?.focus(); return; }
+    if (document.body.classList.contains('nav-open')){ setNav(false); $('#navbtn')?.focus(); return; }
     if (document.body.classList.contains('sheet-open')) return setSheet(false);
     if (editing){ editing = null; render(); return; }
-    if (sel && !AUTO){ sel = null; render(); }
+    if (sel && !autoSel()){ sel = null; render(); }
     return;
   }
   if (document.body.dataset.screen !== 'review' || document.body.classList.contains('modal-open')) return;
@@ -920,8 +924,9 @@ async function lib(){
 const cssNum = name => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0;
 const PHONE_READ = 1.05;   // a phone shows the page at about 1.05 CSS px per point
 function fitWidth(){
-  // the rail on the left holds the markers, so they never sit on the text
-  const avail = scroller.clientWidth - cssNum('--gutter') - cssNum('--gutter-r') - cssNum('--pad-x') * 2;
+  // the gutter on the left holds the markers, so they never sit on the text; the lane of findings sits on the right
+  const lane = MOBILE.matches ? 0 : cssNum('--lane') + cssNum('--lane-gap') + 14;
+  const avail = scroller.clientWidth - lane - cssNum('--gutter') - cssNum('--gutter-r') - cssNum('--pad-x') * 2;
   return Math.max(220, Math.min(avail, MAXW));
 }
 function zoomNow(){
@@ -962,7 +967,7 @@ function mount(){
     drawMarks();
     render();
     alignText();
-    if (sel) scrollDocTo(byId[sel]);
+    if (sel) focusSel();
     thumbs();
     document.body.classList.add('ready');
   })().catch(err => {
@@ -981,6 +986,7 @@ function layout(){
   }
   pages.forEach(paint);
   placeMarkers();
+  placeLane();
   const zv = $('#zoomval'); if (zv) zv.textContent = Math.round(zoomNow() * 100) + '%';
 }
 function paint(P){
@@ -1105,6 +1111,103 @@ function placeMarkers(){
   }
 }
 
+/* ---------- the desk: findings float beside the page, as comments do in Google Docs ----------
+   Each card sits level with its text and scrolls with the document (it lives in the same
+   scroller). Folded, it shows its row; selected, it opens in place and the cards around it
+   move aside: the open one keeps its height, the ones above go up, the ones below go down. */
+const LANE_GAP = 10;
+const lanePos = {};        // id -> {x, y}: a re-render starts each card where it was, so moves animate
+let laneSel = null;        // the open card's top and height in the lane
+const laneRO = new ResizeObserver(() => requestAnimationFrame(placeLane));
+function renderLane(){
+  const host = $('#cmts'); if (!host) return;
+  laneRO.disconnect();
+  if (MOBILE.matches || !pages.length || F.some(f => f.rects === null)){ host.innerHTML = ''; return; }
+  const fs = shown();
+  host.innerHTML = fs.length ? fs.map(f => {
+    const p = lanePos[f.id];
+    return `<li class="cmt st-${statusOf(f)}${sel === f.id ? ' sel' : ''}${p ? '' : ' fresh'}" data-id="${f.id}"${
+      p ? ` style="transform:translate(${p.x}px,${p.y}px)"` : ''}>${rowHTML(f)}${
+      sel === f.id ? `<div class="card" data-id="${f.id}">${cardHTML(f)}</div>` : ''}</li>`;
+  }).join('') : `<li class="cmt fresh"><div class="empty">${ic('funnel-simple')}<b>${F.some(live) ? 'No findings match' : 'No tools are connected'}</b>
+      <span>${F.some(live) ? 'Try another filter or clear them.' : 'Connect a tool to see what it finds.'}</span>
+      ${filtering() ? '<button type="button" class="btn small" data-clear>Clear filters</button>' : ''}</div></li>`;
+  for (const li of $$('.cmt[data-id]', host)){
+    const f = byId[li.dataset.id], b = $('.rowbtn', li);
+    b.title = sel === f.id ? 'Fold' : 'Open';
+    b.onclick = () => select(sel === f.id ? null : f.id, 'lane');
+    li.onmouseenter = () => hover(f.id, true);
+    li.onmouseleave = () => hover(f.id, false);
+    const card = $('.card', li); if (card) wireCard(card, f);
+  }
+  placeLane();
+  const open = $('.cmt.sel', host); if (open) laneRO.observe(open);
+  const fh = $('#findhead'); if (fh) laneRO.observe(fh);
+}
+function anchorOf(f, L){
+  const P = pages[f.page - 1]; if (!P || !P.sheet.clientHeight) return null;
+  const H = P.sheet.clientHeight, r = f.rects && f.rects[0];
+  // the card's marker sits level with the middle of its first line
+  return P.sheet.getBoundingClientRect().top - L + (r ? (r.y + r.h / 2) * H - 24 : 8);
+}
+function laneMin(lane){
+  const h = $('#lanehead', lane);
+  return h && h.contains($('#findhead')) ? h.offsetHeight + 2 : 4;
+}
+function placeLane(){
+  const lane = $('#lane'), host = $('#cmts');
+  laneSel = null;
+  if (!lane || !host || MOBILE.matches || !lane.offsetParent) return;
+  const L = lane.getBoundingClientRect().top, min = laneMin(lane);
+  const items = $$('.cmt', host).map((el, i) => {
+    const f = byId[el.dataset.id], a = f ? anchorOf(f, L) : null;
+    return {el, f, i, y: Math.max(min, a == null ? min : a), h: el.offsetHeight};
+  }).sort((a, b) => a.y - b.y || a.i - b.i);
+  const n = items.length, top = [], s = items.findIndex(o => o.f && o.f.id === sel);
+  const down = from => { for (let i = from; i < n; i++) top[i] = Math.max(items[i].y, i ? top[i - 1] + items[i - 1].h + LANE_GAP : min); };
+  if (s < 0) down(0);
+  else {
+    top[s] = items[s].y;
+    down(s + 1);
+    for (let i = s - 1; i >= 0; i--) top[i] = Math.min(items[i].y, top[i + 1] - LANE_GAP - items[i].h);
+    if (top[0] < min){                       // no room above: the whole stack moves down
+      top[0] = min;
+      for (let i = 1; i < n; i++) top[i] = Math.max(top[i], top[i - 1] + items[i - 1].h + LANE_GAP);
+    }
+  }
+  let bottom = 0;
+  items.forEach((o, i) => {
+    const open = !!(o.f && o.f.id === sel), x = open ? -12 : 0, y = Math.round(top[i]);
+    o.el.style.transform = `translate(${x}px,${y}px)`;
+    if (o.f) lanePos[o.f.id] = {x, y};
+    if (open) laneSel = {top: y, h: o.h};
+    bottom = Math.max(bottom, y + o.h);
+  });
+  lane.style.minHeight = Math.ceil(bottom + 24) + 'px';
+  requestAnimationFrame(() => $$('.cmt.fresh', host).forEach(el => el.classList.remove('fresh')));
+}
+/* bring the open card fully into view, below the pinned findings card */
+function revealSel(){
+  const lane = $('#lane'); if (!lane || !laneSel) return;
+  const cover = laneMin(lane);
+  const sr = scroller.getBoundingClientRect(), st = scroller.scrollTop, ch = scroller.clientHeight;
+  const top = lane.getBoundingClientRect().top - sr.top + st + laneSel.top, bot = top + laneSel.h;
+  let to = null;
+  if (top < st + cover) to = top - cover;
+  else if (bot > st + ch - 12) to = Math.min(bot - ch + 12, top - cover);
+  if (to != null) scroller.scrollTo({top: Math.max(0, to), behavior: REDUCED ? 'auto' : 'smooth'});
+}
+function focusSel(){ if (!sel) return; if (MOBILE.matches) scrollDocTo(byId[sel]); else revealSel(); }
+/* the findings card: pinned in the lane on a desk, at the top of the sheet on a phone */
+function placeFindhead(){
+  const fh = $('#findhead'); if (!fh) return;
+  if (MOBILE.matches){ const d = $('#detail'); if (d && fh.nextElementSibling !== d) d.before(fh); }
+  else { const h = $('#lanehead'); if (h && fh.parentNode !== h) h.append(fh); }
+}
+placeFindhead();
+MOBILE.addEventListener('change', () => { placeFindhead(); render(); });
+document.fonts && document.fonts.ready.then(() => placeLane());
+
 function scrollDocTo(f){
   const P = pages[f.page - 1]; if (!P) return;
   const r = f.rects && f.rects[0];
@@ -1181,8 +1284,8 @@ function thumbMarks(){
 function render(){
   // with a pinned card there is always a finding in it: when filters or search hide
   // the current one, the first one that matches takes its place
-  if (AUTO && document.body.dataset.screen === 'review' && (!sel || !pass(byId[sel]))) sel = firstOpen();
-  renderTop(); renderSearchBox(); renderFilters(); renderTabs(); renderList(); renderDetail(); renderPeek();
+  if (autoSel() && document.body.dataset.screen === 'review' && (!sel || !pass(byId[sel]))) sel = firstOpen();
+  renderTop(); renderSearchBox(); renderFilters(); renderTabs(); renderList(); renderDetail(); renderPeek(); renderLane();
   if (document.body.dataset.screen === 'agents') renderTools();
   if ($('#toolsmodal') && !$('#toolsmodal').hidden) renderTools();
   paintMarks();

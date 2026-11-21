@@ -10,10 +10,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap">
 <style>
 /* Vidimus lab · v1 « Paper » (round 2)
-   Light and cool-neutral. A sidebar that stays folded until asked for; the
-   pages on a grey table with their controls in a small rail at the left
-   edge; three floating cards on the right: the findings header, the
-   selected finding, the other findings folded together underneath.
+   Light and cool-neutral. A sidebar folded to a strip that holds only its
+   toggle, right under the V; the pages on a grey table with one bar under
+   them (shortcuts, pages, zoom) that hides behind a small arrow; three
+   floating cards on the right: the findings header, the selected finding
+   (the Revision 1 card), the other findings folded together underneath.
    Colour: near-black for structure, emerald for approval (and only approval),
    three severity colours that appear nowhere else. Shape rule: cards 16px,
    controls 9px, menu rows 7px; avatars, markers and logos round.
@@ -32,7 +33,7 @@
   --float:0 0 0 1px rgba(24,24,27,.06),0 1px 2px rgba(24,24,27,.04),0 10px 28px -14px rgba(24,24,27,.18);
   --pop:0 0 0 1px rgba(24,24,27,.08),0 16px 40px -12px rgba(24,24,27,.28);
   --ease:cubic-bezier(.23,1,.32,1);
-  --side:232px; --top:58px; --col:432px;
+  --side:232px; --strip:56px; --top:58px; --col:432px; --lane:380px; --lane-gap:28px;
   --gutter:36px; --gutter-r:0px; --pad-x:12px; --peek:164px; --dock:44px;
   --sans:'Geist',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
 }
@@ -54,9 +55,14 @@ kbd{font:500 10.5px/1 var(--sans);min-width:18px;height:18px;display:inline-grid
 body[data-screen="signin"] #screen-signin{display:flex}
 body[data-screen="signin"] .app{display:none}
 .app{height:100%;display:grid;grid-template-rows:var(--top) minmax(0,1fr);grid-template-columns:auto minmax(0,1fr)}
-.top{grid-column:1 / -1;display:flex;align-items:center;gap:12px;padding:0 16px 0 10px;position:relative;z-index:20}
-.side{grid-row:2;width:0;overflow:hidden;visibility:hidden;transition:width .24s var(--ease),visibility 0s .24s}
-body.side-open .side{width:var(--side);visibility:visible;transition:width .24s var(--ease)}
+/* the V sits at the far left, centred over the sidebar strip; the sidebar toggle sits right under it and never moves */
+.top{grid-column:1 / -1;display:flex;align-items:center;gap:12px;padding:0 16px;position:relative;z-index:20}
+#navbtn{display:none}
+.side{grid-row:2;width:var(--strip);overflow:hidden;transition:width .24s var(--ease)}
+body.side-open .side{width:var(--side)}
+.side-top{display:flex;padding-left:1px;margin-bottom:8px}
+.side :is(.side-nav,.side-sep,.side-ws){opacity:0;visibility:hidden;transition:opacity .12s var(--ease),visibility 0s .12s}
+body.side-open .side :is(.side-nav,.side-sep,.side-ws){opacity:1;visibility:visible;transition:opacity .2s var(--ease) .06s}
 .content{grid-row:2;grid-column:2;min-width:0;min-height:0;display:flex;flex-direction:column}
 .content > .screen{flex:1;min-height:0}
 body[data-screen="review"] #screen-review{display:grid}
@@ -173,10 +179,10 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 #usermenu{right:0;top:calc(100% + 8px);transform-origin:top right}
 
 /* ---------- sidebar ---------- */
-.side-in{width:var(--side);height:100%;display:flex;flex-direction:column;padding:6px 12px 16px 12px;overflow-y:auto}
+.side-in{width:var(--side);height:100%;display:flex;flex-direction:column;padding:6px 10px 16px;overflow-y:auto}
 .side-brand{display:none;align-items:center;gap:9px;font-weight:600;font-size:15px;padding:4px 12px 18px}
 .side-nav{list-style:none;margin:0;padding:0;display:grid;gap:2px}
-.side-nav a{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:10px;color:var(--ink-2);text-decoration:none;font-weight:500;
+.side-nav a{display:flex;align-items:center;gap:12px;height:40px;padding:0 9px;border-radius:10px;color:var(--ink-2);text-decoration:none;font-weight:500;
   transition:background-color .15s}
 .side-nav a .ic{width:18px;height:18px;color:var(--muted)}
 .side-nav a:hover{background:rgba(24,24,27,.05);color:var(--ink)}
@@ -192,18 +198,37 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 .wsbtn .ic{color:var(--muted)}
 #wsmenu{left:0;top:calc(100% + 6px);width:100%;transform-origin:top left}
 
-/* ---------- review: the rail, the pages, three cards ---------- */
-#screen-review{grid-template-columns:44px minmax(0,1fr) var(--col);gap:12px;padding:2px 24px 20px 12px}
-/* the page and zoom controls: a small rail at the window's (or the sidebar's) left edge, never on the page */
-.rail{display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:6px}
-.rgroup{display:flex;flex-direction:column;align-items:center;width:44px;padding:4px 0;background:var(--surface);border-radius:12px;box-shadow:var(--float)}
-.rgroup button{display:grid;place-items:center;width:36px;height:32px;border:0;border-radius:8px;background:none;color:var(--ink-2);
+/* ---------- review: the pages with their bar, three cards ---------- */
+#screen-review{grid-template-columns:minmax(0,1fr);padding:2px 12px 0 4px}
+.docpane{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px;padding-bottom:16px}
+/* the bar under the pages: shortcuts, pages, zoom. It hides, and a small arrow brings it back. Never on the page. */
+.dock{flex:none;display:flex;align-items:center;gap:2px;height:var(--dock);padding:0 6px 0 16px;background:var(--surface);
+  border-radius:var(--r-lg);box-shadow:var(--float);font-size:12.5px;color:var(--muted);white-space:nowrap;container-type:inline-size;
+  transition:opacity .2s var(--ease),transform .2s var(--ease)}
+@starting-style{.dock{opacity:0;transform:translateY(8px)}}
+.dkeys{flex:1;min-width:0;display:flex;align-items:center;gap:16px;margin:0;overflow:hidden}
+.dkeys span{display:inline-flex;align-items:center;gap:5px}
+.dkeys kbd + kbd{margin-left:-1px}
+@container (max-width:700px){ .dkeys .k5{display:none} }
+@container (max-width:620px){ .dkeys .k4{display:none} }
+@container (max-width:550px){ .dkeys{visibility:hidden} }
+.dctl{display:flex;align-items:center;gap:2px}
+.dock button{display:inline-grid;place-items:center;height:32px;min-width:32px;border:0;border-radius:999px;background:none;color:var(--ink-2);
   transition:transform .12s var(--ease),background-color .15s}
-.rgroup button:hover{background:var(--hover);color:var(--ink)}
-.rgroup button:active{transform:scale(.92)}
-.rgroup .rlabel{font-size:11.5px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums;padding:4px 0;text-align:center;line-height:1.2;white-space:nowrap}
-#zoomval{width:40px;height:26px;font-size:11.5px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
-.docpane{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column}
+.dock button:hover{background:var(--hover);color:var(--ink)}
+.dock button:active{transform:scale(.94)}
+.dsep{width:1px;height:18px;background:var(--line);margin:0 6px;flex:none}
+#pageno{min-width:52px;text-align:center;font-size:13px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+#zoomval{min-width:48px;font-size:12.5px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.dockshow{display:none}
+body.dock-off .dock{display:none}
+body.dock-off .docpane{gap:6px;padding-bottom:8px}
+body.dock-off .dockshow{display:grid;place-items:center;align-self:center;flex:none;width:56px;height:24px;border:0;border-radius:999px;
+  background:var(--surface);box-shadow:var(--float);color:var(--ink-2);transition:opacity .2s var(--ease),transform .2s var(--ease)}
+@starting-style{body.dock-off .dockshow{opacity:0;transform:translateY(6px)}}
+.dockshow:hover{color:var(--ink)}
+.dockshow:active{transform:scale(.94)}
+.dockshow .ic{width:14px;height:14px}
 #scroller{flex:1;min-height:0;overflow:auto;position:relative;overscroll-behavior:contain;border-radius:var(--r-card)}
 #pages{padding:4px var(--pad-x) 24px}
 .pg{display:grid;grid-template-columns:var(--gutter) auto;width:max-content;margin:0 auto 20px;padding-right:var(--gutter-r)}
@@ -234,8 +259,27 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 .mk.sel{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--ink)}
 
 /* the right column: three floating cards */
-#panel{display:flex;flex-direction:column;gap:12px;min-height:0}
-#findhead{flex:none;padding:14px 16px;display:grid;gap:12px}
+/* Findings beside the page, as comments are in Google Docs: each card floats at the height of its text and
+   scrolls with the document. Folded, a card shows its row; selected, it opens in place (the Revision 1 card)
+   and the cards around it move aside. The findings card stays pinned at the top of the lane. */
+#docrow{display:grid;grid-template-columns:max-content var(--lane);column-gap:var(--lane-gap);width:max-content;margin:0 auto;padding-right:14px;min-height:100%}
+#lane{position:relative;padding:0 0 24px}
+/* the pinned findings card sits on a strip of the table, so the cards slide under it and fade out at its edge */
+.lanehead{position:sticky;top:0;z-index:4;margin:0 -14px;padding:4px 14px 14px;
+  background:linear-gradient(var(--bg) calc(100% - 14px),rgba(241,241,242,0))}
+#findhead{padding:14px 16px;display:grid;gap:12px}
+.cmts{position:absolute;inset:0;list-style:none;margin:0;padding:0}
+.cmt{position:absolute;left:0;right:0;top:0;background:var(--surface);border-radius:var(--r-card);box-shadow:var(--float);
+  transition:transform .22s var(--ease),box-shadow .18s var(--ease)}
+.cmt.fresh{transition:none}
+.cmt > .rowbtn{padding:12px 12px 12px 14px;border-radius:var(--r-card)}
+.cmt:hover,.cmt.hover{box-shadow:0 0 0 1px rgba(24,24,27,.16),0 1px 2px rgba(24,24,27,.05),0 10px 28px -14px rgba(24,24,27,.26)}
+.cmt.st-rejected .rtitle{color:var(--muted)}
+.cmt.sel{z-index:2;background:var(--surface-2);box-shadow:var(--pop)}
+.cmt.sel > .rowbtn{padding-bottom:6px}
+.cmt .card{padding:0 14px 16px 50px}
+#panel{display:none}
+#panel > .fcard{flex:none}
 .fhead{display:flex;align-items:center;gap:10px;min-height:34px}
 .fhead h2{margin:0;font-size:16px;font-weight:600;letter-spacing:-.015em;white-space:nowrap}
 [data-searchbox]{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;min-width:0}
@@ -287,27 +331,15 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 .mitem .lg{width:20px;height:20px}
 .mitem .lg svg,.mitem .lg .ic{width:12px;height:12px}
 
-/* card B: the selected finding, on its own */
-/* the selected finding gets the height it needs; the folded list keeps at least a row and a half */
-#detail{flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;background:var(--surface-2)}
+/* card B: the selected finding, the card from Revision 1 (its row on top, then the text boxes and the decisions), floating on its own.
+   It always shows in full; the column scrolls, the card never does. */
+#detail{background:var(--surface-2)}
 #detail:empty{display:none}
-.card{padding:16px 18px 18px;cursor:default}
-.chead{display:flex;flex-wrap:wrap;align-items:center;gap:6px 9px;font-size:13px;color:var(--muted)}
-.chead > *{white-space:nowrap}
-.ckey{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
-.cpage{margin-left:auto;display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 9px;border:0;border-radius:8px;background:var(--surface);
-  box-shadow:inset 0 0 0 1px var(--line);color:var(--ink-2);font-size:12.5px;transition:transform .12s var(--ease)}
-.cpage:hover{color:var(--ink);box-shadow:inset 0 0 0 1px var(--line-2)}
-.cpage:active{transform:scale(.97)}
-.cpage .ic{width:13px;height:13px}
-.cnav{display:inline-flex;align-items:center;gap:2px;margin-left:auto;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
-.cpage + .cnav{margin-left:0}
-.cnav button{display:grid;place-items:center;width:26px;height:28px;border:0;border-radius:7px;background:none;color:var(--ink-2)}
-.cnav button:hover:not(:disabled){background:var(--hover);color:var(--ink)}
-.cnav button:disabled{color:var(--line-2);cursor:default}
-.cnav .ic{width:14px;height:14px}
-.ctitle{font-size:17px;font-weight:600;line-height:1.3;letter-spacing:-.015em;margin:12px 0 8px;text-wrap:pretty}
-.cagents{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:0 0 14px}
+#detail .row{margin:0;background:none;box-shadow:none;border-radius:inherit}
+#detail .rowbtn{padding:16px 14px 6px 16px}
+#detail .row:hover > .rowbtn,#detail .row.hover > .rowbtn{background:none}
+.card{padding:0 16px 18px 52px;cursor:default}
+.cagents{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:2px 0 14px}
 .cfield{margin-bottom:12px}
 .clabel{display:block;font-size:12.5px;font-weight:500;color:var(--muted);margin:0 0 6px 2px}
 .cquote,.csugg{font-size:15px;line-height:1.55;border-radius:11px;padding:10px 13px;background:var(--surface);
@@ -356,29 +388,24 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 .dempty .keys{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:12.5px}
 
 /* card C: the other findings, folded together */
-.listcard{flex:1 0 128px;min-height:128px;display:flex;flex-direction:column;overflow:hidden}
-.list{flex:1;min-height:0;overflow-y:auto;list-style:none;margin:0;padding:6px 8px 8px;overscroll-behavior:contain}
+/* card C: the other findings, folded together, rows as in Revision 1 (who decided in the meta line, the tools on the right) */
+.list{list-style:none;margin:0;padding:6px 8px 8px}
 .row{border-radius:12px;scroll-margin-top:6px;position:relative}
 .row + .row::before{content:"";position:absolute;left:46px;right:12px;top:0;height:1px;background:var(--line)}
 .row:hover::before,.row:hover + .row::before{opacity:0}
-.rowbtn{width:100%;display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:12px;align-items:start;text-align:left;border:0;background:none;padding:11px 10px;border-radius:12px}
+.rowbtn{width:100%;display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:12px;align-items:start;text-align:left;border:0;background:none;padding:12px 10px;border-radius:12px}
 .row:hover > .rowbtn,.row.hover > .rowbtn{background:var(--surface-2)}
 .rmain{display:flex;flex-direction:column;gap:4px;min-width:0}
 .rtitle{font-weight:500;font-size:14px;line-height:1.4;color:var(--ink);text-wrap:pretty}
 .row.st-rejected .rtitle{color:var(--muted)}
 .rmeta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:12.5px;color:var(--muted)}
 .rkey{font-weight:500;color:var(--ink-2);font-variant-numeric:tabular-nums}
-/* a folded row names who decided; the tools that found it are on the selected card */
-.rside{display:flex;align-items:center;gap:4px;padding-top:1px}
-.rside .lgstack{display:none}
-.rvoters{display:inline-flex;gap:4px;align-items:center}
+.rside{display:flex;flex-direction:column;align-items:flex-end;gap:8px;padding-top:1px}
+.rvoters{display:inline-flex;gap:4px;margin-left:auto;align-items:center}
 .empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:32px 24px;color:var(--muted);text-align:center}
 .empty .ic{width:26px;height:26px;color:var(--line-2);margin-bottom:4px}
 .empty b{color:var(--ink);font-weight:500}
 .empty .btn{margin-top:8px}
-.pfoot{flex:none;display:flex;align-items:center;gap:6px;padding:10px 16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
-.pfoot kbd{margin-left:8px}
-.pfoot kbd:first-child,.pfoot kbd + kbd{margin-left:0}
 .sheetbtn,#peek{display:none}
 
 /* ---------- dashboard, reviews, documents, agents ---------- */
@@ -501,18 +528,21 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 .ex-p i{font-style:normal;color:var(--muted);font-size:12.5px}
 .ex-none{color:var(--muted)}
 
-/* toasts: bottom-left, except on the review screen, where they sit at the
-   foot of the findings column (over the key hints), never on the page */
+/* toasts: bottom-left; on the review screen they sit over the left end of the
+   bar under the pages, never on the page */
 #toast{position:fixed;left:24px;bottom:20px;max-width:340px;transform:translateY(6px);background:var(--ink);color:#fff;
   padding:9px 15px;border-radius:999px;font-size:13px;font-weight:500;line-height:18px;z-index:70;pointer-events:none;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   opacity:0;visibility:hidden;transition:opacity .18s var(--ease),transform .18s var(--ease),visibility 0s .18s}
 #toast.on{opacity:1;visibility:visible;transform:none;transition:opacity .18s var(--ease),transform .18s var(--ease)}
-body[data-screen="review"] #toast{left:auto;right:40px;bottom:24px}
+@media (min-width:761px){
+  body[data-screen="review"] #toast{left:calc(var(--strip) + 24px);bottom:20px}
+  body.side-open[data-screen="review"] #toast{left:calc(var(--side) + 24px)}
+}
 
 /* ---------- narrower screens ---------- */
 @media (max-width:1180px){
-  :root{--col:372px;--pad-x:8px;--gutter:32px}
+  :root{--col:372px;--lane:360px;--lane-gap:20px;--pad-x:8px;--gutter:32px}
   #screen-review{gap:10px;padding:2px 16px 16px 10px}
   .prog .bar{width:84px}
   .rv{grid-template-columns:minmax(0,1fr)}
@@ -527,7 +557,9 @@ body[data-screen="review"] #toast{left:auto;right:40px;bottom:24px}
 }
 /* phone: a drawer for the sidebar, the document first, controls in a row above the findings sheet */
 @media (max-width:760px){
-  :root{--gutter:30px;--gutter-r:0px;--pad-x:6px;--top:54px}
+  :root{--gutter:30px;--gutter-r:0px;--pad-x:6px;--top:54px;--lane:0px;--lane-gap:0px}
+  #docrow{display:block;padding-right:0}
+  #lane{display:none}
   .top{gap:6px;padding:0 10px 0 6px}
   .wm,.home + .vr{display:none}
   #crumb > a,#crumb > .cr-sep{display:none}
@@ -540,30 +572,32 @@ body[data-screen="review"] #toast{left:auto;right:40px;bottom:24px}
   body.nav-open .side{visibility:visible;transform:none;transition:transform .26s var(--ease)}
   .side-in{width:280px;padding-top:16px}
   .side-brand{display:flex}
+  #navbtn{display:inline-grid}
+  .side-top{display:none}
+  body .side :is(.side-nav,.side-sep,.side-ws){opacity:1;visibility:visible;transition:none}
   .app::after{content:"";position:fixed;inset:0;background:rgba(24,24,27,.3);opacity:0;pointer-events:none;transition:opacity .2s;z-index:44}
   body.nav-open .app::after{opacity:1;pointer-events:auto}
   body[data-screen="review"] #screen-review{display:block;position:relative;padding:0}
-  .docpane{height:100%}
+  .docpane,body.dock-off .docpane{height:100%;gap:0;padding-bottom:0}
   #scroller{border-radius:0}
   #pages{padding:6px var(--pad-x) calc(var(--peek) + var(--dock) + 16px)}
   .pg{margin-bottom:12px}
-  .rail{position:fixed;left:0;right:0;bottom:var(--peek);z-index:25;height:var(--dock);flex-direction:row;justify-content:center;gap:16px;padding:0;
-    background:var(--surface);box-shadow:0 -1px 0 var(--line)}
-  .rgroup{flex-direction:row;width:auto;padding:0;box-shadow:none;background:none;border-radius:0}
-  .rgroup .rlabel{padding:0 4px;min-width:44px}
+  /* the bar is a row above the findings sheet; hidden, a small arrow waits at its right end */
+  .dock{position:fixed;left:0;right:0;bottom:var(--peek);z-index:25;height:var(--dock);justify-content:center;gap:12px;padding:0 8px;
+    border-radius:0;box-shadow:0 -1px 0 var(--line)}
+  .dkeys,.dock .dsep{display:none}
+  #dockhide{position:absolute;right:8px;top:6px}
+  body.dock-off .dockshow{position:fixed;right:12px;bottom:calc(var(--peek) + 8px);z-index:25}
   .mk{right:3px}
-  #panel{position:fixed;left:0;right:0;bottom:0;height:min(88dvh,780px);z-index:30;gap:0;border-radius:20px 20px 0 0;background:var(--surface);
+  #panel{display:flex;flex-direction:column;position:fixed;left:0;right:0;bottom:0;height:min(88dvh,780px);z-index:30;gap:0;padding:0;border-radius:20px 20px 0 0;background:var(--surface);
     box-shadow:0 -12px 36px -12px rgba(24,24,27,.28),0 -1px 0 var(--line);overflow-y:auto;
     transform:translateY(calc(100% - var(--peek)));transition:transform .32s cubic-bezier(.32,.72,0,1)}
   body.sheet-open #panel{transform:none}
   body:not(.sheet-open) #panel{overflow:hidden}
   body:not(.sheet-open) #panel > :not(.sheetbtn):not(#peek){visibility:hidden}
   #panel .fcard{box-shadow:none;border-radius:0;max-height:none;overflow:visible;background:var(--surface)}
-  #findhead{padding:4px 14px 12px;border-bottom:1px solid var(--line)}
+  #findhead{position:static;padding:4px 14px 12px;border-bottom:1px solid var(--line)}
   #detail{flex:none;background:var(--surface-2) !important;border-bottom:1px solid var(--line)}
-  #findhead{flex:none}
-  .listcard{flex:none;min-height:0}
-  .list{flex:none;overflow:visible}
   .sheetbtn{display:flex;justify-content:center;align-items:center;flex:none;height:26px;border:0;background:none;width:100%}
   .sheetbtn .handle{width:40px;height:4px;border-radius:2px;background:var(--line-2)}
   #peek{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px 12px;align-items:start;align-content:start;flex:none;
@@ -576,9 +610,9 @@ body[data-screen="review"] #toast{left:auto;right:40px;bottom:24px}
   #peek .pacts .btn{flex:1}
   body.sheet-open #peek{display:none}
   .fmenu{position:fixed;left:12px !important;right:12px !important;top:auto;bottom:16px;min-width:0}
-  .card{padding:14px 14px 16px}
+  #detail .rowbtn{padding:14px 12px 6px 14px}
+  .card{padding:0 14px 16px}
   .btn.show{display:inline-flex}
-  .pfoot{display:none}
   .dempty .keys{display:none}
   #usermenu{position:fixed;left:8px;right:8px;top:56px;width:auto}
   .page,.ex{padding:4px 14px 32px}
@@ -615,14 +649,14 @@ body[data-screen="review"] #toast{left:auto;right:40px;bottom:24px}
 @media (prefers-reduced-motion:reduce){ *{transition:none !important;animation:none !important} }
 </style>
 </head>
-<body data-dir="v1" data-card="detail" data-list="others" data-home="dashboard" data-autoselect data-cardnav data-screen="signin">
+<body data-dir="v1" data-card="detail" data-list="others" data-home="dashboard" data-autoselect data-screen="signin">
 <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><symbol id="i-arrow-left" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></symbol><symbol id="i-arrow-right" viewBox="0 0 256 256" fill="currentColor"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></symbol><symbol id="i-buildings" viewBox="0 0 256 256" fill="currentColor"><path d="M240,208H224V96a16,16,0,0,0-16-16H144V32a16,16,0,0,0-24.88-13.32L39.12,72A16,16,0,0,0,32,85.34V208H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM208,96V208H144V96ZM48,85.34,128,32V208H48ZM112,112v16a8,8,0,0,1-16,0V112a8,8,0,1,1,16,0Zm-32,0v16a8,8,0,0,1-16,0V112a8,8,0,1,1,16,0Zm0,56v16a8,8,0,0,1-16,0V168a8,8,0,0,1,16,0Zm32,0v16a8,8,0,0,1-16,0V168a8,8,0,0,1,16,0Z"/></symbol><symbol id="i-caret-down" viewBox="0 0 256 256" fill="currentColor"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></symbol><symbol id="i-caret-left" viewBox="0 0 256 256" fill="currentColor"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></symbol><symbol id="i-caret-right" viewBox="0 0 256 256" fill="currentColor"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></symbol><symbol id="i-caret-up" viewBox="0 0 256 256" fill="currentColor"><path d="M213.66,165.66a8,8,0,0,1-11.32,0L128,91.31,53.66,165.66a8,8,0,0,1-11.32-11.32l80-80a8,8,0,0,1,11.32,0l80,80A8,8,0,0,1,213.66,165.66Z"/></symbol><symbol id="i-check-circle" viewBox="0 0 256 256" fill="currentColor"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></symbol><symbol id="i-check" viewBox="0 0 256 256" fill="currentColor"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></symbol><symbol id="i-circle-notch" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128a104,104,0,0,1-208,0c0-41,23.81-78.36,60.66-95.27a8,8,0,0,1,6.68,14.54C60.15,61.59,40,93.27,40,128a88,88,0,0,0,176,0c0-34.73-20.15-66.41-51.34-80.73a8,8,0,0,1,6.68-14.54C208.19,49.64,232,87,232,128Z"/></symbol><symbol id="i-clock-counter-clockwise" viewBox="0 0 256 256" fill="currentColor"><path d="M136,80v43.47l36.12,21.67a8,8,0,0,1-8.24,13.72l-40-24A8,8,0,0,1,120,128V80a8,8,0,0,1,16,0Zm-8-48A95.44,95.44,0,0,0,60.08,60.15C52.81,67.51,46.35,74.59,40,82V64a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16H49c7.15-8.42,14.27-16.35,22.39-24.57a80,80,0,1,1,1.66,114.75,8,8,0,1,0-11,11.64A96,96,0,1,0,128,32Z"/></symbol><symbol id="i-crosshair-simple" viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm8,191.63V184a8,8,0,0,0-16,0v31.63A88.13,88.13,0,0,1,40.37,136H72a8,8,0,0,0,0-16H40.37A88.13,88.13,0,0,1,120,40.37V72a8,8,0,0,0,16,0V40.37A88.13,88.13,0,0,1,215.63,120H184a8,8,0,0,0,0,16h31.63A88.13,88.13,0,0,1,136,215.63Z"/></symbol><symbol id="i-download-simple" viewBox="0 0 256 256" fill="currentColor"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/></symbol><symbol id="i-file-text" viewBox="0 0 256 256" fill="currentColor"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-32-80a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,168Z"/></symbol><symbol id="i-funnel-simple" viewBox="0 0 256 256" fill="currentColor"><path d="M200,136a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,136Zm32-56H24a8,8,0,0,0,0,16H232a8,8,0,0,0,0-16Zm-80,96H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z"/></symbol><symbol id="i-house" viewBox="0 0 256 256" fill="currentColor"><path d="M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V160h32v56a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V120A15.87,15.87,0,0,0,219.31,108.68ZM208,208H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48V120l80-80,80,80Z"/></symbol><symbol id="i-keyboard" viewBox="0 0 256 256" fill="currentColor"><path d="M224,48H32A16,16,0,0,0,16,64V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V64A16,16,0,0,0,224,48Zm0,144H32V64H224V192Zm-16-64a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16H200A8,8,0,0,1,208,128Zm0-32a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16H200A8,8,0,0,1,208,96ZM72,160a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16h8A8,8,0,0,1,72,160Zm96,0a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,160Zm40,0a8,8,0,0,1-8,8h-8a8,8,0,0,1,0-16h8A8,8,0,0,1,208,160Z"/></symbol><symbol id="i-lightning" viewBox="0 0 256 256" fill="currentColor"><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17ZM109.37,214l10.47-52.38a8,8,0,0,0-5-9.06L62,132.71l84.62-90.66L136.16,94.43a8,8,0,0,0,5,9.06l52.8,19.8Z"/></symbol><symbol id="i-list-checks" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H128a8,8,0,0,1,0-16h88A8,8,0,0,1,224,128ZM128,72h88a8,8,0,0,0,0-16H128a8,8,0,0,0,0,16Zm88,112H128a8,8,0,0,0,0,16h88a8,8,0,0,0,0-16ZM82.34,42.34,56,68.69,45.66,58.34A8,8,0,0,0,34.34,69.66l16,16a8,8,0,0,0,11.32,0l32-32A8,8,0,0,0,82.34,42.34Zm0,64L56,132.69,45.66,122.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32,0l32-32a8,8,0,0,0-11.32-11.32Zm0,64L56,196.69,45.66,186.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32,0l32-32a8,8,0,0,0-11.32-11.32Z"/></symbol><symbol id="i-list" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"/></symbol><symbol id="i-magnifying-glass" viewBox="0 0 256 256" fill="currentColor"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></symbol><symbol id="i-minus" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128Z"/></symbol><symbol id="i-pencil-simple" viewBox="0 0 256 256" fill="currentColor"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"/></symbol><symbol id="i-plugs-connected" viewBox="0 0 256 256" fill="currentColor"><path d="M237.66,18.34a8,8,0,0,0-11.32,0l-52.4,52.41-5.37-5.38a32.05,32.05,0,0,0-45.26,0L100,88.69l-6.34-6.35A8,8,0,0,0,82.34,93.66L88.69,100,65.37,123.31a32,32,0,0,0,0,45.26l5.38,5.37-52.41,52.4a8,8,0,0,0,11.32,11.32l52.4-52.41,5.37,5.38a32,32,0,0,0,45.26,0L156,167.31l6.34,6.35a8,8,0,0,0,11.32-11.32L167.31,156l23.32-23.31a32,32,0,0,0,0-45.26l-5.38-5.37,52.41-52.4A8,8,0,0,0,237.66,18.34Zm-116.29,161a16,16,0,0,1-22.62,0L76.69,157.25a16,16,0,0,1,0-22.62L100,111.31,144.69,156Zm57.94-57.94L156,144.69,111.31,100l23.32-23.31a16,16,0,0,1,22.62,0l22.06,22A16,16,0,0,1,179.31,121.37ZM88.57,35A8,8,0,0,1,103.43,29l8,20A8,8,0,0,1,96.57,55ZM24.57,93A8,8,0,0,1,35,88.57l20,8A8,8,0,0,1,49,111.43l-20-8A8,8,0,0,1,24.57,93ZM231.43,163a8,8,0,0,1-10.4,4.46l-20-8A8,8,0,1,1,207,144.57l20,8A8,8,0,0,1,231.43,163Zm-64,58.06A8,8,0,0,1,152.57,227l-8-20A8,8,0,0,1,159.43,201Z"/></symbol><symbol id="i-plus" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></symbol><symbol id="i-sidebar-simple" viewBox="0 0 256 256" fill="currentColor"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H80V200H40ZM216,200H96V56H216V200Z"/></symbol><symbol id="i-sign-out" viewBox="0 0 256 256" fill="currentColor"><path d="M120,216a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V40a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H56V208h56A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z"/></symbol><symbol id="i-stack" viewBox="0 0 256 256" fill="currentColor"><path d="M230.91,172A8,8,0,0,1,228,182.91l-96,56a8,8,0,0,1-8.06,0l-96-56A8,8,0,0,1,36,169.09l92,53.65,92-53.65A8,8,0,0,1,230.91,172ZM220,121.09l-92,53.65L36,121.09A8,8,0,0,0,28,134.91l96,56a8,8,0,0,0,8.06,0l96-56A8,8,0,1,0,220,121.09ZM24,80a8,8,0,0,1,4-6.91l96-56a8,8,0,0,1,8.06,0l96,56a8,8,0,0,1,0,13.82l-96,56a8,8,0,0,1-8.06,0l-96-56A8,8,0,0,1,24,80Zm23.88,0L128,126.74,208.12,80,128,33.26Z"/></symbol><symbol id="i-user-switch" viewBox="0 0 256 256" fill="currentColor"><path d="M253.66,133.66l-24,24a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L216,132.69V128A88,88,0,0,0,56.49,76.67a8,8,0,0,1-13-9.34A104,104,0,0,1,232,128v4.69l10.34-10.35a8,8,0,0,1,11.32,11.32Zm-41.18,55A104,104,0,0,1,24,128v-4.69L13.66,133.66A8,8,0,0,1,2.34,122.34l24-24a8,8,0,0,1,11.32,0l24,24a8,8,0,0,1-11.32,11.32L40,123.31V128a87.62,87.62,0,0,0,22.24,58.41A79.66,79.66,0,0,1,98.3,157.66a48,48,0,1,1,59.4,0,79.59,79.59,0,0,1,36.08,28.78,89.68,89.68,0,0,0,5.71-7.11,8,8,0,0,1,13,9.34ZM128,152a32,32,0,1,0-32-32A32,32,0,0,0,128,152Zm0,64a88.2,88.2,0,0,0,53.92-18.49,64,64,0,0,0-107.84,0A87.57,87.57,0,0,0,128,216Z"/></symbol><symbol id="i-users-three" viewBox="0 0 256 256" fill="currentColor"><path d="M244.8,150.4a8,8,0,0,1-11.2-1.6A51.6,51.6,0,0,0,192,128a8,8,0,0,1-7.37-4.89,8,8,0,0,1,0-6.22A8,8,0,0,1,192,112a24,24,0,1,0-23.24-30,8,8,0,1,1-15.5-4A40,40,0,1,1,219,117.51a67.94,67.94,0,0,1,27.43,21.68A8,8,0,0,1,244.8,150.4ZM190.92,212a8,8,0,1,1-13.84,8,57,57,0,0,0-98.16,0,8,8,0,1,1-13.84-8,72.06,72.06,0,0,1,33.74-29.92,48,48,0,1,1,58.36,0A72.06,72.06,0,0,1,190.92,212ZM128,176a32,32,0,1,0-32-32A32,32,0,0,0,128,176ZM72,120a8,8,0,0,0-8-8A24,24,0,1,1,87.24,82a8,8,0,1,0,15.5-4A40,40,0,1,0,37,117.51,67.94,67.94,0,0,0,9.6,139.19a8,8,0,1,0,12.8,9.61A51.6,51.6,0,0,1,64,128,8,8,0,0,0,72,120Z"/></symbol><symbol id="i-warning-circle" viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></symbol><symbol id="i-x-circle" viewBox="0 0 256 256" fill="currentColor"><path d="M165.66,101.66,139.31,128l26.35,26.34a8,8,0,0,1-11.32,11.32L128,139.31l-26.34,26.35a8,8,0,0,1-11.32-11.32L116.69,128,90.34,101.66a8,8,0,0,1,11.32-11.32L128,116.69l26.34-26.35a8,8,0,0,1,11.32,11.32ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></symbol><symbol id="i-x" viewBox="0 0 256 256" fill="currentColor"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></symbol><symbol id="logo-chatgpt" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523zm5.899 2.83a5.947 5.947 0 005.827-4.756C22.287 18.339 24 15.84 24 13.296c0-1.665-.713-3.282-1.998-4.448.119-.5.19-.999.19-1.498 0-3.401-2.759-5.947-5.946-5.947-.642 0-1.26.095-1.88.31A5.962 5.962 0 0010.205 0a5.947 5.947 0 00-5.827 4.757C1.713 5.447 0 7.945 0 10.49c0 1.666.713 3.283 1.998 4.448-.119.5-.19 1-.19 1.499 0 3.401 2.759 5.946 5.946 5.946.642 0 1.26-.095 1.88-.309a5.96 5.96 0 004.162 1.713z"></path></symbol><symbol id="logo-claude" viewBox="0 0 24 24"><path d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z" fill="#D97757" fill-rule="nonzero"></path></symbol><symbol id="logo-gemini" viewBox="0 0 24 24"><path d="M20.616 10.835a14.147 14.147 0 01-4.45-3.001 14.111 14.111 0 01-3.678-6.452.503.503 0 00-.975 0 14.134 14.134 0 01-3.679 6.452 14.155 14.155 0 01-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 000 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 014.45 3.001 14.112 14.112 0 013.679 6.453.502.502 0 00.975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 013.001-4.45 14.113 14.113 0 016.453-3.678.503.503 0 000-.975 13.245 13.245 0 01-2.003-.678z" fill="#3186FF"></path><path d="M20.616 10.835a14.147 14.147 0 01-4.45-3.001 14.111 14.111 0 01-3.678-6.452.503.503 0 00-.975 0 14.134 14.134 0 01-3.679 6.452 14.155 14.155 0 01-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 000 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 014.45 3.001 14.112 14.112 0 013.679 6.453.502.502 0 00.975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 013.001-4.45 14.113 14.113 0 016.453-3.678.503.503 0 000-.975 13.245 13.245 0 01-2.003-.678z" fill="url(#logo-gemini-lobe-icons-gemini-0-_R_0_)"></path><path d="M20.616 10.835a14.147 14.147 0 01-4.45-3.001 14.111 14.111 0 01-3.678-6.452.503.503 0 00-.975 0 14.134 14.134 0 01-3.679 6.452 14.155 14.155 0 01-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 000 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 014.45 3.001 14.112 14.112 0 013.679 6.453.502.502 0 00.975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 013.001-4.45 14.113 14.113 0 016.453-3.678.503.503 0 000-.975 13.245 13.245 0 01-2.003-.678z" fill="url(#logo-gemini-lobe-icons-gemini-1-_R_0_)"></path><path d="M20.616 10.835a14.147 14.147 0 01-4.45-3.001 14.111 14.111 0 01-3.678-6.452.503.503 0 00-.975 0 14.134 14.134 0 01-3.679 6.452 14.155 14.155 0 01-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 000 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 014.45 3.001 14.112 14.112 0 013.679 6.453.502.502 0 00.975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 013.001-4.45 14.113 14.113 0 016.453-3.678.503.503 0 000-.975 13.245 13.245 0 01-2.003-.678z" fill="url(#logo-gemini-lobe-icons-gemini-2-_R_0_)"></path><defs><linearGradient gradientUnits="userSpaceOnUse" id="logo-gemini-lobe-icons-gemini-0-_R_0_" x1="7" x2="11" y1="15.5" y2="12"><stop stop-color="#08B962"></stop><stop offset="1" stop-color="#08B962" stop-opacity="0"></stop></linearGradient><linearGradient gradientUnits="userSpaceOnUse" id="logo-gemini-lobe-icons-gemini-1-_R_0_" x1="8" x2="11.5" y1="5.5" y2="11"><stop stop-color="#F94543"></stop><stop offset="1" stop-color="#F94543" stop-opacity="0"></stop></linearGradient><linearGradient gradientUnits="userSpaceOnUse" id="logo-gemini-lobe-icons-gemini-2-_R_0_" x1="3.5" x2="17.5" y1="13.5" y2="12"><stop stop-color="#FABC12"></stop><stop offset=".46" stop-color="#FABC12" stop-opacity="0"></stop></linearGradient></defs></symbol><symbol id="logo-grok" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd"><path d="M9.27 15.29l7.978-5.897c.391-.29.95-.177 1.137.272.98 2.369.542 5.215-1.41 7.169-1.951 1.954-4.667 2.382-7.149 1.406l-2.711 1.257c3.889 2.661 8.611 2.003 11.562-.953 2.341-2.344 3.066-5.539 2.388-8.42l.006.007c-.983-4.232.242-5.924 2.75-9.383.06-.082.12-.164.179-.248l-3.301 3.305v-.01L9.267 15.292M7.623 16.723c-2.792-2.67-2.31-6.801.071-9.184 1.761-1.763 4.647-2.483 7.166-1.425l2.705-1.25a7.808 7.808 0 00-1.829-1A8.975 8.975 0 005.984 5.83c-2.533 2.536-3.33 6.436-1.962 9.764 1.022 2.487-.653 4.246-2.34 6.022-.599.63-1.199 1.259-1.682 1.925l7.62-6.815"></path></symbol><symbol id="logo-languagetool" viewBox="0 0 24 24"><path d="M2.28 20.494 0 18.865c.67-.938 1.36-1.66 2.088-2.171.805-.568 1.667-.869 2.555-.869.824 0 1.539.198 2.178.582.261.16.504.344.734.549.16.14.281.255.53.504.383.384.537.524.728.633.205.127.422.185.735.185s.53-.058.734-.185c.192-.109.351-.25.734-.633.25-.249.37-.364.537-.51a4.69 4.69 0 0 1 .728-.543c.639-.384 1.348-.582 2.171-.582.824 0 1.533.198 2.172.582.255.153.491.332.728.542.166.147.287.262.536.511.383.384.543.524.735.633.204.127.421.185.734.185.281 0 .588-.109.945-.358.44-.306.92-.81 1.418-1.507L24 18.042c-.67.938-1.36 1.666-2.088 2.17-.805.57-1.667.87-2.555.87-.824 0-1.539-.199-2.178-.582a5.072 5.072 0 0 1-.734-.543c-.166-.146-.281-.261-.537-.51v-.007c-.376-.377-.536-.517-.728-.626-.204-.127-.415-.185-.728-.185s-.523.058-.728.185c-.191.109-.35.25-.728.626v.007c-.255.249-.37.364-.536.51-.243.211-.48.39-.735.543-.638.383-1.354.581-2.177.581-.824 0-1.54-.198-2.178-.58a5.593 5.593 0 0 1-.735-.544 11.126 11.126 0 0 1-.53-.51c-.383-.384-.536-.524-.728-.633-.204-.127-.421-.185-.734-.185-.281 0-.588.109-.945.358-.44.313-.92.81-1.418 1.507zM3.417 2.919h2.33c.965 0 1.75.779 1.75 1.75v6.795h4.554v2.452H6.795c-.964 0-1.75-.786-1.75-1.75V5.371H3.417Zm17.818 1.75v1.82h-2.453V5.37h-1.928v8.545H14.4V5.37h-1.928v1.118H10.02v-1.82c0-.971.786-1.75 1.75-1.75h7.708c.971 0 1.757.779 1.757 1.75zm0 0"/></symbol></svg>
 
 <section id="screen-signin" class="screen" aria-label="Sign in"><div id="signin-root"></div></section>
 
 <div class="app">
   <header class="top">
-    <button id="sidebtn" class="iconbtn" type="button" aria-controls="side" aria-expanded="false" aria-label="Show or hide the sidebar" title="Sidebar">
+    <button id="navbtn" class="iconbtn" type="button" aria-controls="side" aria-expanded="false" aria-label="Menu" title="Menu">
       <svg class="ic" aria-hidden="true"><use href="#i-sidebar-simple"/></svg></button>
     <a class="home" href="#/dashboard" aria-label="Vidimus, dashboard"><svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="1" width="22" height="22" rx="6" fill="currentColor"/><path d="M7 8.5l5 8 5-8" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm">Vidimus</span></a>
     <span class="vr" aria-hidden="true"></span>
@@ -637,6 +671,8 @@ body[data-screen="review"] #toast{left:auto;right:40px;bottom:24px}
 
   <nav id="side" class="side" aria-label="Main">
     <div class="side-in">
+      <div class="side-top"><button id="sidebtn" class="iconbtn" type="button" aria-controls="side" aria-expanded="false" aria-label="Show or hide the sidebar" title="Sidebar">
+        <svg class="ic" aria-hidden="true"><use href="#i-sidebar-simple"/></svg></button></div>
       <div class="side-brand" aria-hidden="true"><svg class="logo" viewBox="0 0 24 24"><rect x="1" y="1" width="22" height="22" rx="6" fill="currentColor"/><path d="M7 8.5l5 8 5-8" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Vidimus</span></div>
       <ul class="side-nav">
         <li><a href="#/dashboard" data-nav="dashboard"><svg class="ic" aria-hidden="true"><use href="#i-house"/></svg><span>Dashboard</span></a></li>
@@ -664,33 +700,42 @@ body[data-screen="review"] #toast{left:auto;right:40px;bottom:24px}
     </div></main>
 
     <main id="screen-review" class="screen">
-      <div class="rail" aria-label="Pages and zoom">
-        <div class="rgroup" role="group" aria-label="Pages">
-          <button id="prevpage" type="button" aria-label="Previous page" title="Previous page"><svg class="ic" aria-hidden="true"><use href="#i-caret-up"/></svg></button>
-          <span id="pageno" class="rlabel" aria-live="polite"></span>
-          <button id="nextpage" type="button" aria-label="Next page" title="Next page"><svg class="ic" aria-hidden="true"><use href="#i-caret-down"/></svg></button>
-        </div>
-        <div class="rgroup" role="group" aria-label="Zoom">
-          <button id="zoomin" type="button" aria-label="Zoom in" title="Zoom in"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button>
-          <button id="zoomval" type="button" title="Back to the default zoom"></button>
-          <button id="zoomout" type="button" aria-label="Zoom out" title="Zoom out"><svg class="ic" aria-hidden="true"><use href="#i-minus"/></svg></button>
-        </div>
-      </div>
       <section class="docpane" aria-label="Document">
-        <div id="scroller"><div id="pages"></div></div>
+        <div id="scroller"><div id="docrow">
+          <div id="pages"></div>
+          <aside id="lane" aria-label="Findings">
+            <div id="lanehead" class="lanehead"><section id="findhead" class="fcard" aria-label="Search and filter">
+              <div class="fhead"><h2>Findings</h2><div data-searchbox></div></div>
+              <div data-filters data-search="none"></div>
+              <div id="tabs" class="seg" role="tablist" aria-label="Status"></div>
+            </section></div>
+            <ol id="cmts" class="cmts"></ol>
+          </aside>
+        </div></div>
+        <div id="dock" class="dock">
+          <p class="dkeys" aria-label="Keyboard shortcuts"><span><kbd>J</kbd><kbd>K</kbd> move</span><span><kbd>A</kbd> approve</span><span><kbd>X</kbd> reject</span><span class="k4"><kbd>E</kbd> edit</span><span class="k5"><kbd>/</kbd> search</span></p>
+          <div class="dctl" role="group" aria-label="Pages">
+            <button id="prevpage" type="button" aria-label="Previous page" title="Previous page"><svg class="ic" aria-hidden="true"><use href="#i-caret-left"/></svg></button>
+            <span id="pageno" aria-live="polite"></span>
+            <button id="nextpage" type="button" aria-label="Next page" title="Next page"><svg class="ic" aria-hidden="true"><use href="#i-caret-right"/></svg></button>
+          </div>
+          <span class="dsep" aria-hidden="true"></span>
+          <div class="dctl" role="group" aria-label="Zoom">
+            <button id="zoomout" type="button" aria-label="Zoom out" title="Zoom out"><svg class="ic" aria-hidden="true"><use href="#i-minus"/></svg></button>
+            <button id="zoomval" type="button" title="Back to the default zoom"></button>
+            <button id="zoomin" type="button" aria-label="Zoom in" title="Zoom in"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button>
+          </div>
+          <span class="dsep hidesep" aria-hidden="true"></span>
+          <button id="dockhide" type="button" aria-controls="dock" aria-label="Hide this bar" title="Hide this bar"><svg class="ic" aria-hidden="true"><use href="#i-caret-down"/></svg></button>
+        </div>
+        <button id="dockshow" class="dockshow" type="button" aria-controls="dock" aria-label="Show the page and zoom bar" title="Show the bar"><svg class="ic" aria-hidden="true"><use href="#i-caret-up"/></svg></button>
       </section>
       <aside id="panel" aria-label="Findings">
         <button id="sheetbtn" class="sheetbtn" type="button" aria-expanded="false" aria-controls="panel"><span class="handle"></span><span class="sr">Show findings</span></button>
         <div id="peek"></div>
-        <section id="findhead" class="fcard" aria-label="Search and filter">
-          <div class="fhead"><h2>Findings</h2><div data-searchbox></div></div>
-          <div data-filters data-search="none"></div>
-          <div id="tabs" class="seg" role="tablist" aria-label="Status"></div>
-        </section>
         <section id="detail" class="fcard" aria-label="Selected finding"></section>
         <section class="fcard listcard" aria-label="Other findings">
           <ol id="list" class="list"></ol>
-          <footer class="pfoot"><kbd>J</kbd><kbd>K</kbd> move <kbd>A</kbd> approve <kbd>X</kbd> reject <kbd>E</kbd> edit <kbd>/</kbd> search</footer>
         </section>
       </aside>
     </main>
@@ -874,7 +919,8 @@ function diffHTML(a, b){
    ===================================================================== */
 const HOME = document.body.dataset.home || 'review';
 const OTHERS = document.body.dataset.list === 'others';      // the selected finding is not repeated in the list
-const AUTO = 'autoselect' in document.body.dataset;          // open the review on the first open finding
+const AUTO = 'autoselect' in document.body.dataset;          // on a phone, the sheet's peek always holds a finding
+const autoSel = () => AUTO && MOBILE.matches;                 // on a desk the findings fold and open like comments
 const NAV_OF = {review: 'documents', export: 'documents'};
 const firstOpen = () => (shown().find(f => tabOf(f) === 'open') || shown()[0] || {}).id || null;
 function route(){
@@ -892,8 +938,8 @@ function route(){
   if (s === 'documents') renderDocuments();
   if (s === 'agents') renderTools();
   if (s === 'review'){
-    if (AUTO && !sel) sel = firstOpen();
-    render(); if (!doc) mount(); else { layout(); if (sel) scrollDocTo(byId[sel]); }
+    if (autoSel() && !sel) sel = firstOpen();
+    render(); if (!doc) mount(); else { layout(); if (sel) focusSel(); }
   }
   const main = $(`#screen-${s}`); if (main) main.scrollTop = 0;
 }
@@ -1043,7 +1089,7 @@ function renderDocuments(){
    phone it is a drawer over the page that closes on every move. */
 function setNav(open){
   document.body.classList.toggle('nav-open', !!open);
-  if (MOBILE.matches) $('#sidebtn')?.setAttribute('aria-expanded', !!open);
+  $('#navbtn')?.setAttribute('aria-expanded', !!open);
 }
 function setSide(open){
   document.body.classList.toggle('side-open', !!open);
@@ -1052,12 +1098,22 @@ function setSide(open){
 }
 if ($('#sidebtn')){
   if (lsGet('side', false)) document.body.classList.add('side-open');
-  $('#sidebtn').setAttribute('aria-expanded', !MOBILE.matches && document.body.classList.contains('side-open'));
-  $('#sidebtn').onclick = e => {
-    e.stopPropagation();
-    if (MOBILE.matches) setNav(!document.body.classList.contains('nav-open'));
-    else setSide(!document.body.classList.contains('side-open'));
-  };
+  $('#sidebtn').setAttribute('aria-expanded', document.body.classList.contains('side-open'));
+  $('#sidebtn').onclick = e => { e.stopPropagation(); setSide(!document.body.classList.contains('side-open')); };
+}
+$('#navbtn') && ($('#navbtn').onclick = e => { e.stopPropagation(); setNav(!document.body.classList.contains('nav-open')); });
+
+/* ---------- the bar under the pages: it hides, and a small arrow brings it back ---------- */
+function setDock(on){
+  document.body.classList.toggle('dock-off', !on);
+  lsSet('dock', !!on);
+  $('#dockhide')?.setAttribute('aria-expanded', !!on);
+  $('#dockshow')?.setAttribute('aria-expanded', !!on);
+}
+if ($('#dock')){
+  setDock(lsGet('dock', true) !== false);
+  $('#dockhide').onclick = () => { setDock(false); $('#dockshow').focus(); };
+  $('#dockshow').onclick = () => { setDock(true); $('#dockhide').focus(); };
 }
 $('#wsbtn') && ($('#wsbtn').onclick = e => {
   e.stopPropagation();
@@ -1275,7 +1331,7 @@ document.addEventListener('pointerdown', e => {
     const el = $(m);
     if (el && !el.hidden && !el.contains(e.target) && !e.target.closest(b)) closeMenus();
   }
-  if (document.body.classList.contains('nav-open') && !e.target.closest('#side,#sidebtn')) setNav(false);
+  if (document.body.classList.contains('nav-open') && !e.target.closest('#side,#navbtn')) setNav(false);
 });
 
 function renderTabs(){
@@ -1302,9 +1358,9 @@ function rowHTML(f){
       <span class="rmain">
         <span class="rtitle">${esc(f.title)}</span>
         <span class="rmeta"><span class="rkey">${f.key}</span><span class="sevw s-${f.severity}">${SEV[f.severity]}</span><span>${TYPES[f.type]}</span><span>Page ${f.page}</span>${
-          s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : ''}</span>
+          s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : ''}${votersHTML(f)}</span>
       </span>
-      <span class="rside">${logos(agentsOf(f))}${votersHTML(f)}</span>
+      <span class="rside">${logos(agentsOf(f))}</span>
     </button>`;
 }
 
@@ -1318,22 +1374,14 @@ function decisionsHTML(f){
 function cardHTML(f){
   const ags = agentsOf(f), mine = myVote(f), text = textOf(f), ed = edits[f.id];
   const variants = (f.variants || []).filter(v => conn[v.agent] && v.text !== text);
-  const head = INLINE ? '' : `
-    <header class="chead"><span class="mk-mini s-${f.severity} st-${statusOf(f)}">${f.n}</span><span class="ckey">${f.key}</span>
-      <span class="sevw s-${f.severity}">${SEV[f.severity]}</span><span class="ctype">${TYPES[f.type]}</span>
-      <button type="button" class="cpage" data-show>${ic('crosshair-simple')}Page ${f.page}</button>${
-      'cardnav' in document.body.dataset ? (() => { const fs = shown(), i = fs.findIndex(x => x.id === f.id);
-        return `<span class="cnav"><button type="button" data-step="-1" aria-label="Previous finding (K)"${i <= 0 ? ' disabled' : ''}>${ic('caret-up')}</button>
-          <span>${i + 1} of ${fs.length}</span><button type="button" data-step="1" aria-label="Next finding (J)"${i >= fs.length - 1 ? ' disabled' : ''}>${ic('caret-down')}</button></span>`; })() : ''}</header>
-    <h2 class="ctitle">${esc(f.title)}</h2>`;
   const suggestion = editing === f.id
     ? `<textarea class="cinput" id="ta-${f.id}" rows="2" spellcheck="true" aria-label="Suggestion for ${f.key}">${esc(text)}</textarea>
        <div class="cedit"><button type="button" class="btn small primary" data-save>${ic('check')}<span>Save</span></button>
          <button type="button" class="btn small ghost" data-cancel>Cancel</button><span class="hint">Enter to save, Esc to cancel</span></div>`
     : `<div class="csugg">${diffHTML(f.quote, text)}</div>
        ${ed ? `<p class="cedited">${ic('pencil-simple')}Edited by ${esc(TEAM[ed.by] ? TEAM[ed.by].name : ed.by)}, ${ago(ed.at)}</p>` : ''}`;
-  return `${head}
-    <div class="cagents">${INLINE ? '' : logos(ags)}<span>Found by ${esc(names(ags.map(k => AG[k].name)))}</span></div>
+  return `
+    <div class="cagents"><span>Found by ${esc(names(ags.map(k => AG[k].name)))}</span></div>
     <div class="cfield"><div class="clabel">Current text</div><div class="cquote">${esc(f.quote)}</div></div>
     <div class="cfield"><div class="clabel">Suggestion</div>${suggestion}</div>
     ${variants.length && editing !== f.id ? `<div class="cfield"><div class="clabel">Alternative</div>${variants.map((v, i) =>
@@ -1374,14 +1422,11 @@ function wireCard(el, f){
   $('.reject', el).onclick = () => vote(f.id, 'rejected');
   $('.edit', el).onclick = () => editing === f.id ? (editing = null, render()) : startEdit(f.id);
   $$('[data-show]', el).forEach(b => b.onclick = () => showInDoc(f));
-  $$('[data-step]', el).forEach(b => b.onclick = () => {
-    const fs = shown(), i = fs.findIndex(x => x.id === f.id), nx = fs[i + +b.dataset.step];
-    if (nx) select(nx.id, 'key');
-  });
 }
 
 function renderList(){
   const host = $('#list'); if (!host) return;
+  if (!MOBILE.matches){ host.innerHTML = ''; listTop = false; return; }
   if (listTop){ host.scrollTop = 0; listTop = false; }
   const fs = shown().filter(f => !(OTHERS && f.id === sel));
   if (!fs.length){
@@ -1403,6 +1448,7 @@ function renderList(){
 }
 function renderDetail(){
   const host = $('#detail'); if (!host || INLINE) return;
+  if (!MOBILE.matches){ host.innerHTML = ''; return; }
   const f = sel && byId[sel];
   if (!f){
     const next = shown().find(x => tabOf(x) === 'open');
@@ -1413,7 +1459,10 @@ function renderDetail(){
     const b = $('[data-first]', host); if (b) b.onclick = () => select(next.id, 'detail');
     return;
   }
-  host.innerHTML = `<div class="card" data-id="${f.id}">${cardHTML(f)}</div>`;
+  host.innerHTML = `<div class="row sel st-${statusOf(f)}" data-id="${f.id}">${rowHTML(f)}<div class="card" data-id="${f.id}">${cardHTML(f)}</div></div>`;
+  const rb = $('.rowbtn', host);
+  rb.title = 'Show in the document'; rb.onclick = () => showInDoc(f);
+  rb.onmouseenter = () => hover(f.id, true); rb.onmouseleave = () => hover(f.id, false);
   wireCard($('.card', host), f);
 }
 
@@ -1460,12 +1509,11 @@ function select(id, from){
   render();
   const f = id && byId[id];
   if (!f) return;
-  if (from !== 'doc' && !(MOBILE.matches && document.body.classList.contains('sheet-open'))) scrollDocTo(f);
+  if (!MOBILE.matches){ revealSel(); return; }
+  const open = document.body.classList.contains('sheet-open');
+  if (from !== 'doc' && !open) scrollDocTo(f);
   // with the phone sheet folded the list is out of sight: leave it (and the peek) where they are
-  if (from !== 'list' && !(MOBILE.matches && !document.body.classList.contains('sheet-open'))){
-    const li = $(`#list .row[data-id="${id}"]`);
-    if (li) li.scrollIntoView({block: INLINE ? 'start' : 'nearest', behavior: 'auto'});
-  }
+  if (open){ const p = $('#panel'); if (p) p.scrollTop = 0; }
 }
 function showInDoc(f){
   if (MOBILE.matches) setSheet(false);
@@ -1474,6 +1522,7 @@ function showInDoc(f){
 function hover(id, on){
   $$(`[data-fid="${id}"]`).forEach(el => el.classList.toggle('hover', on));
   const li = $(`#list .row[data-id="${id}"]`); if (li) li.classList.toggle('hover', on);
+  const c = $(`#cmts .cmt[data-id="${id}"]`); if (c) c.classList.toggle('hover', on);
 }
 
 /* =====================================================================
@@ -1580,10 +1629,10 @@ addEventListener('keydown', e => {
     if (openDrop){ openDrop = null; renderFilters(); return; }
     if ($('#usermenu') && !$('#usermenu').hidden){ closeMenus(); $('#avatarbtn')?.focus(); return; }
     if ($('#wsmenu') && !$('#wsmenu').hidden){ closeMenus(); $('#wsbtn')?.focus(); return; }
-    if (document.body.classList.contains('nav-open')){ setNav(false); $('#sidebtn')?.focus(); return; }
+    if (document.body.classList.contains('nav-open')){ setNav(false); $('#navbtn')?.focus(); return; }
     if (document.body.classList.contains('sheet-open')) return setSheet(false);
     if (editing){ editing = null; render(); return; }
-    if (sel && !AUTO){ sel = null; render(); }
+    if (sel && !autoSel()){ sel = null; render(); }
     return;
   }
   if (document.body.dataset.screen !== 'review' || document.body.classList.contains('modal-open')) return;
@@ -1623,8 +1672,9 @@ async function lib(){
 const cssNum = name => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0;
 const PHONE_READ = 1.05;   // a phone shows the page at about 1.05 CSS px per point
 function fitWidth(){
-  // the rail on the left holds the markers, so they never sit on the text
-  const avail = scroller.clientWidth - cssNum('--gutter') - cssNum('--gutter-r') - cssNum('--pad-x') * 2;
+  // the gutter on the left holds the markers, so they never sit on the text; the lane of findings sits on the right
+  const lane = MOBILE.matches ? 0 : cssNum('--lane') + cssNum('--lane-gap') + 14;
+  const avail = scroller.clientWidth - lane - cssNum('--gutter') - cssNum('--gutter-r') - cssNum('--pad-x') * 2;
   return Math.max(220, Math.min(avail, MAXW));
 }
 function zoomNow(){
@@ -1665,7 +1715,7 @@ function mount(){
     drawMarks();
     render();
     alignText();
-    if (sel) scrollDocTo(byId[sel]);
+    if (sel) focusSel();
     thumbs();
     document.body.classList.add('ready');
   })().catch(err => {
@@ -1684,6 +1734,7 @@ function layout(){
   }
   pages.forEach(paint);
   placeMarkers();
+  placeLane();
   const zv = $('#zoomval'); if (zv) zv.textContent = Math.round(zoomNow() * 100) + '%';
 }
 function paint(P){
@@ -1808,6 +1859,103 @@ function placeMarkers(){
   }
 }
 
+/* ---------- the desk: findings float beside the page, as comments do in Google Docs ----------
+   Each card sits level with its text and scrolls with the document (it lives in the same
+   scroller). Folded, it shows its row; selected, it opens in place and the cards around it
+   move aside: the open one keeps its height, the ones above go up, the ones below go down. */
+const LANE_GAP = 10;
+const lanePos = {};        // id -> {x, y}: a re-render starts each card where it was, so moves animate
+let laneSel = null;        // the open card's top and height in the lane
+const laneRO = new ResizeObserver(() => requestAnimationFrame(placeLane));
+function renderLane(){
+  const host = $('#cmts'); if (!host) return;
+  laneRO.disconnect();
+  if (MOBILE.matches || !pages.length || F.some(f => f.rects === null)){ host.innerHTML = ''; return; }
+  const fs = shown();
+  host.innerHTML = fs.length ? fs.map(f => {
+    const p = lanePos[f.id];
+    return `<li class="cmt st-${statusOf(f)}${sel === f.id ? ' sel' : ''}${p ? '' : ' fresh'}" data-id="${f.id}"${
+      p ? ` style="transform:translate(${p.x}px,${p.y}px)"` : ''}>${rowHTML(f)}${
+      sel === f.id ? `<div class="card" data-id="${f.id}">${cardHTML(f)}</div>` : ''}</li>`;
+  }).join('') : `<li class="cmt fresh"><div class="empty">${ic('funnel-simple')}<b>${F.some(live) ? 'No findings match' : 'No tools are connected'}</b>
+      <span>${F.some(live) ? 'Try another filter or clear them.' : 'Connect a tool to see what it finds.'}</span>
+      ${filtering() ? '<button type="button" class="btn small" data-clear>Clear filters</button>' : ''}</div></li>`;
+  for (const li of $$('.cmt[data-id]', host)){
+    const f = byId[li.dataset.id], b = $('.rowbtn', li);
+    b.title = sel === f.id ? 'Fold' : 'Open';
+    b.onclick = () => select(sel === f.id ? null : f.id, 'lane');
+    li.onmouseenter = () => hover(f.id, true);
+    li.onmouseleave = () => hover(f.id, false);
+    const card = $('.card', li); if (card) wireCard(card, f);
+  }
+  placeLane();
+  const open = $('.cmt.sel', host); if (open) laneRO.observe(open);
+  const fh = $('#findhead'); if (fh) laneRO.observe(fh);
+}
+function anchorOf(f, L){
+  const P = pages[f.page - 1]; if (!P || !P.sheet.clientHeight) return null;
+  const H = P.sheet.clientHeight, r = f.rects && f.rects[0];
+  // the card's marker sits level with the middle of its first line
+  return P.sheet.getBoundingClientRect().top - L + (r ? (r.y + r.h / 2) * H - 24 : 8);
+}
+function laneMin(lane){
+  const h = $('#lanehead', lane);
+  return h && h.contains($('#findhead')) ? h.offsetHeight + 2 : 4;
+}
+function placeLane(){
+  const lane = $('#lane'), host = $('#cmts');
+  laneSel = null;
+  if (!lane || !host || MOBILE.matches || !lane.offsetParent) return;
+  const L = lane.getBoundingClientRect().top, min = laneMin(lane);
+  const items = $$('.cmt', host).map((el, i) => {
+    const f = byId[el.dataset.id], a = f ? anchorOf(f, L) : null;
+    return {el, f, i, y: Math.max(min, a == null ? min : a), h: el.offsetHeight};
+  }).sort((a, b) => a.y - b.y || a.i - b.i);
+  const n = items.length, top = [], s = items.findIndex(o => o.f && o.f.id === sel);
+  const down = from => { for (let i = from; i < n; i++) top[i] = Math.max(items[i].y, i ? top[i - 1] + items[i - 1].h + LANE_GAP : min); };
+  if (s < 0) down(0);
+  else {
+    top[s] = items[s].y;
+    down(s + 1);
+    for (let i = s - 1; i >= 0; i--) top[i] = Math.min(items[i].y, top[i + 1] - LANE_GAP - items[i].h);
+    if (top[0] < min){                       // no room above: the whole stack moves down
+      top[0] = min;
+      for (let i = 1; i < n; i++) top[i] = Math.max(top[i], top[i - 1] + items[i - 1].h + LANE_GAP);
+    }
+  }
+  let bottom = 0;
+  items.forEach((o, i) => {
+    const open = !!(o.f && o.f.id === sel), x = open ? -12 : 0, y = Math.round(top[i]);
+    o.el.style.transform = `translate(${x}px,${y}px)`;
+    if (o.f) lanePos[o.f.id] = {x, y};
+    if (open) laneSel = {top: y, h: o.h};
+    bottom = Math.max(bottom, y + o.h);
+  });
+  lane.style.minHeight = Math.ceil(bottom + 24) + 'px';
+  requestAnimationFrame(() => $$('.cmt.fresh', host).forEach(el => el.classList.remove('fresh')));
+}
+/* bring the open card fully into view, below the pinned findings card */
+function revealSel(){
+  const lane = $('#lane'); if (!lane || !laneSel) return;
+  const cover = laneMin(lane);
+  const sr = scroller.getBoundingClientRect(), st = scroller.scrollTop, ch = scroller.clientHeight;
+  const top = lane.getBoundingClientRect().top - sr.top + st + laneSel.top, bot = top + laneSel.h;
+  let to = null;
+  if (top < st + cover) to = top - cover;
+  else if (bot > st + ch - 12) to = Math.min(bot - ch + 12, top - cover);
+  if (to != null) scroller.scrollTo({top: Math.max(0, to), behavior: REDUCED ? 'auto' : 'smooth'});
+}
+function focusSel(){ if (!sel) return; if (MOBILE.matches) scrollDocTo(byId[sel]); else revealSel(); }
+/* the findings card: pinned in the lane on a desk, at the top of the sheet on a phone */
+function placeFindhead(){
+  const fh = $('#findhead'); if (!fh) return;
+  if (MOBILE.matches){ const d = $('#detail'); if (d && fh.nextElementSibling !== d) d.before(fh); }
+  else { const h = $('#lanehead'); if (h && fh.parentNode !== h) h.append(fh); }
+}
+placeFindhead();
+MOBILE.addEventListener('change', () => { placeFindhead(); render(); });
+document.fonts && document.fonts.ready.then(() => placeLane());
+
 function scrollDocTo(f){
   const P = pages[f.page - 1]; if (!P) return;
   const r = f.rects && f.rects[0];
@@ -1884,8 +2032,8 @@ function thumbMarks(){
 function render(){
   // with a pinned card there is always a finding in it: when filters or search hide
   // the current one, the first one that matches takes its place
-  if (AUTO && document.body.dataset.screen === 'review' && (!sel || !pass(byId[sel]))) sel = firstOpen();
-  renderTop(); renderSearchBox(); renderFilters(); renderTabs(); renderList(); renderDetail(); renderPeek();
+  if (autoSel() && document.body.dataset.screen === 'review' && (!sel || !pass(byId[sel]))) sel = firstOpen();
+  renderTop(); renderSearchBox(); renderFilters(); renderTabs(); renderList(); renderDetail(); renderPeek(); renderLane();
   if (document.body.dataset.screen === 'agents') renderTools();
   if ($('#toolsmodal') && !$('#toolsmodal').hidden) renderTools();
   paintMarks();

@@ -10,10 +10,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap">
 <style>
 /* Vidimus lab · v1 « Paper » (round 2)
-   Light and cool-neutral. A sidebar that stays folded until asked for; the
-   pages on a grey table with their controls in a small rail at the left
-   edge; three floating cards on the right: the findings header, the
-   selected finding, the other findings folded together underneath.
+   Light and cool-neutral. A sidebar folded to a strip that holds only its
+   toggle, right under the V; the pages on a grey table with one bar under
+   them (shortcuts, pages, zoom) that hides behind a small arrow; three
+   floating cards on the right: the findings header, the selected finding
+   (the Revision 1 card), the other findings folded together underneath.
    Colour: near-black for structure, emerald for approval (and only approval),
    three severity colours that appear nowhere else. Shape rule: cards 16px,
    controls 9px, menu rows 7px; avatars, markers and logos round.
@@ -32,7 +33,7 @@
   --float:0 0 0 1px rgba(24,24,27,.06),0 1px 2px rgba(24,24,27,.04),0 10px 28px -14px rgba(24,24,27,.18);
   --pop:0 0 0 1px rgba(24,24,27,.08),0 16px 40px -12px rgba(24,24,27,.28);
   --ease:cubic-bezier(.23,1,.32,1);
-  --side:232px; --top:58px; --col:432px;
+  --side:232px; --strip:56px; --top:58px; --col:432px; --lane:380px; --lane-gap:28px;
   --gutter:36px; --gutter-r:0px; --pad-x:12px; --peek:164px; --dock:44px;
   --sans:'Geist',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
 }
@@ -54,9 +55,14 @@ kbd{font:500 10.5px/1 var(--sans);min-width:18px;height:18px;display:inline-grid
 body[data-screen="signin"] #screen-signin{display:flex}
 body[data-screen="signin"] .app{display:none}
 .app{height:100%;display:grid;grid-template-rows:var(--top) minmax(0,1fr);grid-template-columns:auto minmax(0,1fr)}
-.top{grid-column:1 / -1;display:flex;align-items:center;gap:12px;padding:0 16px 0 10px;position:relative;z-index:20}
-.side{grid-row:2;width:0;overflow:hidden;visibility:hidden;transition:width .24s var(--ease),visibility 0s .24s}
-body.side-open .side{width:var(--side);visibility:visible;transition:width .24s var(--ease)}
+/* the V sits at the far left, centred over the sidebar strip; the sidebar toggle sits right under it and never moves */
+.top{grid-column:1 / -1;display:flex;align-items:center;gap:12px;padding:0 16px;position:relative;z-index:20}
+#navbtn{display:none}
+.side{grid-row:2;width:var(--strip);overflow:hidden;transition:width .24s var(--ease)}
+body.side-open .side{width:var(--side)}
+.side-top{display:flex;padding-left:1px;margin-bottom:8px}
+.side :is(.side-nav,.side-sep,.side-ws){opacity:0;visibility:hidden;transition:opacity .12s var(--ease),visibility 0s .12s}
+body.side-open .side :is(.side-nav,.side-sep,.side-ws){opacity:1;visibility:visible;transition:opacity .2s var(--ease) .06s}
 .content{grid-row:2;grid-column:2;min-width:0;min-height:0;display:flex;flex-direction:column}
 .content > .screen{flex:1;min-height:0}
 body[data-screen="review"] #screen-review{display:grid}
@@ -173,10 +179,10 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 #usermenu{right:0;top:calc(100% + 8px);transform-origin:top right}
 
 /* ---------- sidebar ---------- */
-.side-in{width:var(--side);height:100%;display:flex;flex-direction:column;padding:6px 12px 16px 12px;overflow-y:auto}
+.side-in{width:var(--side);height:100%;display:flex;flex-direction:column;padding:6px 10px 16px;overflow-y:auto}
 .side-brand{display:none;align-items:center;gap:9px;font-weight:600;font-size:15px;padding:4px 12px 18px}
 .side-nav{list-style:none;margin:0;padding:0;display:grid;gap:2px}
-.side-nav a{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:10px;color:var(--ink-2);text-decoration:none;font-weight:500;
+.side-nav a{display:flex;align-items:center;gap:12px;height:40px;padding:0 9px;border-radius:10px;color:var(--ink-2);text-decoration:none;font-weight:500;
   transition:background-color .15s}
 .side-nav a .ic{width:18px;height:18px;color:var(--muted)}
 .side-nav a:hover{background:rgba(24,24,27,.05);color:var(--ink)}
@@ -192,18 +198,37 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 .wsbtn .ic{color:var(--muted)}
 #wsmenu{left:0;top:calc(100% + 6px);width:100%;transform-origin:top left}
 
-/* ---------- review: the rail, the pages, three cards ---------- */
-#screen-review{grid-template-columns:44px minmax(0,1fr) var(--col);gap:12px;padding:2px 24px 20px 12px}
-/* the page and zoom controls: a small rail at the window's (or the sidebar's) left edge, never on the page */
-.rail{display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:6px}
-.rgroup{display:flex;flex-direction:column;align-items:center;width:44px;padding:4px 0;background:var(--surface);border-radius:12px;box-shadow:var(--float)}
-.rgroup button{display:grid;place-items:center;width:36px;height:32px;border:0;border-radius:8px;background:none;color:var(--ink-2);
+/* ---------- review: the pages with their bar, three cards ---------- */
+#screen-review{grid-template-columns:minmax(0,1fr);padding:2px 12px 0 4px}
+.docpane{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px;padding-bottom:16px}
+/* the bar under the pages: shortcuts, pages, zoom. It hides, and a small arrow brings it back. Never on the page. */
+.dock{flex:none;display:flex;align-items:center;gap:2px;height:var(--dock);padding:0 6px 0 16px;background:var(--surface);
+  border-radius:var(--r-lg);box-shadow:var(--float);font-size:12.5px;color:var(--muted);white-space:nowrap;container-type:inline-size;
+  transition:opacity .2s var(--ease),transform .2s var(--ease)}
+@starting-style{.dock{opacity:0;transform:translateY(8px)}}
+.dkeys{flex:1;min-width:0;display:flex;align-items:center;gap:16px;margin:0;overflow:hidden}
+.dkeys span{display:inline-flex;align-items:center;gap:5px}
+.dkeys kbd + kbd{margin-left:-1px}
+@container (max-width:700px){ .dkeys .k5{display:none} }
+@container (max-width:620px){ .dkeys .k4{display:none} }
+@container (max-width:550px){ .dkeys{visibility:hidden} }
+.dctl{display:flex;align-items:center;gap:2px}
+.dock button{display:inline-grid;place-items:center;height:32px;min-width:32px;border:0;border-radius:999px;background:none;color:var(--ink-2);
   transition:transform .12s var(--ease),background-color .15s}
-.rgroup button:hover{background:var(--hover);color:var(--ink)}
-.rgroup button:active{transform:scale(.92)}
-.rgroup .rlabel{font-size:11.5px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums;padding:4px 0;text-align:center;line-height:1.2;white-space:nowrap}
-#zoomval{width:40px;height:26px;font-size:11.5px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
-.docpane{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column}
+.dock button:hover{background:var(--hover);color:var(--ink)}
+.dock button:active{transform:scale(.94)}
+.dsep{width:1px;height:18px;background:var(--line);margin:0 6px;flex:none}
+#pageno{min-width:52px;text-align:center;font-size:13px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+#zoomval{min-width:48px;font-size:12.5px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.dockshow{display:none}
+body.dock-off .dock{display:none}
+body.dock-off .docpane{gap:6px;padding-bottom:8px}
+body.dock-off .dockshow{display:grid;place-items:center;align-self:center;flex:none;width:56px;height:24px;border:0;border-radius:999px;
+  background:var(--surface);box-shadow:var(--float);color:var(--ink-2);transition:opacity .2s var(--ease),transform .2s var(--ease)}
+@starting-style{body.dock-off .dockshow{opacity:0;transform:translateY(6px)}}
+.dockshow:hover{color:var(--ink)}
+.dockshow:active{transform:scale(.94)}
+.dockshow .ic{width:14px;height:14px}
 #scroller{flex:1;min-height:0;overflow:auto;position:relative;overscroll-behavior:contain;border-radius:var(--r-card)}
 #pages{padding:4px var(--pad-x) 24px}
 .pg{display:grid;grid-template-columns:var(--gutter) auto;width:max-content;margin:0 auto 20px;padding-right:var(--gutter-r)}
@@ -234,8 +259,27 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 .mk.sel{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--ink)}
 
 /* the right column: three floating cards */
-#panel{display:flex;flex-direction:column;gap:12px;min-height:0}
-#findhead{flex:none;padding:14px 16px;display:grid;gap:12px}
+/* Findings beside the page, as comments are in Google Docs: each card floats at the height of its text and
+   scrolls with the document. Folded, a card shows its row; selected, it opens in place (the Revision 1 card)
+   and the cards around it move aside. The findings card stays pinned at the top of the lane. */
+#docrow{display:grid;grid-template-columns:max-content var(--lane);column-gap:var(--lane-gap);width:max-content;margin:0 auto;padding-right:14px;min-height:100%}
+#lane{position:relative;padding:0 0 24px}
+/* the pinned findings card sits on a strip of the table, so the cards slide under it and fade out at its edge */
+.lanehead{position:sticky;top:0;z-index:4;margin:0 -14px;padding:4px 14px 14px;
+  background:linear-gradient(var(--bg) calc(100% - 14px),rgba(241,241,242,0))}
+#findhead{padding:14px 16px;display:grid;gap:12px}
+.cmts{position:absolute;inset:0;list-style:none;margin:0;padding:0}
+.cmt{position:absolute;left:0;right:0;top:0;background:var(--surface);border-radius:var(--r-card);box-shadow:var(--float);
+  transition:transform .22s var(--ease),box-shadow .18s var(--ease)}
+.cmt.fresh{transition:none}
+.cmt > .rowbtn{padding:12px 12px 12px 14px;border-radius:var(--r-card)}
+.cmt:hover,.cmt.hover{box-shadow:0 0 0 1px rgba(24,24,27,.16),0 1px 2px rgba(24,24,27,.05),0 10px 28px -14px rgba(24,24,27,.26)}
+.cmt.st-rejected .rtitle{color:var(--muted)}
+.cmt.sel{z-index:2;background:var(--surface-2);box-shadow:var(--pop)}
+.cmt.sel > .rowbtn{padding-bottom:6px}
+.cmt .card{padding:0 14px 16px 50px}
+#panel{display:none}
+#panel > .fcard{flex:none}
 .fhead{display:flex;align-items:center;gap:10px;min-height:34px}
 .fhead h2{margin:0;font-size:16px;font-weight:600;letter-spacing:-.015em;white-space:nowrap}
 [data-searchbox]{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;min-width:0}
@@ -287,27 +331,15 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 .mitem .lg{width:20px;height:20px}
 .mitem .lg svg,.mitem .lg .ic{width:12px;height:12px}
 
-/* card B: the selected finding, on its own */
-/* the selected finding gets the height it needs; the folded list keeps at least a row and a half */
-#detail{flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;background:var(--surface-2)}
+/* card B: the selected finding, the card from Revision 1 (its row on top, then the text boxes and the decisions), floating on its own.
+   It always shows in full; the column scrolls, the card never does. */
+#detail{background:var(--surface-2)}
 #detail:empty{display:none}
-.card{padding:16px 18px 18px;cursor:default}
-.chead{display:flex;flex-wrap:wrap;align-items:center;gap:6px 9px;font-size:13px;color:var(--muted)}
-.chead > *{white-space:nowrap}
-.ckey{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
-.cpage{margin-left:auto;display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 9px;border:0;border-radius:8px;background:var(--surface);
-  box-shadow:inset 0 0 0 1px var(--line);color:var(--ink-2);font-size:12.5px;transition:transform .12s var(--ease)}
-.cpage:hover{color:var(--ink);box-shadow:inset 0 0 0 1px var(--line-2)}
-.cpage:active{transform:scale(.97)}
-.cpage .ic{width:13px;height:13px}
-.cnav{display:inline-flex;align-items:center;gap:2px;margin-left:auto;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
-.cpage + .cnav{margin-left:0}
-.cnav button{display:grid;place-items:center;width:26px;height:28px;border:0;border-radius:7px;background:none;color:var(--ink-2)}
-.cnav button:hover:not(:disabled){background:var(--hover);color:var(--ink)}
-.cnav button:disabled{color:var(--line-2);cursor:default}
-.cnav .ic{width:14px;height:14px}
-.ctitle{font-size:17px;font-weight:600;line-height:1.3;letter-spacing:-.015em;margin:12px 0 8px;text-wrap:pretty}
-.cagents{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:0 0 14px}
+#detail .row{margin:0;background:none;box-shadow:none;border-radius:inherit}
+#detail .rowbtn{padding:16px 14px 6px 16px}
+#detail .row:hover > .rowbtn,#detail .row.hover > .rowbtn{background:none}
+.card{padding:0 16px 18px 52px;cursor:default}
+.cagents{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:2px 0 14px}
 .cfield{margin-bottom:12px}
 .clabel{display:block;font-size:12.5px;font-weight:500;color:var(--muted);margin:0 0 6px 2px}
 .cquote,.csugg{font-size:15px;line-height:1.55;border-radius:11px;padding:10px 13px;background:var(--surface);
@@ -356,29 +388,24 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 .dempty .keys{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:12.5px}
 
 /* card C: the other findings, folded together */
-.listcard{flex:1 0 128px;min-height:128px;display:flex;flex-direction:column;overflow:hidden}
-.list{flex:1;min-height:0;overflow-y:auto;list-style:none;margin:0;padding:6px 8px 8px;overscroll-behavior:contain}
+/* card C: the other findings, folded together, rows as in Revision 1 (who decided in the meta line, the tools on the right) */
+.list{list-style:none;margin:0;padding:6px 8px 8px}
 .row{border-radius:12px;scroll-margin-top:6px;position:relative}
 .row + .row::before{content:"";position:absolute;left:46px;right:12px;top:0;height:1px;background:var(--line)}
 .row:hover::before,.row:hover + .row::before{opacity:0}
-.rowbtn{width:100%;display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:12px;align-items:start;text-align:left;border:0;background:none;padding:11px 10px;border-radius:12px}
+.rowbtn{width:100%;display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:12px;align-items:start;text-align:left;border:0;background:none;padding:12px 10px;border-radius:12px}
 .row:hover > .rowbtn,.row.hover > .rowbtn{background:var(--surface-2)}
 .rmain{display:flex;flex-direction:column;gap:4px;min-width:0}
 .rtitle{font-weight:500;font-size:14px;line-height:1.4;color:var(--ink);text-wrap:pretty}
 .row.st-rejected .rtitle{color:var(--muted)}
 .rmeta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:12.5px;color:var(--muted)}
 .rkey{font-weight:500;color:var(--ink-2);font-variant-numeric:tabular-nums}
-/* a folded row names who decided; the tools that found it are on the selected card */
-.rside{display:flex;align-items:center;gap:4px;padding-top:1px}
-.rside .lgstack{display:none}
-.rvoters{display:inline-flex;gap:4px;align-items:center}
+.rside{display:flex;flex-direction:column;align-items:flex-end;gap:8px;padding-top:1px}
+.rvoters{display:inline-flex;gap:4px;margin-left:auto;align-items:center}
 .empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:32px 24px;color:var(--muted);text-align:center}
 .empty .ic{width:26px;height:26px;color:var(--line-2);margin-bottom:4px}
 .empty b{color:var(--ink);font-weight:500}
 .empty .btn{margin-top:8px}
-.pfoot{flex:none;display:flex;align-items:center;gap:6px;padding:10px 16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
-.pfoot kbd{margin-left:8px}
-.pfoot kbd:first-child,.pfoot kbd + kbd{margin-left:0}
 .sheetbtn,#peek{display:none}
 
 /* ---------- dashboard, reviews, documents, agents ---------- */
@@ -501,18 +528,21 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 .ex-p i{font-style:normal;color:var(--muted);font-size:12.5px}
 .ex-none{color:var(--muted)}
 
-/* toasts: bottom-left, except on the review screen, where they sit at the
-   foot of the findings column (over the key hints), never on the page */
+/* toasts: bottom-left; on the review screen they sit over the left end of the
+   bar under the pages, never on the page */
 #toast{position:fixed;left:24px;bottom:20px;max-width:340px;transform:translateY(6px);background:var(--ink);color:#fff;
   padding:9px 15px;border-radius:999px;font-size:13px;font-weight:500;line-height:18px;z-index:70;pointer-events:none;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   opacity:0;visibility:hidden;transition:opacity .18s var(--ease),transform .18s var(--ease),visibility 0s .18s}
 #toast.on{opacity:1;visibility:visible;transform:none;transition:opacity .18s var(--ease),transform .18s var(--ease)}
-body[data-screen="review"] #toast{left:auto;right:40px;bottom:24px}
+@media (min-width:761px){
+  body[data-screen="review"] #toast{left:calc(var(--strip) + 24px);bottom:20px}
+  body.side-open[data-screen="review"] #toast{left:calc(var(--side) + 24px)}
+}
 
 /* ---------- narrower screens ---------- */
 @media (max-width:1180px){
-  :root{--col:372px;--pad-x:8px;--gutter:32px}
+  :root{--col:372px;--lane:360px;--lane-gap:20px;--pad-x:8px;--gutter:32px}
   #screen-review{gap:10px;padding:2px 16px 16px 10px}
   .prog .bar{width:84px}
   .rv{grid-template-columns:minmax(0,1fr)}
@@ -527,7 +557,9 @@ body[data-screen="review"] #toast{left:auto;right:40px;bottom:24px}
 }
 /* phone: a drawer for the sidebar, the document first, controls in a row above the findings sheet */
 @media (max-width:760px){
-  :root{--gutter:30px;--gutter-r:0px;--pad-x:6px;--top:54px}
+  :root{--gutter:30px;--gutter-r:0px;--pad-x:6px;--top:54px;--lane:0px;--lane-gap:0px}
+  #docrow{display:block;padding-right:0}
+  #lane{display:none}
   .top{gap:6px;padding:0 10px 0 6px}
   .wm,.home + .vr{display:none}
   #crumb > a,#crumb > .cr-sep{display:none}
@@ -540,30 +572,32 @@ body[data-screen="review"] #toast{left:auto;right:40px;bottom:24px}
   body.nav-open .side{visibility:visible;transform:none;transition:transform .26s var(--ease)}
   .side-in{width:280px;padding-top:16px}
   .side-brand{display:flex}
+  #navbtn{display:inline-grid}
+  .side-top{display:none}
+  body .side :is(.side-nav,.side-sep,.side-ws){opacity:1;visibility:visible;transition:none}
   .app::after{content:"";position:fixed;inset:0;background:rgba(24,24,27,.3);opacity:0;pointer-events:none;transition:opacity .2s;z-index:44}
   body.nav-open .app::after{opacity:1;pointer-events:auto}
   body[data-screen="review"] #screen-review{display:block;position:relative;padding:0}
-  .docpane{height:100%}
+  .docpane,body.dock-off .docpane{height:100%;gap:0;padding-bottom:0}
   #scroller{border-radius:0}
   #pages{padding:6px var(--pad-x) calc(var(--peek) + var(--dock) + 16px)}
   .pg{margin-bottom:12px}
-  .rail{position:fixed;left:0;right:0;bottom:var(--peek);z-index:25;height:var(--dock);flex-direction:row;justify-content:center;gap:16px;padding:0;
-    background:var(--surface);box-shadow:0 -1px 0 var(--line)}
-  .rgroup{flex-direction:row;width:auto;padding:0;box-shadow:none;background:none;border-radius:0}
-  .rgroup .rlabel{padding:0 4px;min-width:44px}
+  /* the bar is a row above the findings sheet; hidden, a small arrow waits at its right end */
+  .dock{position:fixed;left:0;right:0;bottom:var(--peek);z-index:25;height:var(--dock);justify-content:center;gap:12px;padding:0 8px;
+    border-radius:0;box-shadow:0 -1px 0 var(--line)}
+  .dkeys,.dock .dsep{display:none}
+  #dockhide{position:absolute;right:8px;top:6px}
+  body.dock-off .dockshow{position:fixed;right:12px;bottom:calc(var(--peek) + 8px);z-index:25}
   .mk{right:3px}
-  #panel{position:fixed;left:0;right:0;bottom:0;height:min(88dvh,780px);z-index:30;gap:0;border-radius:20px 20px 0 0;background:var(--surface);
+  #panel{display:flex;flex-direction:column;position:fixed;left:0;right:0;bottom:0;height:min(88dvh,780px);z-index:30;gap:0;padding:0;border-radius:20px 20px 0 0;background:var(--surface);
     box-shadow:0 -12px 36px -12px rgba(24,24,27,.28),0 -1px 0 var(--line);overflow-y:auto;
     transform:translateY(calc(100% - var(--peek)));transition:transform .32s cubic-bezier(.32,.72,0,1)}
   body.sheet-open #panel{transform:none}
   body:not(.sheet-open) #panel{overflow:hidden}
   body:not(.sheet-open) #panel > :not(.sheetbtn):not(#peek){visibility:hidden}
   #panel .fcard{box-shadow:none;border-radius:0;max-height:none;overflow:visible;background:var(--surface)}
-  #findhead{padding:4px 14px 12px;border-bottom:1px solid var(--line)}
+  #findhead{position:static;padding:4px 14px 12px;border-bottom:1px solid var(--line)}
   #detail{flex:none;background:var(--surface-2) !important;border-bottom:1px solid var(--line)}
-  #findhead{flex:none}
-  .listcard{flex:none;min-height:0}
-  .list{flex:none;overflow:visible}
   .sheetbtn{display:flex;justify-content:center;align-items:center;flex:none;height:26px;border:0;background:none;width:100%}
   .sheetbtn .handle{width:40px;height:4px;border-radius:2px;background:var(--line-2)}
   #peek{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px 12px;align-items:start;align-content:start;flex:none;
@@ -576,9 +610,9 @@ body[data-screen="review"] #toast{left:auto;right:40px;bottom:24px}
   #peek .pacts .btn{flex:1}
   body.sheet-open #peek{display:none}
   .fmenu{position:fixed;left:12px !important;right:12px !important;top:auto;bottom:16px;min-width:0}
-  .card{padding:14px 14px 16px}
+  #detail .rowbtn{padding:14px 12px 6px 14px}
+  .card{padding:0 14px 16px}
   .btn.show{display:inline-flex}
-  .pfoot{display:none}
   .dempty .keys{display:none}
   #usermenu{position:fixed;left:8px;right:8px;top:56px;width:auto}
   .page,.ex{padding:4px 14px 32px}
@@ -615,14 +649,14 @@ body[data-screen="review"] #toast{left:auto;right:40px;bottom:24px}
 @media (prefers-reduced-motion:reduce){ *{transition:none !important;animation:none !important} }
 </style>
 </head>
-<body data-dir="v1" data-card="detail" data-list="others" data-home="dashboard" data-autoselect data-cardnav data-screen="signin">
+<body data-dir="v1" data-card="detail" data-list="others" data-home="dashboard" data-autoselect data-screen="signin">
 <!--__SPRITE__-->
 
 <section id="screen-signin" class="screen" aria-label="Sign in"><div id="signin-root"></div></section>
 
 <div class="app">
   <header class="top">
-    <button id="sidebtn" class="iconbtn" type="button" aria-controls="side" aria-expanded="false" aria-label="Show or hide the sidebar" title="Sidebar">
+    <button id="navbtn" class="iconbtn" type="button" aria-controls="side" aria-expanded="false" aria-label="Menu" title="Menu">
       <svg class="ic" aria-hidden="true"><use href="#i-sidebar-simple"/></svg></button>
     <a class="home" href="#/dashboard" aria-label="Vidimus, dashboard"><svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="1" width="22" height="22" rx="6" fill="currentColor"/><path d="M7 8.5l5 8 5-8" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm">Vidimus</span></a>
     <span class="vr" aria-hidden="true"></span>
@@ -637,6 +671,8 @@ body[data-screen="review"] #toast{left:auto;right:40px;bottom:24px}
 
   <nav id="side" class="side" aria-label="Main">
     <div class="side-in">
+      <div class="side-top"><button id="sidebtn" class="iconbtn" type="button" aria-controls="side" aria-expanded="false" aria-label="Show or hide the sidebar" title="Sidebar">
+        <svg class="ic" aria-hidden="true"><use href="#i-sidebar-simple"/></svg></button></div>
       <div class="side-brand" aria-hidden="true"><svg class="logo" viewBox="0 0 24 24"><rect x="1" y="1" width="22" height="22" rx="6" fill="currentColor"/><path d="M7 8.5l5 8 5-8" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Vidimus</span></div>
       <ul class="side-nav">
         <li><a href="#/dashboard" data-nav="dashboard"><svg class="ic" aria-hidden="true"><use href="#i-house"/></svg><span>Dashboard</span></a></li>
@@ -664,33 +700,42 @@ body[data-screen="review"] #toast{left:auto;right:40px;bottom:24px}
     </div></main>
 
     <main id="screen-review" class="screen">
-      <div class="rail" aria-label="Pages and zoom">
-        <div class="rgroup" role="group" aria-label="Pages">
-          <button id="prevpage" type="button" aria-label="Previous page" title="Previous page"><svg class="ic" aria-hidden="true"><use href="#i-caret-up"/></svg></button>
-          <span id="pageno" class="rlabel" aria-live="polite"></span>
-          <button id="nextpage" type="button" aria-label="Next page" title="Next page"><svg class="ic" aria-hidden="true"><use href="#i-caret-down"/></svg></button>
-        </div>
-        <div class="rgroup" role="group" aria-label="Zoom">
-          <button id="zoomin" type="button" aria-label="Zoom in" title="Zoom in"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button>
-          <button id="zoomval" type="button" title="Back to the default zoom"></button>
-          <button id="zoomout" type="button" aria-label="Zoom out" title="Zoom out"><svg class="ic" aria-hidden="true"><use href="#i-minus"/></svg></button>
-        </div>
-      </div>
       <section class="docpane" aria-label="Document">
-        <div id="scroller"><div id="pages"></div></div>
+        <div id="scroller"><div id="docrow">
+          <div id="pages"></div>
+          <aside id="lane" aria-label="Findings">
+            <div id="lanehead" class="lanehead"><section id="findhead" class="fcard" aria-label="Search and filter">
+              <div class="fhead"><h2>Findings</h2><div data-searchbox></div></div>
+              <div data-filters data-search="none"></div>
+              <div id="tabs" class="seg" role="tablist" aria-label="Status"></div>
+            </section></div>
+            <ol id="cmts" class="cmts"></ol>
+          </aside>
+        </div></div>
+        <div id="dock" class="dock">
+          <p class="dkeys" aria-label="Keyboard shortcuts"><span><kbd>J</kbd><kbd>K</kbd> move</span><span><kbd>A</kbd> approve</span><span><kbd>X</kbd> reject</span><span class="k4"><kbd>E</kbd> edit</span><span class="k5"><kbd>/</kbd> search</span></p>
+          <div class="dctl" role="group" aria-label="Pages">
+            <button id="prevpage" type="button" aria-label="Previous page" title="Previous page"><svg class="ic" aria-hidden="true"><use href="#i-caret-left"/></svg></button>
+            <span id="pageno" aria-live="polite"></span>
+            <button id="nextpage" type="button" aria-label="Next page" title="Next page"><svg class="ic" aria-hidden="true"><use href="#i-caret-right"/></svg></button>
+          </div>
+          <span class="dsep" aria-hidden="true"></span>
+          <div class="dctl" role="group" aria-label="Zoom">
+            <button id="zoomout" type="button" aria-label="Zoom out" title="Zoom out"><svg class="ic" aria-hidden="true"><use href="#i-minus"/></svg></button>
+            <button id="zoomval" type="button" title="Back to the default zoom"></button>
+            <button id="zoomin" type="button" aria-label="Zoom in" title="Zoom in"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button>
+          </div>
+          <span class="dsep hidesep" aria-hidden="true"></span>
+          <button id="dockhide" type="button" aria-controls="dock" aria-label="Hide this bar" title="Hide this bar"><svg class="ic" aria-hidden="true"><use href="#i-caret-down"/></svg></button>
+        </div>
+        <button id="dockshow" class="dockshow" type="button" aria-controls="dock" aria-label="Show the page and zoom bar" title="Show the bar"><svg class="ic" aria-hidden="true"><use href="#i-caret-up"/></svg></button>
       </section>
       <aside id="panel" aria-label="Findings">
         <button id="sheetbtn" class="sheetbtn" type="button" aria-expanded="false" aria-controls="panel"><span class="handle"></span><span class="sr">Show findings</span></button>
         <div id="peek"></div>
-        <section id="findhead" class="fcard" aria-label="Search and filter">
-          <div class="fhead"><h2>Findings</h2><div data-searchbox></div></div>
-          <div data-filters data-search="none"></div>
-          <div id="tabs" class="seg" role="tablist" aria-label="Status"></div>
-        </section>
         <section id="detail" class="fcard" aria-label="Selected finding"></section>
         <section class="fcard listcard" aria-label="Other findings">
           <ol id="list" class="list"></ol>
-          <footer class="pfoot"><kbd>J</kbd><kbd>K</kbd> move <kbd>A</kbd> approve <kbd>X</kbd> reject <kbd>E</kbd> edit <kbd>/</kbd> search</footer>
         </section>
       </aside>
     </main>
