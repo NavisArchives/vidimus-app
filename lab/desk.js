@@ -341,7 +341,7 @@ function renderDocuments(){
    phone it is a drawer over the page that closes on every move. */
 function setNav(open){
   document.body.classList.toggle('nav-open', !!open);
-  $('#navbtn')?.setAttribute('aria-expanded', !!open);
+  if (MOBILE.matches) $('#sidebtn')?.setAttribute('aria-expanded', !!open);
 }
 function setSide(open){
   document.body.classList.toggle('side-open', !!open);
@@ -350,10 +350,13 @@ function setSide(open){
 }
 if ($('#sidebtn')){
   if (lsGet('side', false)) document.body.classList.add('side-open');
-  $('#sidebtn').setAttribute('aria-expanded', document.body.classList.contains('side-open'));
-  $('#sidebtn').onclick = e => { e.stopPropagation(); setSide(!document.body.classList.contains('side-open')); };
+  $('#sidebtn').setAttribute('aria-expanded', !MOBILE.matches && document.body.classList.contains('side-open'));
+  $('#sidebtn').onclick = e => {
+    e.stopPropagation();
+    if (MOBILE.matches) setNav(!document.body.classList.contains('nav-open'));
+    else setSide(!document.body.classList.contains('side-open'));
+  };
 }
-$('#navbtn') && ($('#navbtn').onclick = e => { e.stopPropagation(); setNav(!document.body.classList.contains('nav-open')); });
 
 /* ---------- the bar under the pages: it hides, and a small arrow brings it back ---------- */
 function setDock(on){
@@ -583,7 +586,7 @@ document.addEventListener('pointerdown', e => {
     const el = $(m);
     if (el && !el.hidden && !el.contains(e.target) && !e.target.closest(b)) closeMenus();
   }
-  if (document.body.classList.contains('nav-open') && !e.target.closest('#side,#navbtn')) setNav(false);
+  if (document.body.classList.contains('nav-open') && !e.target.closest('#side,#sidebtn')) setNav(false);
 });
 
 function renderTabs(){
@@ -882,8 +885,8 @@ function placeToast(t){
   dock?.classList.remove('toasting');
   if (MOBILE.matches || document.body.dataset.screen !== 'review' || !dock) return;
   if (document.body.classList.contains('dock-off')){
-    const p = $('.docpane').getBoundingClientRect();
-    t.style.left = Math.round(p.left + 16) + 'px'; t.style.bottom = '2px';
+    const p = pages[0] ? pages[0].el.getBoundingClientRect() : $('.docpane').getBoundingClientRect();
+    t.style.left = Math.round(Math.max(p.left, 8) + 16) + 'px'; t.style.bottom = '12px';
     return;
   }
   const d = dock.getBoundingClientRect(), keys = $('.dkeys', dock), w = t.offsetWidth;
@@ -905,7 +908,7 @@ addEventListener('keydown', e => {
     if (openDrop){ openDrop = null; renderFilters(); return; }
     if ($('#usermenu') && !$('#usermenu').hidden){ closeMenus(); $('#avatarbtn')?.focus(); return; }
     if ($('#wsmenu') && !$('#wsmenu').hidden){ closeMenus(); $('#wsbtn')?.focus(); return; }
-    if (document.body.classList.contains('nav-open')){ setNav(false); $('#navbtn')?.focus(); return; }
+    if (document.body.classList.contains('nav-open')){ setNav(false); $('#sidebtn')?.focus(); return; }
     if (document.body.classList.contains('sheet-open')) return setSheet(false);
     if (editing){ editing = null; render(); return; }
     if (sel && !autoSel()){ sel = null; render(); }
@@ -1001,6 +1004,17 @@ function mount(){
   return mounting;
 }
 
+/* the bar sits under the page only, and its tab (when hidden) in the middle of the page */
+function placeDock(){
+  const dock = $('#dock'), tab = $('#dockshow'), pane = $('.docpane'), P = pages[0];
+  if (!dock || !pane || !P || MOBILE.matches){ if (dock){ dock.style.marginLeft = dock.style.width = ''; } if (tab) tab.style.left = ''; return; }
+  const d = pane.getBoundingClientRect(), r = P.el.getBoundingClientRect();
+  const left = Math.max(d.left, r.left), right = Math.min(d.right, r.right);
+  dock.style.marginLeft = Math.round(left - d.left) + 'px';
+  dock.style.width = Math.round(right - left) + 'px';
+  if (tab) tab.style.left = Math.round((left + right) / 2 - d.left) + 'px';
+}
+scroller.addEventListener('scroll', () => requestAnimationFrame(placeDock), {passive: true});
 function layout(){
   if (!scroller.clientWidth) return;
   const w = sheetWidth();
@@ -1011,6 +1025,7 @@ function layout(){
   pages.forEach(paint);
   placeMarkers();
   placeLane();
+  placeDock();
   if (sel) revealSel(true);
   const zv = $('#zoomval'); if (zv) zv.textContent = Math.round(zoomNow() * 100) + '%';
 }

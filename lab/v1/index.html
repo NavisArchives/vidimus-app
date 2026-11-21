@@ -10,8 +10,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap">
 <style>
 /* Vidimus lab · v1 « Paper » (round 2)
-   Light and cool-neutral. A sidebar folded to a strip that holds only its
-   toggle, right under the V; the pages on a grey table with one bar under
+   Light and cool-neutral. A sidebar folded away, its toggle at the far left
+   of the header where a logo would sit; the pages on a grey table with one bar under
    them (shortcuts, pages, zoom) that hides behind a small arrow; three
    floating cards on the right: the findings header, the selected finding
    (the Revision 1 card), the other findings folded together underneath.
@@ -33,7 +33,7 @@
   --float:0 0 0 1px rgba(24,24,27,.06),0 1px 2px rgba(24,24,27,.04),0 10px 28px -14px rgba(24,24,27,.18);
   --pop:0 0 0 1px rgba(24,24,27,.08),0 16px 40px -12px rgba(24,24,27,.28);
   --ease:cubic-bezier(.23,1,.32,1);
-  --side:232px; --strip:56px; --top:58px; --col:432px; --lane:380px; --lane-gap:28px;
+  --side:232px; --top:58px; --col:432px; --lane:380px; --lane-gap:28px;
   --gutter:36px; --gutter-r:0px; --pad-x:12px; --peek:164px; --dock:44px;
   --sans:'Geist',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
 }
@@ -55,14 +55,10 @@ kbd{font:500 10.5px/1 var(--sans);min-width:18px;height:18px;display:inline-grid
 body[data-screen="signin"] #screen-signin{display:flex}
 body[data-screen="signin"] .app{display:none}
 .app{height:100%;display:grid;grid-template-rows:var(--top) minmax(0,1fr);grid-template-columns:auto minmax(0,1fr)}
-/* the V sits at the far left, centred over the sidebar strip; the sidebar toggle sits right under it and never moves */
-.top{grid-column:1 / -1;display:flex;align-items:center;gap:12px;padding:0 16px;position:relative;z-index:20}
-#navbtn{display:none}
-.side{grid-row:2;width:var(--strip);overflow:hidden;transition:width .24s var(--ease)}
-body.side-open .side{width:var(--side)}
-.side-top{display:flex;padding-left:1px;margin-bottom:8px}
-.side :is(.side-nav,.side-sep,.side-ws){opacity:0;visibility:hidden;transition:opacity .12s var(--ease),visibility 0s .12s}
-body.side-open .side :is(.side-nav,.side-sep,.side-ws){opacity:1;visibility:visible;transition:opacity .2s var(--ease) .06s}
+/* the sidebar toggle takes the logo's place at the far left of the header; it never moves */
+.top{grid-column:1 / -1;display:flex;align-items:center;gap:10px;padding:0 16px 0 10px;position:relative;z-index:20}
+.side{grid-row:2;width:0;overflow:hidden;visibility:hidden;transition:width .24s var(--ease),visibility 0s .24s}
+body.side-open .side{width:var(--side);visibility:visible;transition:width .24s var(--ease)}
 .content{grid-row:2;grid-column:2;min-width:0;min-height:0;display:flex;flex-direction:column}
 .content > .screen{flex:1;min-height:0}
 body[data-screen="review"] #screen-review{display:grid}
@@ -188,7 +184,7 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 .side-nav a:hover{background:rgba(24,24,27,.05);color:var(--ink)}
 .side-nav a[aria-current="page"]{background:var(--accent-soft);color:var(--ink);font-weight:600}
 .side-nav a[aria-current="page"] .ic{color:var(--accent)}
-.side-sep{height:1px;background:var(--line-2);margin:16px 6px}
+.side-sep{height:1px;background:var(--line-2);margin:auto 6px 16px}   /* pushes the workspace to the foot */
 .side-label{display:block;font-size:12.5px;color:var(--muted);margin:0 6px 8px}
 .side-ws{position:relative}
 .wsbtn{display:flex;align-items:center;gap:10px;width:100%;height:42px;padding:0 10px;border:0;border-radius:11px;background:var(--surface);
@@ -201,6 +197,8 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 /* ---------- review: the pages with their bar, three cards ---------- */
 #screen-review{grid-template-columns:minmax(0,1fr);padding:2px 12px 0 4px}
 .docpane{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px;padding-bottom:16px}
+/* the bar spans the page's column only (the desk sets its left and width from the page) */
+.dock{align-self:flex-start;max-width:100%}
 /* the bar under the pages: shortcuts, pages, zoom. It hides, and a small arrow brings it back. Never on the page. */
 .dock{flex:none;display:flex;align-items:center;gap:2px;height:var(--dock);padding:0 6px 0 16px;background:var(--surface);
   border-radius:var(--r-lg);box-shadow:var(--float);font-size:12.5px;color:var(--muted);white-space:nowrap;container-type:inline-size;
@@ -209,9 +207,8 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 .dkeys{flex:1;min-width:0;display:flex;align-items:center;gap:16px;margin:0;overflow:hidden}
 .dkeys span{display:inline-flex;align-items:center;gap:5px}
 .dkeys kbd + kbd{margin-left:-1px}
-@container (max-width:700px){ .dkeys .k5{display:none} }
-@container (max-width:620px){ .dkeys .k4{display:none} }
-@container (max-width:550px){ .dkeys{visibility:hidden} }
+@container (max-width:640px){ .dkeys .k4{display:none} }
+@container (max-width:560px){ .dkeys{visibility:hidden} }
 .dctl{display:flex;align-items:center;gap:2px}
 .dock button{display:inline-grid;place-items:center;height:32px;min-width:32px;border:0;border-radius:999px;background:none;color:var(--ink-2);
   transition:transform .12s var(--ease),background-color .15s}
@@ -222,12 +219,13 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 #zoomval{min-width:48px;font-size:12.5px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
 .dockshow{display:none}
 body.dock-off .dock{display:none}
-body.dock-off .docpane{gap:6px;padding-bottom:8px}
-body.dock-off .dockshow{display:grid;place-items:center;align-self:center;flex:none;width:56px;height:24px;border:0;border-radius:999px;
+body.dock-off .docpane{gap:0;padding-bottom:0}
+body.dock-off #pages{padding-bottom:44px}
+body.dock-off .dockshow{display:grid;place-items:center;position:absolute;bottom:0;z-index:6;transform:translateX(-50%);width:56px;height:28px;border:0;border-radius:10px 10px 0 0;
   background:var(--surface);box-shadow:var(--float);color:var(--ink-2);transition:opacity .2s var(--ease),transform .2s var(--ease)}
-@starting-style{body.dock-off .dockshow{opacity:0;transform:translateY(6px)}}
+@starting-style{body.dock-off .dockshow{opacity:0;transform:translate(-50%,6px)}}
 .dockshow:hover{color:var(--ink)}
-.dockshow:active{transform:scale(.94)}
+body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 .dockshow .ic{width:14px;height:14px}
 #scroller{flex:1;min-height:0;overflow:auto;position:relative;overscroll-behavior:contain;border-radius:var(--r-card)}
 #pages{padding:4px var(--pad-x) 24px}
@@ -559,7 +557,7 @@ body.dock-off .dockshow{display:grid;place-items:center;align-self:center;flex:n
   #docrow{display:block;padding-right:0}
   #lane{display:none}
   .top{gap:6px;padding:0 10px 0 6px}
-  .wm,.home + .vr{display:none}
+  .home,.home + .vr{display:none}
   #crumb > a,#crumb > .cr-sep{display:none}
   .topright{gap:6px}
   .btn{height:34px;padding:0 11px}
@@ -570,9 +568,6 @@ body.dock-off .dockshow{display:grid;place-items:center;align-self:center;flex:n
   body.nav-open .side{visibility:visible;transform:none;transition:transform .26s var(--ease)}
   .side-in{width:280px;padding-top:16px}
   .side-brand{display:flex}
-  #navbtn{display:inline-grid}
-  .side-top{display:none}
-  body .side :is(.side-nav,.side-sep,.side-ws){opacity:1;visibility:visible;transition:none}
   .app::after{content:"";position:fixed;inset:0;background:rgba(24,24,27,.3);opacity:0;pointer-events:none;transition:opacity .2s;z-index:44}
   body.nav-open .app::after{opacity:1;pointer-events:auto}
   body[data-screen="review"] #screen-review{display:block;position:relative;padding:0}
@@ -585,7 +580,7 @@ body.dock-off .dockshow{display:grid;place-items:center;align-self:center;flex:n
     border-radius:0;box-shadow:0 -1px 0 var(--line)}
   .dkeys,.dock .dsep{display:none}
   #dockhide{position:absolute;right:8px;top:6px}
-  body.dock-off .dockshow{position:fixed;right:12px;bottom:calc(var(--peek) + 8px);z-index:25}
+  body.dock-off .dockshow{position:fixed;left:auto;right:12px;bottom:calc(var(--peek) + 8px);z-index:25;transform:none;border-radius:999px}
   .mk{right:3px}
   #panel{display:flex;flex-direction:column;position:fixed;left:0;right:0;bottom:0;height:min(88dvh,780px);z-index:30;gap:0;padding:0;border-radius:20px 20px 0 0;background:var(--surface);
     box-shadow:0 -12px 36px -12px rgba(24,24,27,.28),0 -1px 0 var(--line);overflow-y:auto;
@@ -654,9 +649,9 @@ body.dock-off .dockshow{display:grid;place-items:center;align-self:center;flex:n
 
 <div class="app">
   <header class="top">
-    <button id="navbtn" class="iconbtn" type="button" aria-controls="side" aria-expanded="false" aria-label="Menu" title="Menu">
+    <button id="sidebtn" class="iconbtn" type="button" aria-controls="side" aria-expanded="false" aria-label="Show or hide the sidebar" title="Sidebar">
       <svg class="ic" aria-hidden="true"><use href="#i-sidebar-simple"/></svg></button>
-    <a class="home" href="#/dashboard" aria-label="Vidimus, dashboard"><svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="1" width="22" height="22" rx="6" fill="currentColor"/><path d="M7 8.5l5 8 5-8" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm">Vidimus</span></a>
+    <a class="home" href="#/dashboard" aria-label="Vidimus, dashboard"><span class="wm">Vidimus</span></a>
     <span class="vr" aria-hidden="true"></span>
     <div id="crumb"></div>
     <div class="topright">
@@ -669,9 +664,7 @@ body.dock-off .dockshow{display:grid;place-items:center;align-self:center;flex:n
 
   <nav id="side" class="side" aria-label="Main">
     <div class="side-in">
-      <div class="side-top"><button id="sidebtn" class="iconbtn" type="button" aria-controls="side" aria-expanded="false" aria-label="Show or hide the sidebar" title="Sidebar">
-        <svg class="ic" aria-hidden="true"><use href="#i-sidebar-simple"/></svg></button></div>
-      <div class="side-brand" aria-hidden="true"><svg class="logo" viewBox="0 0 24 24"><rect x="1" y="1" width="22" height="22" rx="6" fill="currentColor"/><path d="M7 8.5l5 8 5-8" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Vidimus</span></div>
+      <div class="side-brand" aria-hidden="true"><span>Vidimus</span></div>
       <ul class="side-nav">
         <li><a href="#/dashboard" data-nav="dashboard"><svg class="ic" aria-hidden="true"><use href="#i-house"/></svg><span>Dashboard</span></a></li>
         <li><a href="#/reviews" data-nav="reviews"><svg class="ic" aria-hidden="true"><use href="#i-list-checks"/></svg><span>Reviews</span></a></li>
@@ -711,7 +704,7 @@ body.dock-off .dockshow{display:grid;place-items:center;align-self:center;flex:n
           </aside>
         </div></div>
         <div id="dock" class="dock">
-          <p class="dkeys" aria-label="Keyboard shortcuts"><span><kbd>J</kbd><kbd>K</kbd> move</span><span><kbd>A</kbd> approve</span><span><kbd>X</kbd> reject</span><span class="k4"><kbd>E</kbd> edit</span><span class="k5"><kbd>/</kbd> search</span></p>
+          <p class="dkeys" aria-label="Keyboard shortcuts"><span><kbd>J</kbd><kbd>K</kbd> move</span><span><kbd>A</kbd> approve</span><span><kbd>X</kbd> reject</span><span class="k4"><kbd>E</kbd> edit</span></p>
           <div class="dctl" role="group" aria-label="Pages">
             <button id="prevpage" type="button" aria-label="Previous page" title="Previous page"><svg class="ic" aria-hidden="true"><use href="#i-caret-left"/></svg></button>
             <span id="pageno" aria-live="polite"></span>
@@ -1087,7 +1080,7 @@ function renderDocuments(){
    phone it is a drawer over the page that closes on every move. */
 function setNav(open){
   document.body.classList.toggle('nav-open', !!open);
-  $('#navbtn')?.setAttribute('aria-expanded', !!open);
+  if (MOBILE.matches) $('#sidebtn')?.setAttribute('aria-expanded', !!open);
 }
 function setSide(open){
   document.body.classList.toggle('side-open', !!open);
@@ -1096,10 +1089,13 @@ function setSide(open){
 }
 if ($('#sidebtn')){
   if (lsGet('side', false)) document.body.classList.add('side-open');
-  $('#sidebtn').setAttribute('aria-expanded', document.body.classList.contains('side-open'));
-  $('#sidebtn').onclick = e => { e.stopPropagation(); setSide(!document.body.classList.contains('side-open')); };
+  $('#sidebtn').setAttribute('aria-expanded', !MOBILE.matches && document.body.classList.contains('side-open'));
+  $('#sidebtn').onclick = e => {
+    e.stopPropagation();
+    if (MOBILE.matches) setNav(!document.body.classList.contains('nav-open'));
+    else setSide(!document.body.classList.contains('side-open'));
+  };
 }
-$('#navbtn') && ($('#navbtn').onclick = e => { e.stopPropagation(); setNav(!document.body.classList.contains('nav-open')); });
 
 /* ---------- the bar under the pages: it hides, and a small arrow brings it back ---------- */
 function setDock(on){
@@ -1329,7 +1325,7 @@ document.addEventListener('pointerdown', e => {
     const el = $(m);
     if (el && !el.hidden && !el.contains(e.target) && !e.target.closest(b)) closeMenus();
   }
-  if (document.body.classList.contains('nav-open') && !e.target.closest('#side,#navbtn')) setNav(false);
+  if (document.body.classList.contains('nav-open') && !e.target.closest('#side,#sidebtn')) setNav(false);
 });
 
 function renderTabs(){
@@ -1628,8 +1624,8 @@ function placeToast(t){
   dock?.classList.remove('toasting');
   if (MOBILE.matches || document.body.dataset.screen !== 'review' || !dock) return;
   if (document.body.classList.contains('dock-off')){
-    const p = $('.docpane').getBoundingClientRect();
-    t.style.left = Math.round(p.left + 16) + 'px'; t.style.bottom = '2px';
+    const p = pages[0] ? pages[0].el.getBoundingClientRect() : $('.docpane').getBoundingClientRect();
+    t.style.left = Math.round(Math.max(p.left, 8) + 16) + 'px'; t.style.bottom = '12px';
     return;
   }
   const d = dock.getBoundingClientRect(), keys = $('.dkeys', dock), w = t.offsetWidth;
@@ -1651,7 +1647,7 @@ addEventListener('keydown', e => {
     if (openDrop){ openDrop = null; renderFilters(); return; }
     if ($('#usermenu') && !$('#usermenu').hidden){ closeMenus(); $('#avatarbtn')?.focus(); return; }
     if ($('#wsmenu') && !$('#wsmenu').hidden){ closeMenus(); $('#wsbtn')?.focus(); return; }
-    if (document.body.classList.contains('nav-open')){ setNav(false); $('#navbtn')?.focus(); return; }
+    if (document.body.classList.contains('nav-open')){ setNav(false); $('#sidebtn')?.focus(); return; }
     if (document.body.classList.contains('sheet-open')) return setSheet(false);
     if (editing){ editing = null; render(); return; }
     if (sel && !autoSel()){ sel = null; render(); }
@@ -1747,6 +1743,17 @@ function mount(){
   return mounting;
 }
 
+/* the bar sits under the page only, and its tab (when hidden) in the middle of the page */
+function placeDock(){
+  const dock = $('#dock'), tab = $('#dockshow'), pane = $('.docpane'), P = pages[0];
+  if (!dock || !pane || !P || MOBILE.matches){ if (dock){ dock.style.marginLeft = dock.style.width = ''; } if (tab) tab.style.left = ''; return; }
+  const d = pane.getBoundingClientRect(), r = P.el.getBoundingClientRect();
+  const left = Math.max(d.left, r.left), right = Math.min(d.right, r.right);
+  dock.style.marginLeft = Math.round(left - d.left) + 'px';
+  dock.style.width = Math.round(right - left) + 'px';
+  if (tab) tab.style.left = Math.round((left + right) / 2 - d.left) + 'px';
+}
+scroller.addEventListener('scroll', () => requestAnimationFrame(placeDock), {passive: true});
 function layout(){
   if (!scroller.clientWidth) return;
   const w = sheetWidth();
@@ -1757,6 +1764,7 @@ function layout(){
   pages.forEach(paint);
   placeMarkers();
   placeLane();
+  placeDock();
   if (sel) revealSel(true);
   const zv = $('#zoomval'); if (zv) zv.textContent = Math.round(zoomNow() * 100) + '%';
 }
