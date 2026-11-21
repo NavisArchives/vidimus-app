@@ -36,7 +36,7 @@
   --side:232px; --top:58px; --col:432px; --lane:404px; --lane-gap:32px;
   /* the lane's spacing grid: 8 px steps (4 and 12 for fine steps); every card shares the 24 px inner edge */
   --g1:4px; --g2:8px; --g3:12px; --g4:16px; --g6:24px; --g8:32px;
-  --gutter:36px; --gutter-r:0px; --pad-x:12px; --peek:164px; --dock:44px;
+  --gutter:0px; --gutter-r:0px; --pad-x:12px; --peek:164px; --dock:44px;
   --sans:'Geist',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
 }
 *{box-sizing:border-box}
@@ -232,19 +232,24 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 #pages{padding:4px var(--pad-x) calc(var(--dock) + 40px)}
 .pg{display:grid;grid-template-columns:var(--gutter) auto;width:max-content;margin:0 auto 20px;padding-right:var(--gutter-r)}
 /* the marker rail stays at the left edge when the page is wider than its column */
-.gut{position:sticky;left:0;z-index:3;background:var(--bg)}
+/* no numbers in a margin: each highlight carries its own number */
+.gut{width:0;overflow:hidden;visibility:hidden}
 .sheet{position:relative;background:#fff;border-radius:4px;box-shadow:0 0 0 1px rgba(24,24,27,.05),0 2px 12px -4px rgba(24,24,27,.14)}
 .sheet canvas{display:block;width:100%;height:100%;border-radius:4px}
 .hls{position:absolute;inset:0}
 .loaderr{max-width:480px;margin:80px auto;color:var(--ink-2);text-align:center}
 
 /* highlights are translucent tints, not blends: the letters show through whatever the browser does while repainting */
-.hl{position:absolute;border-radius:3px;cursor:pointer;transition:filter .15s}
-.hl.s-high{background:var(--high-hl)} .hl.s-medium{background:var(--medium-hl)} .hl.s-low{background:var(--low-hl)}
+/* each highlight: a box outlined in its severity colour, a light tint, and its number in a small badge at the top right */
+.hl{position:absolute;border-radius:3px;cursor:pointer;box-shadow:inset 0 0 0 1px var(--hlc);transition:filter .15s}
+.hl.s-high{--hlc:var(--high);background:var(--high-hl)} .hl.s-medium{--hlc:var(--medium);background:var(--medium-hl)} .hl.s-low{--hlc:var(--low);background:var(--low-hl)}
+.hl.first::after{content:attr(data-n);position:absolute;top:-11px;left:calc(100% - 7px);z-index:1;min-width:15px;height:15px;padding:0 3px;border-radius:5px;
+  display:grid;place-items:center;background:var(--hlc);color:#fff;font:600 9.5px/1 var(--sans);font-variant-numeric:tabular-nums;
+  box-shadow:0 0 0 1.5px #fff;pointer-events:none}
 .hl.hover{filter:saturate(1.5) brightness(.93)}
-.hl.sel{outline:2px solid var(--ink);outline-offset:1px}
-.hl.st-approved{background:var(--accent-hl)}
-.hl.st-rejected{background:transparent;box-shadow:inset 0 -2px 0 #C7C7CC}
+.hl.sel{outline:2px solid var(--ink);outline-offset:2px}
+.hl.st-approved{--hlc:var(--accent);background:var(--accent-hl)}
+.hl.st-rejected{--hlc:#A1A1AA;background:transparent}
 .hl.off,.mk.off{display:none}
 .mk,.mk-mini{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;border:0;padding:0;
   font:600 11.5px/1 var(--sans);font-variant-numeric:tabular-nums;color:#fff;flex:none}
@@ -549,7 +554,7 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 
 /* ---------- narrower screens ---------- */
 @media (max-width:1180px){
-  :root{--col:372px;--lane:360px;--lane-gap:20px;--pad-x:8px;--gutter:32px}
+  :root{--col:372px;--lane:360px;--lane-gap:20px;--pad-x:8px}
   #screen-review{gap:10px;padding:2px 16px 16px 10px}
   .prog .bar{width:84px}
   .rv{grid-template-columns:minmax(0,1fr)}
@@ -564,7 +569,7 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 }
 /* phone: a drawer for the sidebar, the document first, controls in a row above the findings sheet */
 @media (max-width:760px){
-  :root{--gutter:30px;--gutter-r:0px;--pad-x:6px;--top:54px;--lane:0px;--lane-gap:0px}
+  :root{--gutter-r:0px;--pad-x:6px;--top:54px;--lane:0px;--lane-gap:0px}
   #docrow{display:block;padding-right:0}
   #lane{display:none}
   .top{gap:6px;padding:0 10px 0 6px}
@@ -1853,7 +1858,7 @@ function drawMarks(){
     f.rects.forEach((r, i) => {
       const d = document.createElement('div');
       d.className = `hl s-${f.severity}`; d.dataset.fid = f.id;
-      if (i === 0) d.classList.add('first');
+      if (i === 0){ d.classList.add('first'); d.dataset.n = f.n; }
       Object.assign(d.style, {left: r.x * 100 + '%', top: r.y * 100 + '%', width: r.w * 100 + '%', height: r.h * 100 + '%'});
       d.onclick = () => select(f.id, 'doc');
       d.onmouseenter = () => hover(f.id, true); d.onmouseleave = () => hover(f.id, false);
