@@ -278,8 +278,8 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 .cmt.sel{z-index:2;background:var(--surface-2);box-shadow:var(--pop)}
 /* the open card breathes: more room around and between its parts */
 .cmt.sel > .rowbtn{padding:var(--g6) var(--g4) var(--g2) var(--g6)}
-/* body indent = 24 edge + 24 marker + 12 gap, so it lines up under the title */
-.cmt .card{padding:0 var(--g6) var(--g6) 60px}
+/* the body spans the card with the same 24 px on both sides, so the card is balanced */
+.cmt .card{padding:var(--g2) var(--g6) var(--g6)}
 .cmt .cagents{margin:var(--g1) 0 var(--g6)}
 .cmt .cfield{margin-bottom:var(--g4)}
 .cmt .clabel{margin:0 0 var(--g2)}
