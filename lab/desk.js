@@ -1166,7 +1166,7 @@ function renderLane(){
   const fs = shown();
   host.innerHTML = fs.length ? fs.map(f => {
     const p = lanePos[f.id];
-    return `<li class="cmt st-${statusOf(f)}${sel === f.id ? ' sel' : ''}${p ? '' : ' fresh'}" data-id="${f.id}"${
+    return `<li class="cmt s-${f.severity} st-${statusOf(f)}${sel === f.id ? ' sel' : ''}${p ? '' : ' fresh'}" data-id="${f.id}" data-n="${f.n}"${
       p ? ` style="transform:translate(${p.x}px,${p.y}px)"` : ''}>${rowHTML(f)}${
       sel === f.id ? `<div class="card" data-id="${f.id}">${cardHTML(f)}</div>` : ''}</li>`;
   }).join('') : `<li class="cmt fresh"><div class="empty">${ic('funnel-simple')}<b>${F.some(live) ? 'No findings match' : 'No tools are connected'}</b>

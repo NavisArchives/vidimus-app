@@ -279,6 +279,15 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 .cmt > .rowbtn{padding:var(--g4) var(--g4) var(--g4) var(--g6);border-radius:var(--r-card)}
 .cmt:hover,.cmt.hover{box-shadow:0 0 0 1px rgba(24,24,27,.16),0 1px 2px rgba(24,24,27,.05),0 10px 28px -14px rgba(24,24,27,.26)}
 .cmt.st-rejected .rtitle{color:var(--muted)}
+/* the number leaves the card's text: a small square badge on the card's top-right corner, in the finding's colour,
+   like the badge on its highlight; the title then starts on the same edge as everything under it */
+.cmt > .rowbtn{grid-template-columns:minmax(0,1fr) auto}
+.cmt > .rowbtn > .mk-mini{display:none}
+.cmt[data-n]::after{content:attr(data-n);position:absolute;top:-7px;right:-7px;z-index:3;min-width:20px;height:20px;padding:0 5px;border-radius:6px;
+  display:grid;place-items:center;background:var(--cc);color:#fff;font:600 11px/1 var(--sans);font-variant-numeric:tabular-nums;
+  box-shadow:0 0 0 2px var(--bg);pointer-events:none}
+.cmt.s-high{--cc:var(--high)} .cmt.s-medium{--cc:var(--medium)} .cmt.s-low{--cc:var(--low)}
+.cmt.st-approved{--cc:var(--accent)} .cmt.st-rejected{--cc:#A1A1AA}
 .cmt.sel{z-index:2;background:var(--surface-2);box-shadow:var(--pop)}
 /* the open card breathes: more room around and between its parts */
 .cmt.sel > .rowbtn{padding:var(--g6) var(--g4) var(--g2) var(--g6)}
