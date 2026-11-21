@@ -528,17 +528,15 @@ body.dock-off .dockshow{display:grid;place-items:center;align-self:center;flex:n
 .ex-p i{font-style:normal;color:var(--muted);font-size:12.5px}
 .ex-none{color:var(--muted)}
 
-/* toasts: bottom-left; on the review screen they sit over the left end of the
-   bar under the pages, never on the page */
+/* toasts: bottom-left; on the review screen the desk places them in the bar's
+   empty middle (never on the page, never on the shortcuts) */
 #toast{position:fixed;left:24px;bottom:20px;max-width:340px;transform:translateY(6px);background:var(--ink);color:#fff;
   padding:9px 15px;border-radius:999px;font-size:13px;font-weight:500;line-height:18px;z-index:70;pointer-events:none;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   opacity:0;visibility:hidden;transition:opacity .18s var(--ease),transform .18s var(--ease),visibility 0s .18s}
 #toast.on{opacity:1;visibility:visible;transform:none;transition:opacity .18s var(--ease),transform .18s var(--ease)}
-@media (min-width:761px){
-  body[data-screen="review"] #toast{left:calc(var(--strip) + 24px);bottom:20px}
-  body.side-open[data-screen="review"] #toast{left:calc(var(--side) + 24px)}
-}
+.dkeys{transition:opacity .15s var(--ease)}
+.dock.toasting .dkeys{opacity:0}
 
 /* ---------- narrower screens ---------- */
 @media (max-width:1180px){

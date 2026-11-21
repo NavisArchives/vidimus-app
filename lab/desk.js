@@ -870,8 +870,32 @@ function renderExport(){
 
 function toast(m){
   const t = $('#toast'); if (!t) return;
-  t.textContent = m; t.classList.add('on');
-  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 2500);
+  t.textContent = m; placeToast(t); t.classList.add('on');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => { t.classList.remove('on'); $('#dock')?.classList.remove('toasting'); }, 2500);
+}
+/* On the review a toast never covers the page or the bar's shortcuts: it sits in the bar's
+   empty middle, and where that middle is too narrow the shortcuts fade out while it shows. */
+function placeToast(t){
+  const dock = $('#dock');
+  t.style.left = t.style.bottom = t.style.maxWidth = '';
+  dock?.classList.remove('toasting');
+  if (MOBILE.matches || document.body.dataset.screen !== 'review' || !dock) return;
+  if (document.body.classList.contains('dock-off')){
+    const p = $('.docpane').getBoundingClientRect();
+    t.style.left = Math.round(p.left + 16) + 'px'; t.style.bottom = '2px';
+    return;
+  }
+  const d = dock.getBoundingClientRect(), keys = $('.dkeys', dock), w = t.offsetWidth;
+  const kr = keys && getComputedStyle(keys).visibility !== 'hidden'
+    ? Math.min(keys.getBoundingClientRect().right, Math.max(d.left, ...$$('span', keys).filter(x => x.offsetWidth).map(x => x.getBoundingClientRect().right)))
+    : d.left;
+  const cl = $('.dctl', dock).getBoundingClientRect().left;
+  let left;
+  if (w <= cl - kr - 40) left = kr + 20 + (cl - kr - 40 - w) / 2;
+  else { dock.classList.add('toasting'); left = d.left + 12; t.style.maxWidth = Math.max(160, cl - left - 16) + 'px'; }
+  t.style.left = Math.round(left) + 'px';
+  t.style.bottom = Math.round(innerHeight - d.bottom + (d.height - t.offsetHeight) / 2) + 'px';
 }
 
 /* ---------- keyboard: j/k walk the list, a approves, x rejects, e edits ---------- */
@@ -987,6 +1011,7 @@ function layout(){
   pages.forEach(paint);
   placeMarkers();
   placeLane();
+  if (sel) revealSel(true);
   const zv = $('#zoomval'); if (zv) zv.textContent = Math.round(zoomNow() * 100) + '%';
 }
 function paint(P){
@@ -1187,15 +1212,16 @@ function placeLane(){
   requestAnimationFrame(() => $$('.cmt.fresh', host).forEach(el => el.classList.remove('fresh')));
 }
 /* bring the open card fully into view, below the pinned findings card */
-function revealSel(){
-  const lane = $('#lane'); if (!lane || !laneSel) return;
+function revealSel(keep){
+  const lane = $('#lane'); if (!lane || !laneSel || !lane.offsetParent) return;
   const cover = laneMin(lane);
   const sr = scroller.getBoundingClientRect(), st = scroller.scrollTop, ch = scroller.clientHeight;
   const top = lane.getBoundingClientRect().top - sr.top + st + laneSel.top, bot = top + laneSel.h;
+  if (keep && (bot < st || top > st + ch)) return;     // a relayout leaves an off-screen card where it is
   let to = null;
   if (top < st + cover) to = top - cover;
   else if (bot > st + ch - 12) to = Math.min(bot - ch + 12, top - cover);
-  if (to != null) scroller.scrollTo({top: Math.max(0, to), behavior: REDUCED ? 'auto' : 'smooth'});
+  if (to != null) scroller.scrollTo({top: Math.max(0, to), behavior: REDUCED || keep ? 'auto' : 'smooth'});
 }
 function focusSel(){ if (!sel) return; if (MOBILE.matches) scrollDocTo(byId[sel]); else revealSel(); }
 /* the findings card: pinned in the lane on a desk, at the top of the sheet on a phone */
