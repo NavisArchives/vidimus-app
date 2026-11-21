@@ -1155,7 +1155,7 @@ function placeMarkers(){
    Each card sits level with its text and scrolls with the document (it lives in the same
    scroller). Folded, it shows its row; selected, it opens in place and the cards around it
    move aside: the open one keeps its height, the ones above go up, the ones below go down. */
-const LANE_GAP = 10;
+const LANE_GAP = 12;   // on the lane's 4 px grid
 const lanePos = {};        // id -> {x, y}: a re-render starts each card where it was, so moves animate
 let laneSel = null;        // the open card's top and height in the lane
 const laneRO = new ResizeObserver(() => requestAnimationFrame(placeLane));
@@ -1217,7 +1217,7 @@ function placeLane(){
   }
   let bottom = 0;
   items.forEach((o, i) => {
-    const open = !!(o.f && o.f.id === sel), x = open ? -12 : 0, y = Math.round(top[i]);
+    const open = !!(o.f && o.f.id === sel), x = 0, y = Math.round(top[i]);   // every card stays aligned with the findings card
     o.el.style.transform = `translate(${x}px,${y}px)`;
     if (o.f) lanePos[o.f.id] = {x, y};
     if (open) laneSel = {top: y, h: o.h};

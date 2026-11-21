@@ -33,7 +33,9 @@
   --float:0 0 0 1px rgba(24,24,27,.06),0 1px 2px rgba(24,24,27,.04),0 10px 28px -14px rgba(24,24,27,.18);
   --pop:0 0 0 1px rgba(24,24,27,.08),0 16px 40px -12px rgba(24,24,27,.28);
   --ease:cubic-bezier(.23,1,.32,1);
-  --side:232px; --top:58px; --col:432px; --lane:380px; --lane-gap:28px;
+  --side:232px; --top:58px; --col:432px; --lane:404px; --lane-gap:32px;
+  /* the lane's spacing grid: 8 px steps (4 and 12 for fine steps); every card shares the 24 px inner edge */
+  --g1:4px; --g2:8px; --g3:12px; --g4:16px; --g6:24px; --g8:32px;
   --gutter:36px; --gutter-r:0px; --pad-x:12px; --peek:164px; --dock:44px;
   --sans:'Geist',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
 }
@@ -265,17 +267,25 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 /* the pinned findings card sits on a strip of the table, so the cards slide under it and fade out at its edge */
 .lanehead{position:sticky;top:0;z-index:4;margin:0 -14px;padding:4px 14px 14px;
   background:linear-gradient(var(--bg) calc(100% - 14px),rgba(241,241,242,0))}
-#findhead{padding:14px 16px;display:grid;gap:12px}
+#findhead{padding:var(--g4) var(--g6) var(--g6);display:grid;gap:var(--g4)}
 .cmts{position:absolute;inset:0;list-style:none;margin:0;padding:0}
 .cmt{position:absolute;left:0;right:0;top:0;background:var(--surface);border-radius:var(--r-card);box-shadow:var(--float);
   transition:transform .22s var(--ease),box-shadow .18s var(--ease)}
 .cmt.fresh{transition:none}
-.cmt > .rowbtn{padding:12px 12px 12px 14px;border-radius:var(--r-card)}
+.cmt > .rowbtn{padding:var(--g4) var(--g4) var(--g4) var(--g6);border-radius:var(--r-card)}
 .cmt:hover,.cmt.hover{box-shadow:0 0 0 1px rgba(24,24,27,.16),0 1px 2px rgba(24,24,27,.05),0 10px 28px -14px rgba(24,24,27,.26)}
 .cmt.st-rejected .rtitle{color:var(--muted)}
 .cmt.sel{z-index:2;background:var(--surface-2);box-shadow:var(--pop)}
-.cmt.sel > .rowbtn{padding-bottom:6px}
-.cmt .card{padding:0 14px 16px 50px}
+/* the open card breathes: more room around and between its parts */
+.cmt.sel > .rowbtn{padding:var(--g6) var(--g4) var(--g2) var(--g6)}
+/* body indent = 24 edge + 24 marker + 12 gap, so it lines up under the title */
+.cmt .card{padding:0 var(--g6) var(--g6) 60px}
+.cmt .cagents{margin:var(--g1) 0 var(--g6)}
+.cmt .cfield{margin-bottom:var(--g4)}
+.cmt .clabel{margin:0 0 var(--g2)}
+.cmt .cnote{margin:var(--g2) 0 var(--g6)}
+.cmt .cdec{margin-top:var(--g6);padding-top:var(--g4)}
+.cmt .rmeta{row-gap:var(--g2)}
 #panel{display:none}
 #panel > .fcard{flex:none}
 .fhead{display:flex;align-items:center;gap:10px;min-height:34px}
@@ -1894,7 +1904,7 @@ function placeMarkers(){
    Each card sits level with its text and scrolls with the document (it lives in the same
    scroller). Folded, it shows its row; selected, it opens in place and the cards around it
    move aside: the open one keeps its height, the ones above go up, the ones below go down. */
-const LANE_GAP = 10;
+const LANE_GAP = 12;   // on the lane's 4 px grid
 const lanePos = {};        // id -> {x, y}: a re-render starts each card where it was, so moves animate
 let laneSel = null;        // the open card's top and height in the lane
 const laneRO = new ResizeObserver(() => requestAnimationFrame(placeLane));
@@ -1956,7 +1966,7 @@ function placeLane(){
   }
   let bottom = 0;
   items.forEach((o, i) => {
-    const open = !!(o.f && o.f.id === sel), x = open ? -12 : 0, y = Math.round(top[i]);
+    const open = !!(o.f && o.f.id === sel), x = 0, y = Math.round(top[i]);   // every card stays aligned with the findings card
     o.el.style.transform = `translate(${x}px,${y}px)`;
     if (o.f) lanePos[o.f.id] = {x, y};
     if (open) laneSel = {top: y, h: o.h};
