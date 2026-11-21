@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>Compliancenotitie CN-2026-07 (fictief voorbeeld)</title>
+<!-- An invented document, made to demonstrate the review desk. The firm, the
+     regulator, the framework, every figure and every article number are made
+     up. Mistakes were put in on purpose; lab/sample/findings.json lists them.
+     Printed to note.pdf by make_pdf.py. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=block">
+<style>
+@page { size: A4; margin: 0 }
+* { box-sizing: border-box }
+html, body { margin: 0; padding: 0 }
+body {
+  font-family: 'Source Serif 4', Georgia, serif; font-size: 10.4pt; line-height: 1.52;
+  color: #1B1F24; font-variant-ligatures: none; font-kerning: normal;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.page {
+  width: 210mm; height: 297mm; position: relative; overflow: hidden;
+  padding: 22mm 24mm 26mm 26mm; break-after: page; page-break-after: always;
+}
+.page:last-child { break-after: auto; page-break-after: auto }
+.sans { font-family: 'IBM Plex Sans', Helvetica, Arial, sans-serif }
+
+/* running head and foot */
+.runhead {
+  position: absolute; top: 11mm; left: 26mm; right: 24mm; display: flex;
+  justify-content: space-between; font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 7.4pt; color: #5B6470; letter-spacing: .02em;
+  border-bottom: .6pt solid #D5D9DE; padding-bottom: 2.2mm;
+}
+.foot {
+  position: absolute; bottom: 12mm; left: 26mm; right: 24mm; display: flex;
+  justify-content: space-between; font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 7.2pt; color: #6A7380;
+}
+
+/* first page letterhead */
+.letterhead { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 2mm }
+.mark { display: flex; align-items: center; gap: 3.2mm }
+.mark svg { width: 9mm; height: 9mm }
+.mark b { display: block; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; font-size: 12.5pt;
+  letter-spacing: .01em; color: #12324A }
+.mark span { display: block; font-family: 'IBM Plex Sans', sans-serif; font-size: 7.6pt; color: #5B6470;
+  letter-spacing: .04em }
+.docid { text-align: right; font-family: 'IBM Plex Sans', sans-serif; font-size: 7.6pt; color: #5B6470; line-height: 1.6 }
+.docid b { color: #12324A; font-weight: 600 }
+.stamp { display: inline-block; margin-top: 1.4mm; border: .7pt solid #B4472F; color: #B4472F;
+  padding: .4mm 2mm; font-weight: 600; letter-spacing: .08em; font-size: 6.8pt }
+
+h1 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; font-size: 19pt; line-height: 1.18;
+  letter-spacing: -.01em; color: #12324A; margin: 13mm 0 3mm; max-width: 150mm }
+.lede { font-family: 'IBM Plex Sans', sans-serif; font-size: 9pt; color: #4A5360; margin: 0 0 7mm }
+.facts { display: grid; grid-template-columns: 27mm 1fr 27mm 1fr; gap: 1.6mm 4mm;
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 8.3pt; padding: 3.6mm 0;
+  border-top: .8pt solid #12324A; border-bottom: .6pt solid #D5D9DE; margin-bottom: 8mm }
+.facts dt { color: #5B6470 } .facts dd { margin: 0; color: #1B1F24 }
+
+h2 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; font-size: 11.6pt; color: #12324A;
+  margin: 7mm 0 2.4mm; display: flex; gap: 3mm; align-items: baseline }
+h2 .no { color: #3E7CA6; font-weight: 500; min-width: 6mm }
+p { margin: 0 0 3mm; orphans: 3; widows: 3 }
+sup { font-family: 'IBM Plex Sans', sans-serif; font-size: 6.4pt; color: #3E7CA6; line-height: 0 }
+
+table { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Sans', sans-serif; font-size: 8.4pt;
+  margin: 2mm 0 5mm }
+caption { caption-side: top; text-align: left; font-weight: 600; font-size: 8.4pt; color: #12324A;
+  padding-bottom: 2mm }
+th { text-align: left; font-weight: 500; color: #5B6470; border-bottom: .8pt solid #12324A;
+  padding: 1.6mm 2mm 1.6mm 0 }
+td { border-bottom: .5pt solid #DDE1E5; padding: 2mm 2mm 2mm 0; vertical-align: top }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0 }
+tr:nth-child(even) td { background: #F5F7F9 }
+
+.callout { border-left: 2.2pt solid #3E7CA6; background: #F2F6F9; padding: 3.2mm 4mm; margin: 4mm 0 5mm;
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 8.8pt; color: #26313C }
+.callout b { color: #12324A; font-weight: 600 }
+
+.notes { position: absolute; left: 26mm; right: 24mm; bottom: 20mm; border-top: .6pt solid #D5D9DE;
+  padding-top: 2.4mm; font-family: 'IBM Plex Sans', sans-serif; font-size: 7.2pt; color: #4A5360; line-height: 1.5 }
+.notes p { margin: 0 0 .8mm }
+.notes sup { font-size: 6pt }
+
+dl.terms { display: grid; grid-template-columns: 45mm 1fr; gap: 2.6mm 5mm; font-size: 9.4pt; margin: 3mm 0 6mm }
+dl.terms dt { font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; font-size: 8.6pt; color: #12324A }
+dl.terms dd { margin: 0 }
+.sign { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 8.4pt; margin-top: 8mm }
+.sign div { border-top: .6pt solid #9AA4AF; padding-top: 2mm; color: #4A5360 }
+.sign b { display: block; color: #1B1F24; font-weight: 500 }
+ol.steps { margin: 0 0 4mm; padding-left: 5mm }
+ol.steps li { margin-bottom: 1.6mm }
+</style>
+</head>
+<body>
+
+<!-- ========================= page 1 ========================= -->
+<section class="page">
+  <div class="letterhead">
+    <div class="mark">
+      <svg viewBox="0 0 36 36" aria-hidden="true"><rect x="1" y="1" width="34" height="34" rx="3" fill="#12324A"/>
+        <path d="M7 22c4-5 8-5 11 0s7 5 11 0" fill="none" stroke="#8FC1E3" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M7 15c4-5 8-5 11 0s7 5 11 0" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/></svg>
+      <div><b>Oeverlicht</b><span>CUSTODY B.V.</span></div>
+    </div>
+    <div class="docid">
+      <b>Compliancenotitie CN-2026-07</b><br>
+      Versie 1.3 · 14 oktober 2026<br>
+      <span class="stamp">VERTROUWELIJK · FICTIEF</span>
+    </div>
+  </div>
+
+  <h1>Vergunningsaanvraag als aanbieder van cryptoactivadiensten</h1>
+  <p class="lede">Toelichting voor de Toezichthouder Digitale Activa (TDA) bij de aanvraag onder de Kaderverordening Cryptoactiva (KCA).</p>
+
+  <dl class="facts">
+    <dt>Aanvrager</dt><dd>Oeverlicht Custody B.V.</dd>
+    <dt>Dienstklasse</dt><dd>Klasse 2</dd>
+    <dt>Diensten</dt><dd>Bewaring, ruil, orderuitvoering</dd>
+    <dt>Opgesteld door</dt><dd>Afdeling Compliance</dd>
+  </dl>
+
+  <h2><span class="no">1</span>Samenvatting</h2>
+  <p>Oeverlicht Custody B.V. (hierna: Oeverlicht) vraagt een vergunning aan als cryptoactivadienstverlener in de zin van artikel 3 KCA. De aanvraag betreft drie diensten: bewaring en beheer van cryptoactiva voor cliënten, ruil van cryptoactiva tegen geld en uitvoering van orders voor cliënten. Daarmee valt Oeverlicht in klasse 2, waarvoor de KCA een minimumkapitaal van € 150.000 voorschrijft (zie tabel 1).</p>
+  <p>Op 30 september 2026 beheerde Oeverlicht cryptoactiva ter waarde van € 48,6 miljoen voor 3.912 cliënten. Ten minste 90% daarvan staat in offline bewaring (zie paragraaf 4).</p>
+  <p>Deze notitie licht toe hoe Oeverlicht voldoet aan de kapitaalvereisten, de regels voor bewaring en scheiding, de overdrachtsregel en de meldplicht. De vergunning word naar verwachting in het eerste kwartaal van 2027 verleend.</p>
+
+  <h2><span class="no">2</span>Reikwijdte van de aanvraag</h2>
+  <p>Oeverlicht geeft zelf geen tokens uit. Wel bewaart de onderneming asset-referenced tokens en e-geldtokens voor cliënten. Voor die bewaring gelden dezelfde regels als voor andere cryptoactiva, met uitzondering van de reservevereisten in artikel 36 KCA, die alleen voor uitgevende instellingen gelden.</p>
+  <p>Voor elke token die Oeverlicht in bewaring neemt, beoordeelt de afdeling Compliance vooraf het whitepaper van de uitgevende instelling. Tokens zonder whitepaper worden niet in bewaring genomen.</p>
+
+  <div class="foot"><span>Oeverlicht Custody B.V. · CN-2026-07 · Fictief document, gemaakt voor een demonstratie</span><span>Pagina 1 van 4</span></div>
+</section>
+
+<!-- ========================= page 2 ========================= -->
+<section class="page">
+  <div class="runhead"><span>Oeverlicht · Compliancenotitie CN-2026-07</span><span>Vergunningsaanvraag KCA</span></div>
+
+  <h2><span class="no">3</span>Kapitaalvereisten</h2>
+  <p>Artikel 62 KCA deelt aanbieders van cryptoactivadiensten in drie klassen in, naar de diensten die zij verlenen.<sup>1</sup> Het minimumkapitaal per klasse staat in tabel 1. Een aanbieder houdt ten minste het hoogste van twee bedragen aan: het minimumkapitaal van zijn klasse, of een kwart van de vaste kosten van het voorgaande jaar.</p>
+
+  <table>
+    <caption>Tabel 1 · Minimumkapitaal per dienstklasse</caption>
+    <thead><tr><th style="width:18mm">Klasse</th><th>Diensten</th><th class="num" style="width:36mm">Minimumkapitaal</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Advies, ontvangst en doorgifte van orders</td><td class="num">€ 50.000</td></tr>
+      <tr><td>2</td><td>Klasse 1, plus bewaring, ruil en orderuitvoering</td><td class="num">€ 125.000</td></tr>
+      <tr><td>3</td><td>Klasse 2, plus het exploiteren van een handelsplatform</td><td class="num">€ 150.000</td></tr>
+    </tbody>
+  </table>
+
+  <p>Over 2025 bedroegen de vaste kosten van Oeverlicht € 2.140.000. Een kwart daarvan is € 435.000, wat hoger is dan het minimumkapitaal van klasse 2. Dat hogere bedrag is dus het vereiste.</p>
+  <p>Het eigen vermogen van Oeverlicht bedroeg op 30 september 2026 € 1.000.0000 en ligt daarmee ruim boven het vereiste. De directie toetst dit elk kwartaal en legt de uitkomst vast in het kapitaalregister.</p>
+
+  <h2><span class="no">4</span>Bewaring en scheiding van activa</h2>
+  <p>Cliëntactiva worden gescheiden van de eigen activa van Oeverlicht bewaard, op adressen die per cliënt herleidbaar zijn. Ten minste 90% van de cliëntactiva staat in offline bewaring; ten hoogste 10% staat in online wallets voor de dagelijkse uitbetalingen.</p>
+  <p>De private sleutels van de offline wallets zijn verdeeld over drie locaties volgens een 2-van-3-schema: voor elke transactie zijn twee van de drie sleutels nodig. De onderneming bewaart hun sleutels nooit op één locatie.</p>
+  <p>Elk kwartaal stemt Oeverlicht de eigen administratie af met de posities op de blockchain. Bij een verschil van meer dan 0,5% meldt Oeverlicht dit binnen 24 uur aan de TDA (zie paragraaf 7.2).</p>
+
+  <div class="notes">
+    <p><sup>1</sup> Artikel 26 KCA, zoals gewijzigd bij de uitvoeringsregeling van 2 maart 2026. De bedragen in tabel 1 gelden vanaf 1 januari 2026.</p>
+  </div>
+  <div class="foot"><span>Oeverlicht Custody B.V. · CN-2026-07 · Fictief document, gemaakt voor een demonstratie</span><span>Pagina 2 van 4</span></div>
+</section>
+
+<!-- ========================= page 3 ========================= -->
+<section class="page">
+  <div class="runhead"><span>Oeverlicht · Compliancenotitie CN-2026-07</span><span>Vergunningsaanvraag KCA</span></div>
+
+  <p>Omdat 80% van de cliëntactiva offline staat, is het risico van een inbraak op de online wallets beperkt tot een klein deel van het totaal. De liquiditeitsreserve van Oeverlicht bestaat voor 60% uit deposito's bij twee banken, voor 35% uit kortlopende staatsobligaties en voor 15% uit geldmarktfondsen.</p>
+
+  <h2><span class="no">5</span>Overdrachtsregel en zelf-gehoste wallets</h2>
+  <p>Bij elke overdracht van cryptoactiva stuurt Oeverlicht de gegevens van de opdrachtgever en van de begunstigde mee, ongeacht het bedrag. Voor overdrachten naar of van een zelf-gehoste wallet<sup>2</sup> geldt vanaf € 1.000 een extra controle: Oeverlicht stelt dan vast dat de wallet in het bezit is van de cliënt.</p>
+
+  <table>
+    <caption>Tabel 2 · Drempels en meldtermijnen</caption>
+    <thead><tr><th>Situatie</th><th style="width:30mm">Drempel</th><th style="width:44mm">Termijn</th></tr></thead>
+    <tbody>
+      <tr><td>Overdracht naar een zelf-gehoste wallet</td><td>vanaf € 1.000</td><td>vóór uitvoering</td></tr>
+      <tr><td>Ongebruikelijke transactie</td><td>geen drempel</td><td>melden binnen 14 dagen</td></tr>
+      <tr><td>Verschil bij de afstemming</td><td>meer dan 0,5%</td><td>melden binnen 24 uur</td></tr>
+      <tr><td>Ernstig ICT-incident</td><td>geen drempel</td><td>melden binnen 4 uur</td></tr>
+    </tbody>
+  </table>
+
+  <p>Ongebruikelijke transacties meldt Oeverlicht binnen 30 dagen aan de financiële inlichtingeneenheid. Zie tabel 3 voor de volledige lijst van meldtermijnen.</p>
+
+  <h2><span class="no">6</span>Meldplicht bij incidenten</h2>
+  <p>Een ernstig ICT-incident meldt Oeverlicht binnen vier uur na de classificatie aan de TDA.<sup>3</sup> Een eerste rapport volgt binnen 72 uur, een eindrapport binnen een maand. De crypto-dienstverlener houdt een register bij van alle incidenten, ook van incidenten die niet gemeld hoeven te worden.</p>
+  <p>Cliënten worden binnen 48 uur geinformeerd als een incident hun activa raakt. Het bericht noemt wat er is gebeurd, welke activa geraakt zijn en wat Oeverlicht doet om herhaling te voorkomen.</p>
+
+  <div class="callout"><b>Afspraak met de TDA.</b> Tot de vergunning is verleend, stuurt Oeverlicht elke maand een kort overzicht van de incidenten en van de afstemmingsverschillen, ook als er niets te melden is.</div>
+
+  <div class="notes">
+    <p><sup>2</sup> Een zelf-gehoste wallet is een adres waarvan de cliënt zelf de private sleutel beheert.</p>
+    <p><sup>3</sup> Classificatie volgens de incidentrichtlijn van de TDA (TDA-R 2025/4).</p>
+  </div>
+  <div class="foot"><span>Oeverlicht Custody B.V. · CN-2026-07 · Fictief document, gemaakt voor een demonstratie</span><span>Pagina 3 van 4</span></div>
+</section>
+
+<!-- ========================= page 4 ========================= -->
+<section class="page">
+  <div class="runhead"><span>Oeverlicht · Compliancenotitie CN-2026-07</span><span>Vergunningsaanvraag KCA</span></div>
+
+  <h2><span class="no">7</span>Tijdlijn</h2>
+  <p>De aanvraag is op 31 juni 2026 ingediend. De TDA beslist binnen 25 werkdagen nadat de aanvraag volledig is. Ontbreken er stukken, dan begint die termijn opnieuw zodra de stukken binnen zijn.</p>
+  <ol class="steps">
+    <li>Ontvangstbevestiging door de TDA, met de lijst van ontbrekende stukken.</li>
+    <li>Aanvulling door Oeverlicht, uiterlijk tien werkdagen na de ontvangstbevestiging.</li>
+    <li>Gesprek met de directie over de bedrijfsvoering en voor de de bewaring van cliëntactiva.</li>
+    <li>Besluit, binnen de beslistermijn van 20 werkdagen.</li>
+  </ol>
+  <p>Oeverlight Custody B.V. verklaart dat de gegevens in deze notitie juist en volledig zijn, en meldt elke wijziging onverwijld aan de TDA.</p>
+
+  <h2><span class="no">8</span>Begrippen</h2>
+  <dl class="terms">
+    <dt>Cryptoactivadienstverlener</dt><dd>Een onderneming die beroepsmatig een of meer cryptoactivadiensten verleent, zoals bewaring, ruil of orderuitvoering.</dd>
+    <dt>Activagebonden token</dt><dd>Een token waarvan de waarde gekoppeld is aan een of meer andere activa, bijvoorbeeld een mand van valuta's of grondstoffen.</dd>
+    <dt>E-geldtoken</dt><dd>Een token waarvan de waarde gekoppeld is aan één officiële munt.</dd>
+    <dt>Witboek</dt><dd>Het verplichte informatiedocument dat een uitgevende instelling over een token publiceert.</dd>
+    <dt>Offline bewaring</dt><dd>Bewaring van private sleutels op apparaten die niet met het internet verbonden zijn.</dd>
+    <dt>Kapitaalvereisten</dt><dd>Artikel 26 KCA en tabel 1 van deze notitie.</dd>
+  </dl>
+
+  <div class="sign">
+    <div><b>Opgesteld</b>Afdeling Compliance, Oeverlicht Custody B.V.</div>
+    <div><b>Goedgekeurd</b>Directie, 14 oktober 2026</div>
+  </div>
+
+  <div class="foot"><span>Oeverlicht Custody B.V. · CN-2026-07 · Fictief document, gemaakt voor een demonstratie</span><span>Pagina 4 van 4</span></div>
+</section>
+</body>
+</html>

@@ -1,0 +1,175 @@
+{
+  "about": "Invented sample. The document, the firm, the regulator and the framework are made up, and so are these findings: the mistakes were put in note.html on purpose. Each quote must appear exactly once on its page of note.pdf (lab/build.py checks it).",
+  "document": {
+    "title": "Compliancenotitie CN-2026-07",
+    "subtitle": "Oeverlicht Custody · vergunningsaanvraag KCA",
+    "file": "note.pdf",
+    "pages": 4
+  },
+  "agents": [
+    {"key": "claude",       "name": "Claude",       "mono": "CL", "kind": "AI-model",              "connected": true},
+    {"key": "chatgpt",      "name": "ChatGPT",      "mono": "GP", "kind": "AI-model",              "connected": true},
+    {"key": "gemini",       "name": "Gemini",       "mono": "GE", "kind": "AI-model",              "connected": true},
+    {"key": "grok",         "name": "Grok",         "mono": "GR", "kind": "AI-model",              "connected": false},
+    {"key": "languagetool", "name": "LanguageTool", "mono": "LT", "kind": "Taalcontrole, lokaal", "connected": true},
+    {"key": "reviewer",     "name": "Reviewer",     "mono": "RV", "kind": "Mens",                  "connected": true}
+  ],
+  "findings": [
+    {
+      "id": "f01", "page": 1, "severity": "high", "type": "cijfers",
+      "quote": "een minimumkapitaal van € 150.000",
+      "suggestion": "een minimumkapitaal van € 125.000",
+      "title": "Minimumkapitaal van klasse 2 wijkt af van tabel 1",
+      "note": "Tabel 1 op pagina 2 noemt € 125.000 voor klasse 2. € 150.000 is het bedrag van klasse 3.",
+      "agents": ["claude", "chatgpt", "reviewer"]
+    },
+    {
+      "id": "f02", "page": 1, "severity": "low", "type": "taal",
+      "quote": "De vergunning word naar verwachting",
+      "suggestion": "De vergunning wordt naar verwachting",
+      "title": "Werkwoord: ‘word’ moet ‘wordt’ zijn",
+      "note": "Bij ‘de vergunning’ hoort de vorm met t: de vergunning wordt verleend.",
+      "agents": ["languagetool", "gemini"]
+    },
+    {
+      "id": "f03", "page": 1, "severity": "medium", "type": "terminologie",
+      "quote": "asset-referenced tokens",
+      "suggestion": "activagebonden tokens",
+      "title": "Engelse term waar de notitie een eigen begrip heeft",
+      "note": "Paragraaf 8 definieert ‘activagebonden token’. Gebruik dat begrip, zoals ‘e-geldtoken’ in dezelfde zin ook Nederlands is.",
+      "agents": ["chatgpt", "claude"],
+      "variants": [{"agent": "claude", "text": "tokens waarvan de waarde aan andere activa gekoppeld is"}]
+    },
+    {
+      "id": "f04", "page": 1, "severity": "low", "type": "terminologie",
+      "quote": "vooraf het whitepaper van de uitgevende instelling",
+      "suggestion": "vooraf het witboek van de uitgevende instelling",
+      "title": "‘Whitepaper’ naast het begrip ‘witboek’",
+      "note": "Paragraaf 8 gebruikt ‘witboek’. Kies één term; de volgende zin zegt ook ‘whitepaper’.",
+      "agents": ["grok"]
+    },
+    {
+      "id": "f05", "page": 2, "severity": "high", "type": "verwijzing",
+      "quote": "Artikel 62 KCA deelt aanbieders",
+      "suggestion": "Artikel 26 KCA deelt aanbieders",
+      "title": "Verkeerd artikelnummer voor de kapitaalvereisten",
+      "note": "Voetnoot 1 en de begrippenlijst noemen artikel 26 KCA. De cijfers lijken omgedraaid.",
+      "agents": ["claude", "grok"]
+    },
+    {
+      "id": "f06", "page": 2, "severity": "high", "type": "cijfers",
+      "quote": "Een kwart daarvan is € 435.000",
+      "suggestion": "Een kwart daarvan is € 535.000",
+      "title": "Rekenfout: een kwart van € 2.140.000 is € 535.000",
+      "note": "2.140.000 gedeeld door 4 is 535.000. De conclusie van de zin klopt nog, het bedrag niet.",
+      "agents": ["claude", "gemini"]
+    },
+    {
+      "id": "f07", "page": 2, "severity": "medium", "type": "cijfers",
+      "quote": "€ 1.000.0000",
+      "suggestion": "€ 1.000.000",
+      "title": "Bedrag met een cijfer te veel",
+      "note": "‘1.000.0000’ is geen geldig bedrag. Waarschijnlijk is € 1.000.000 bedoeld; controleer het in de kwartaalcijfers.",
+      "agents": ["chatgpt"]
+    },
+    {
+      "id": "f08", "page": 2, "severity": "low", "type": "taal",
+      "quote": "De onderneming bewaart hun sleutels",
+      "suggestion": "De onderneming bewaart haar sleutels",
+      "title": "‘Hun’ verwijst naar één onderneming",
+      "note": "De onderneming is enkelvoud: ‘haar sleutels’, of eenvoudiger ‘de sleutels’.",
+      "agents": ["languagetool", "reviewer"],
+      "variants": [{"agent": "reviewer", "text": "De onderneming bewaart de sleutels"}]
+    },
+    {
+      "id": "f09", "page": 2, "severity": "medium", "type": "verwijzing",
+      "quote": "(zie paragraaf 7.2)",
+      "suggestion": "(zie tabel 2)",
+      "title": "Verwijzing naar een paragraaf die niet bestaat",
+      "note": "Paragraaf 7 heeft geen onderdelen. De termijn van 24 uur voor een afstemmingsverschil staat in tabel 2.",
+      "agents": ["claude"]
+    },
+    {
+      "id": "f10", "page": 3, "severity": "high", "type": "consistentie",
+      "quote": "Omdat 80% van de cliëntactiva offline staat",
+      "suggestion": "Omdat ten minste 90% van de cliëntactiva offline staat",
+      "title": "80% offline, waar paragraaf 1 en 4 90% noemen",
+      "note": "Paragraaf 1 en paragraaf 4 zeggen allebei: ten minste 90% in offline bewaring.",
+      "agents": ["gemini", "claude"]
+    },
+    {
+      "id": "f11", "page": 3, "severity": "high", "type": "cijfers",
+      "quote": "voor 15% uit geldmarktfondsen",
+      "suggestion": "voor 5% uit geldmarktfondsen",
+      "title": "De delen van de reserve tellen op tot 110%",
+      "note": "60% + 35% + 15% = 110%. Een van de drie aandelen klopt niet; vraag het na bij Treasury voor de tekst wordt aangepast.",
+      "agents": ["claude", "chatgpt", "gemini"]
+    },
+    {
+      "id": "f12", "page": 3, "severity": "high", "type": "consistentie",
+      "quote": "meldt Oeverlicht binnen 30 dagen",
+      "suggestion": "meldt Oeverlicht binnen 14 dagen",
+      "title": "Meldtermijn wijkt af van tabel 2",
+      "note": "Tabel 2, net erboven, geeft 14 dagen voor een ongebruikelijke transactie.",
+      "agents": ["grok", "reviewer"]
+    },
+    {
+      "id": "f13", "page": 3, "severity": "medium", "type": "verwijzing",
+      "quote": "Zie tabel 3 voor de volledige lijst",
+      "suggestion": "Zie tabel 2 voor de volledige lijst",
+      "title": "Tabel 3 bestaat niet",
+      "note": "De notitie heeft twee tabellen. De meldtermijnen staan in tabel 2.",
+      "agents": ["chatgpt"]
+    },
+    {
+      "id": "f14", "page": 3, "severity": "medium", "type": "terminologie",
+      "quote": "De crypto-dienstverlener houdt een register bij",
+      "suggestion": "Oeverlicht houdt een register bij",
+      "title": "Begrip wijkt af van ‘cryptoactivadienstverlener’",
+      "note": "Paragraaf 8 definieert ‘cryptoactivadienstverlener’. Hier is Oeverlicht zelf bedoeld, dus de naam is het duidelijkst.",
+      "agents": ["gemini", "chatgpt"],
+      "variants": [{"agent": "chatgpt", "text": "De cryptoactivadienstverlener houdt een register bij"}]
+    },
+    {
+      "id": "f15", "page": 3, "severity": "low", "type": "taal",
+      "quote": "geinformeerd",
+      "suggestion": "geïnformeerd",
+      "title": "Trema ontbreekt: ‘geïnformeerd’",
+      "note": "Spelling: geïnformeerd, met trema.",
+      "agents": ["languagetool"]
+    },
+    {
+      "id": "f16", "page": 4, "severity": "high", "type": "cijfers",
+      "quote": "op 31 juni 2026 ingediend",
+      "suggestion": "op 30 juni 2026 ingediend",
+      "title": "Datum bestaat niet: juni heeft 30 dagen",
+      "note": "31 juni bestaat niet. Controleer de datum op de ontvangstbevestiging van de TDA.",
+      "agents": ["reviewer", "claude"],
+      "variants": [{"agent": "claude", "text": "op 1 juli 2026 ingediend"}]
+    },
+    {
+      "id": "f17", "page": 4, "severity": "low", "type": "taal",
+      "quote": "en voor de de bewaring",
+      "suggestion": "en over de bewaring",
+      "title": "Dubbel woord: ‘de de’",
+      "note": "‘de’ staat er twee keer, en het gesprek gaat ‘over’ de bewaring, zoals over de bedrijfsvoering.",
+      "agents": ["languagetool"]
+    },
+    {
+      "id": "f18", "page": 4, "severity": "medium", "type": "consistentie",
+      "quote": "binnen de beslistermijn van 20 werkdagen",
+      "suggestion": "binnen de beslistermijn van 25 werkdagen",
+      "title": "Beslistermijn: 20 werkdagen hier, 25 erboven",
+      "note": "De alinea boven de lijst noemt 25 werkdagen.",
+      "agents": ["chatgpt", "grok"]
+    },
+    {
+      "id": "f19", "page": 4, "severity": "medium", "type": "consistentie",
+      "quote": "Oeverlight Custody B.V. verklaart",
+      "suggestion": "Oeverlicht Custody B.V. verklaart",
+      "title": "Bedrijfsnaam verkeerd gespeld",
+      "note": "Overal elders: Oeverlicht, met ‘ch’. In een verklaring telt de juiste naam.",
+      "agents": ["gemini", "reviewer"]
+    }
+  ]
+}
