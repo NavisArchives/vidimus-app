@@ -76,7 +76,11 @@ if (!votes){
 let edits = lsGet('edits', {});                     // id -> {text, by, at}
 const conn = Object.assign(Object.fromEntries(D.agents.map(a => [a.key, !!a.connected])), lsGet('tools', {}));
 const connecting = new Set();
-let zoom = lsGet('zoom', 1);
+/* Zoom is relative to the page fitting its column. A phone opens at a reading
+   zoom instead (the page about 1.05x its size in points, body text near 11px)
+   and keeps its own setting; null means « use the default for this screen ». */
+const zkey = () => MOBILE.matches ? 'zoom-phone' : 'zoom';
+let zoom = lsGet(zkey(), null);
 const filt = {sev: new Set(), type: new Set(), agent: new Set()};
 let query = '', openDrop = null;
 let tab = 'all', sel = null, editing = null, listTop = false;
@@ -395,9 +399,9 @@ function rowHTML(f){
       <span class="rmain">
         <span class="rtitle">${esc(f.title)}</span>
         <span class="rmeta"><span class="rkey">${f.key}</span><span class="sevw s-${f.severity}">${SEV[f.severity]}</span><span>${TYPES[f.type]}</span><span>Page ${f.page}</span>${
-          s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : ''}</span>
+          s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : ''}${votersHTML(f)}</span>
       </span>
-      <span class="rside">${logos(agentsOf(f))}${votersHTML(f)}</span>
+      <span class="rside">${logos(agentsOf(f))}</span>
     </button>`;
 }
 
@@ -423,7 +427,7 @@ function cardHTML(f){
     : `<div class="csugg">${diffHTML(f.quote, text)}</div>
        ${ed ? `<p class="cedited">${ic('pencil-simple')}Edited by ${esc(TEAM[ed.by] ? TEAM[ed.by].name : ed.by)}, ${ago(ed.at)}</p>` : ''}`;
   return `${head}
-    <div class="cagents">${logos(ags)}<span>Found by ${esc(names(ags.map(k => AG[k].name)))}</span></div>
+    <div class="cagents">${INLINE ? '' : logos(ags)}<span>Found by ${esc(names(ags.map(k => AG[k].name)))}</span></div>
     <div class="cfield"><div class="clabel">Current text</div><div class="cquote">${esc(f.quote)}</div></div>
     <div class="cfield"><div class="clabel">Suggestion</div>${suggestion}</div>
     ${variants.length && editing !== f.id ? `<div class="cfield"><div class="clabel">Alternative</div>${variants.map((v, i) =>
@@ -530,7 +534,7 @@ function renderPeek(){
 function setSheet(open){
   document.body.classList.toggle('sheet-open', open);
   const b = $('#sheetbtn'); if (b) b.setAttribute('aria-expanded', open);
-  if (open && !INLINE){ const p = $('#panel'); if (p) p.scrollTop = 0; }   // the pinned card comes first
+  if (!open || !INLINE){ const p = $('#panel'); if (p) p.scrollTop = 0; }   // folded, or the pinned card first
   else if (open && sel){
     const li = $(`#list .row[data-id="${sel}"]`);
     if (li) requestAnimationFrame(() => li.scrollIntoView({block: 'start'}));
@@ -547,7 +551,8 @@ function select(id, from){
   const f = id && byId[id];
   if (!f) return;
   if (from !== 'doc' && !(MOBILE.matches && document.body.classList.contains('sheet-open'))) scrollDocTo(f);
-  if (from !== 'list'){
+  // with the phone sheet folded the list is out of sight: leave it (and the peek) where they are
+  if (from !== 'list' && !(MOBILE.matches && !document.body.classList.contains('sheet-open'))){
     const li = $(`#list .row[data-id="${id}"]`);
     if (li) li.scrollIntoView({block: INLINE ? 'start' : 'nearest', behavior: 'auto'});
   }
@@ -655,7 +660,7 @@ function renderExport(){
 function toast(m){
   const t = $('#toast'); if (!t) return;
   t.textContent = m; t.classList.add('on');
-  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 2400);
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 2500);
 }
 
 /* ---------- keyboard: j/k walk the list, a approves, x rejects, e edits ---------- */
@@ -687,7 +692,7 @@ addEventListener('keydown', e => {
    The document: PDF.js pages, highlights and gutter markers
    ===================================================================== */
 const scroller = $('#scroller'), host = $('#pages');
-const MAXW = 880;
+const MAXW = 848;   // the page's widest; both directions show it at this scale
 let pdfjs = null, doc = null, mounting = null;
 const pages = [];          // {n, pg, el, sheet, canvas, hls, gut, w, h (pt), task, painted}
 
@@ -699,10 +704,26 @@ async function lib(){
   return pdfjs;
 }
 const cssNum = name => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0;
-function sheetWidth(){
-  // the gutter on the left holds the markers; --gutter-r balances it on wide screens
+const PHONE_READ = 1.05;   // a phone shows the page at about 1.05 CSS px per point
+function fitWidth(){
+  // the rail on the left holds the markers, so they never sit on the text
   const avail = scroller.clientWidth - cssNum('--gutter') - cssNum('--gutter-r') - cssNum('--pad-x') * 2;
-  return Math.round(Math.max(220, Math.min(avail, MAXW)) * zoom);
+  return Math.max(220, Math.min(avail, MAXW));
+}
+function zoomNow(){
+  if (zoom != null) return zoom;
+  return MOBILE.matches && pages.length ? Math.max(1, pages[0].w * PHONE_READ / fitWidth()) : 1;
+}
+function sheetWidth(){ return Math.round(fitWidth() * zoomNow()); }
+/* When the page is wider than its column (a phone at reading zoom), start at
+   the text column, just right of the marker rail, instead of the page margin. */
+function sheetLeft(P){
+  return P.sheet.getBoundingClientRect().left - scroller.getBoundingClientRect().left + scroller.scrollLeft;
+}
+function alignText(){
+  if (!pages.length || scroller.scrollWidth <= scroller.clientWidth + 2) return;
+  const P = pages[0], minx = Math.min(...pages.map(q => q.minx || 0));
+  scroller.scrollLeft = Math.max(0, sheetLeft(P) + minx / P.w * P.sheet.clientWidth - cssNum('--gutter') - 10);
 }
 
 function mount(){
@@ -726,6 +747,7 @@ function mount(){
     for (const f of F) if (f.rects === null) f.rects = false;
     drawMarks();
     render();
+    alignText();
     thumbs();
     document.body.classList.add('ready');
   })().catch(err => {
@@ -744,7 +766,7 @@ function layout(){
   }
   pages.forEach(paint);
   placeMarkers();
-  const zv = $('#zoomval'); if (zv) zv.textContent = Math.round(zoom * 100) + '%';
+  const zv = $('#zoomval'); if (zv) zv.textContent = Math.round(zoomNow() * 100) + '%';
 }
 function paint(P){
   const w = P.sheet.clientWidth || sheetWidth();
@@ -779,6 +801,8 @@ async function index(P){
     return {str: it.str, x: tr[4], base: tr[5], h, w: it.width,
             family: (tc.styles[it.fontName] || {}).fontFamily || 'sans-serif'};
   });
+  const xs = items.filter(it => it.str.trim()).map(it => it.x);
+  P.minx = xs.length ? Math.min(...xs) : 0;
   let s = ''; const map = [];
   items.forEach((it, i) => {
     [...it.str].forEach((ch, off) => {
@@ -872,7 +896,16 @@ function scrollDocTo(f){
   const top = P.sheet.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop
             + (r ? r.y * P.sheet.clientHeight - scroller.clientHeight * 0.3 : -16);
   const opts = {top: Math.max(0, top), behavior: REDUCED ? 'auto' : 'smooth'};
-  if (r && zoom > 1) opts.left = Math.max(0, r.x * P.sheet.clientWidth - scroller.clientWidth * 0.3);
+  if (r && scroller.scrollWidth > scroller.clientWidth + 2){
+    // keep the lines' starts in view (aligned to the text column) and move
+    // sideways only as far as it takes to show the whole highlight
+    const W = P.sheet.clientWidth, sl = sheetLeft(P), g = cssNum('--gutter') + 10;
+    const minx = Math.min(...pages.map(q => q.minx || 0));
+    let left = sl + minx / P.w * W - g;                                  // text column aligned
+    const need = sl + (r.x + r.w) * W + 12 - scroller.clientWidth;      // the highlight's end in view
+    if (left < need) left = Math.min(need, sl + r.x * W - g);           // but never past its start
+    opts.left = Math.max(0, left);
+  }
   scroller.scrollTo(opts);
 }
 function goPage(n){
@@ -894,10 +927,14 @@ function currentPage(){
 scroller.addEventListener('scroll', () => requestAnimationFrame(currentPage), {passive: true});
 $('#prevpage') && ($('#prevpage').onclick = () => goPage(Math.max(1, cur - 1)));
 $('#nextpage') && ($('#nextpage').onclick = () => goPage(Math.min(pages.length, cur + 1)));
-function setZoom(z){ zoom = Math.max(0.6, Math.min(2, Math.round(z * 10) / 10)); lsSet('zoom', zoom); layout(); }
-$('#zoomin') && ($('#zoomin').onclick = () => setZoom(zoom + 0.1));
-$('#zoomout') && ($('#zoomout').onclick = () => setZoom(zoom - 0.1));
-$('#zoomval') && ($('#zoomval').onclick = () => setZoom(1));
+function setZoom(z){
+  zoom = z == null ? null : Math.max(0.6, Math.min(2.6, Math.round(z * 10) / 10));
+  lsSet(zkey(), zoom); layout(); alignText();
+}
+$('#zoomin') && ($('#zoomin').onclick = () => setZoom(zoomNow() + 0.1));
+$('#zoomout') && ($('#zoomout').onclick = () => setZoom(zoomNow() - 0.1));
+$('#zoomval') && ($('#zoomval').onclick = () => setZoom(null));
+MOBILE.addEventListener('change', () => { zoom = lsGet(zkey(), null); layout(); });
 let rt = 0;
 new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(layout, 120); }).observe(scroller);
 

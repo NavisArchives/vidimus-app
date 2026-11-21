@@ -30,7 +30,7 @@
   --float:0 0 0 1px rgba(24,24,27,.06),0 1px 2px rgba(24,24,27,.04),0 10px 28px -14px rgba(24,24,27,.18);
   --pop:0 0 0 1px rgba(24,24,27,.08),0 16px 40px -12px rgba(24,24,27,.28);
   --ease:cubic-bezier(.23,1,.32,1);
-  --gutter:40px; --gutter-r:40px; --pad-x:24px; --peek:164px;
+  --gutter:36px; --gutter-r:0px; --pad-x:12px; --peek:164px; --dock:48px;
   --sans:'Geist',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
 }
 *{box-sizing:border-box}
@@ -157,18 +157,19 @@ body[data-screen="signin"] .top{display:none}
 
 /* ---------- review ---------- */
 #screen-review{flex:1;min-height:0;grid-template-columns:minmax(0,1fr) 452px;gap:12px;padding:0 12px 12px}
-.docpane{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column}
+.docpane{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px}
 #scroller{flex:1;min-height:0;overflow:auto;position:relative;overscroll-behavior:contain;border-radius:var(--r-lg)}
-#pages{padding:6px var(--pad-x) 112px}
+#pages{padding:6px var(--pad-x) 24px}
 .pg{display:grid;grid-template-columns:var(--gutter) auto;width:max-content;margin:0 auto 20px;padding-right:var(--gutter-r)}
-.gut{position:relative}
+/* the marker rail stays at the left edge when the page is wider than its column */
+.gut{position:sticky;left:0;z-index:3;background:var(--bg)}
 .sheet{position:relative;background:#fff;border-radius:4px;box-shadow:0 0 0 1px rgba(24,24,27,.05),0 2px 12px -4px rgba(24,24,27,.14)}
 .sheet canvas{display:block;width:100%;height:100%;border-radius:4px}
 .hls{position:absolute;inset:0}
 .loaderr{max-width:480px;margin:80px auto;color:var(--ink-2);text-align:center}
-.dock{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;gap:2px;
-  height:42px;padding:0 5px;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  border-radius:999px;box-shadow:var(--pop);font-size:13px;color:var(--ink-2);white-space:nowrap;z-index:5}
+/* the document bar is docked under the pages, opaque, so nothing scrolls under it */
+.dock{flex:none;display:flex;align-items:center;justify-content:flex-end;gap:2px;height:var(--dock);padding:0 8px;
+  background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--float);font-size:13px;color:var(--ink-2);white-space:nowrap}
 .dock button{display:inline-grid;place-items:center;height:32px;min-width:32px;border:0;border-radius:999px;background:none;color:var(--ink-2);
   transition:transform .12s var(--ease)}
 .dock button:hover{background:var(--hover);color:var(--ink)}
@@ -187,7 +188,7 @@ body[data-screen="signin"] .top{display:none}
 .hl.off,.mk.off{display:none}
 .mk,.mk-mini{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;border:0;padding:0;
   font:600 11.5px/1 var(--sans);font-variant-numeric:tabular-nums;color:#fff}
-.mk{position:absolute;right:8px;box-shadow:0 1px 3px rgba(24,24,27,.25);transition:transform .15s var(--ease)}
+.mk{position:absolute;right:6px;box-shadow:0 1px 3px rgba(24,24,27,.25);transition:transform .15s var(--ease)}
 .s-high.mk,.s-high.mk-mini{background:var(--high)}
 .s-medium.mk,.s-medium.mk-mini{background:var(--medium)}
 .s-low.mk,.s-low.mk-mini{background:var(--low)}
@@ -254,7 +255,7 @@ body[data-screen="signin"] .top{display:none}
 .rmeta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:12.5px;color:var(--muted)}
 .rkey{font-weight:500;color:var(--ink-2);font-variant-numeric:tabular-nums}
 .rside{display:flex;flex-direction:column;align-items:flex-end;gap:8px;padding-top:1px}
-.rvoters{display:inline-flex}
+.rvoters{display:inline-flex;margin-left:auto;align-items:center}
 .rvoters{gap:4px}
 .empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:48px 24px;color:var(--muted);text-align:center}
 .empty .ic{width:28px;height:28px;color:var(--line-2);margin-bottom:4px}
@@ -353,7 +354,7 @@ body[data-screen="signin"] .top{display:none}
 .modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:24px;background:rgba(24,24,27,.32);
   backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);transition:opacity .2s var(--ease)}
 @starting-style{.modal{opacity:0}}
-.modal-card{width:100%;max-width:720px;max-height:calc(100dvh - 48px);overflow:auto;background:var(--surface);border-radius:20px;
+.modal-card{width:100%;max-width:720px;max-height:calc(100dvh - 136px);overflow:auto;background:var(--surface);border-radius:20px;
   box-shadow:0 0 0 1px rgba(24,24,27,.08),0 30px 80px -24px rgba(24,24,27,.45);padding:26px 26px 20px;transition:transform .22s var(--ease),opacity .22s var(--ease)}
 @starting-style{.modal-card{opacity:0;transform:scale(.97) translateY(6px)}}
 .mhead{display:flex;align-items:flex-start;gap:16px}
@@ -386,15 +387,20 @@ body[data-screen="signin"] .top{display:none}
 .mfoot{display:flex;align-items:center;gap:16px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
 .mfoot p{margin:0;font-size:12.5px;color:var(--muted);flex:1}
 
-#toast{position:fixed;left:50%;top:66px;transform:translate(-50%,-6px);background:var(--ink);color:#fff;
-  padding:9px 15px;border-radius:999px;font-size:13px;font-weight:500;z-index:70;pointer-events:none;box-shadow:0 8px 24px -8px rgba(24,24,27,.5);
+/* toasts sit bottom-left: on the review screen in the empty left end of the
+   document bar, never on the page; with a dialog open, below it */
+#toast{position:fixed;left:24px;bottom:18px;max-width:300px;transform:translateY(6px);background:var(--ink);color:#fff;
+  padding:9px 15px;border-radius:999px;font-size:13px;font-weight:500;line-height:18px;z-index:70;pointer-events:none;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   opacity:0;visibility:hidden;transition:opacity .18s var(--ease),transform .18s var(--ease),visibility 0s .18s}
-#toast.on{opacity:1;visibility:visible;transform:translate(-50%,0);transition:opacity .18s var(--ease),transform .18s var(--ease)}
+#toast.on{opacity:1;visibility:visible;transform:none;transition:opacity .18s var(--ease),transform .18s var(--ease)}
+body.modal-open[data-screen] #toast{left:50%;bottom:16px;transform:translate(-50%,6px)}
+body.modal-open[data-screen] #toast.on{transform:translate(-50%,0)}
 
 /* ---------- narrower screens ---------- */
 @media (max-width:1180px){
-  #screen-review{grid-template-columns:minmax(0,1fr) 396px}
-  :root{--pad-x:14px;--gutter:36px;--gutter-r:36px}
+  #screen-review{grid-template-columns:minmax(0,1fr) 372px}
+  :root{--pad-x:10px}
   .prog .bar{width:84px}
 }
 @media (max-width:960px){
@@ -402,7 +408,7 @@ body[data-screen="signin"] .top{display:none}
   .ex-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:760px){
-  :root{--gutter:32px;--gutter-r:0px;--pad-x:8px}
+  :root{--gutter:30px;--gutter-r:0px;--pad-x:6px;--dock:44px}
   .top{height:54px;padding:0 10px 0 12px;gap:8px}
   .brand{gap:8px}
   .wm,.crumb{display:none}
@@ -415,9 +421,12 @@ body[data-screen="signin"] .top{display:none}
   body[data-screen="review"] #screen-review{display:block}
   .docpane{height:100%}
   #scroller{border-radius:0}
-  #pages{padding:6px var(--pad-x) calc(var(--peek) + 80px)}
+  #pages{padding:6px var(--pad-x) calc(var(--peek) + var(--dock) + 16px)}
   .pg{margin-bottom:12px}
-  .dock{bottom:calc(var(--peek) + 12px);height:40px}
+  .docpane{gap:0}
+  .dock{position:fixed;left:0;right:0;bottom:var(--peek);z-index:25;height:var(--dock);border-radius:0;border-top:0;
+    justify-content:center;box-shadow:0 -1px 0 var(--line)}
+  .mk{right:3px}
   #panel{position:fixed;left:0;right:0;bottom:0;height:min(88dvh,780px);z-index:30;border-radius:20px 20px 0 0;
     box-shadow:0 -12px 36px -12px rgba(24,24,27,.28),0 -1px 0 var(--line);
     transform:translateY(calc(100% - var(--peek)));transition:transform .32s cubic-bezier(.32,.72,0,1)}
@@ -447,7 +456,11 @@ body[data-screen="signin"] .top{display:none}
   .card{padding:0 10px 16px 10px}
   .btn.show{display:inline-flex}
   .pfoot{display:none}
-  #toast{top:62px;max-width:calc(100vw - 32px);text-align:center}
+  body[data-screen] #toast{left:12px;right:12px;max-width:none;text-align:center;bottom:16px}
+  body[data-screen="review"] #toast{bottom:calc(var(--peek) + var(--dock) + 8px)}
+  body.sheet-open[data-screen] #toast{bottom:auto;top:60px}
+  body.modal-open[data-screen] #toast{left:12px;right:12px;bottom:auto;top:16px;transform:translateY(-6px)}
+  body.modal-open[data-screen] #toast.on{transform:none}
   .menu{position:fixed;left:8px;right:8px;top:58px;width:auto}
   #screen-export{padding:4px 12px 32px}
   .ex-head h1{font-size:24px}
@@ -533,7 +546,7 @@ body[data-screen="signin"] .top{display:none}
     </div>
     <ol class="steps"><li>Connect the tools you use</li><li>They read the document</li><li>Your team approves or rejects</li></ol>
     <ul id="toolsgrid"></ul>
-    <div class="mfoot"><p>Demo: nothing is connected and nothing leaves this page.</p>
+    <div class="mfoot"><p>Demo states: no real connection; nothing leaves this page.</p>
       <button class="btn primary" type="button" data-close-tools>Done</button></div>
   </div>
 </div>

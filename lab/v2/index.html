@@ -3,31 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="light">
 <title>Vidimus</title>
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap">
 <style>
-/* Vidimus lab · v2 « Night »
-   A dark room with the paper lit: the white pages are the only bright surface.
-   Three panes, each with one job: find (search, page map, filters), read (the
-   document), decide (the pinned finding, then the list). Emerald means
-   approved and nothing else; three severity colours appear nowhere else.
+/* Vidimus lab · v2 « Ledger »
+   White, like v1, with a different structure. Three panes, each with one job:
+   find (search, page map, filters), read (the document), decide (the pinned
+   finding, then the list). Emerald means approved and nothing else; three
+   severity colours appear nowhere else.
    Shape rule: near-square, 8px for panels and controls, 6px for rows and
    tiles; only avatars are round. Motion: press feedback and a short scale-in
    for pop-ups, nothing on keyboard navigation. */
 :root{
-  --bg:#0B0B0D; --surface:#121215; --surface-2:#18181C; --raise:#202026; --canvas:#08080A;
-  --ink:#F4F4F5; --ink-2:#C6C6CE; --muted:#90909B;
-  --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.13);
-  --accent:#3DD68C; --accent-ink:#04281A; --accent-soft:rgba(61,214,140,.13); --accent-hl:#B4EBD2;
-  --high:#FF7A7A; --high-soft:rgba(255,122,122,.13); --high-hl:#FFC9C9;
-  --medium:#F7BE4F; --medium-soft:rgba(247,190,79,.13); --medium-hl:#FFE08A;
-  --low:#9AA7BB; --low-soft:rgba(154,167,187,.14); --low-hl:#D9E2EE;
+  --bg:#FFFFFF; --surface:#FFFFFF; --surface-2:#F7F7F8; --raise:#EFEFF1; --canvas:#F2F2F3;
+  --ink:#18181B; --ink-2:#3F3F46; --muted:#66666E;
+  --line:#E7E7EA; --line-2:#D4D4D8;
+  --accent:#047857; --accent-ink:#FFFFFF; --accent-soft:#ECFDF5; --accent-hl:#B4EBD2;
+  --high:#D02E2E; --high-soft:#FEF2F2; --high-hl:#FFC9C9;
+  --medium:#B45309; --medium-soft:#FFF7E6; --medium-hl:#FFE08A;
+  --low:#5B6B82; --low-soft:#F1F5F9; --low-hl:#D9E2EE;
   --r-lg:10px; --r:8px; --r-sm:6px;
-  --pop:0 0 0 1px var(--line-2),0 24px 48px -16px rgba(0,0,0,.85);
+  --pop:0 0 0 1px rgba(24,24,27,.08),0 16px 40px -12px rgba(24,24,27,.24);
   --ease:cubic-bezier(.23,1,.32,1);
-  --gutter:40px; --gutter-r:40px; --pad-x:24px; --peek:164px;
+  --gutter:32px; --gutter-r:0px; --pad-x:8px; --peek:164px; --dock:48px;
   --sans:'Satoshi',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
 }
 *{box-sizing:border-box}
@@ -41,7 +41,7 @@ input{font:inherit;color:inherit}
 [hidden]{display:none !important}
 .ic{width:16px;height:16px;flex:none;vertical-align:middle}
 kbd{font:500 10.5px/1 var(--sans);min-width:18px;height:18px;display:inline-grid;place-items:center;padding:0 4px;
-  border-radius:4px;background:var(--raise);box-shadow:inset 0 -1px 0 rgba(0,0,0,.4);color:var(--ink-2)}
+  border-radius:4px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line-2),0 1px 0 var(--line-2);color:var(--ink-2)}
 .screen{display:none}
 body[data-screen="signin"] #screen-signin{display:flex}
 body[data-screen="review"] #screen-review{display:grid}
@@ -56,7 +56,7 @@ body[data-screen="signin"] .top{display:none}
 .btn:hover{background:var(--raise)}
 .btn:active{transform:scale(.97)}
 .btn.primary{background:var(--ink);box-shadow:none;color:var(--bg)}
-.btn.primary:hover{background:#fff}
+.btn.primary:hover{background:#2E2E33}
 .btn:disabled{opacity:.4;cursor:default;transform:none}
 .btn.small{height:30px;padding:0 11px;font-size:13px}
 .btn.ghost{box-shadow:none;background:none;color:var(--ink-2)}
@@ -64,16 +64,16 @@ body[data-screen="signin"] .top{display:none}
 .linkbtn{background:none;border:0;padding:0;color:var(--ink-2);text-decoration:underline;text-decoration-color:var(--line-2);
   text-underline-offset:3px;font-size:13px}
 .linkbtn:hover{color:var(--ink);text-decoration-color:var(--ink)}
-.lg{display:inline-grid;place-items:center;flex:none;width:22px;height:22px;border-radius:6px;background:#fff;color:#111}
+.lg{display:inline-grid;place-items:center;flex:none;width:22px;height:22px;border-radius:6px;background:#fff;color:#111;box-shadow:inset 0 0 0 1px var(--line-2)}
 .lg svg,.lg .ic{width:13px;height:13px}
 .lg-languagetool svg{fill:#45A1FC}
 .lg-reviewer{background:var(--raise);color:var(--ink-2)}
 .lgstack{display:inline-flex}
-.lgstack .lg{box-shadow:0 0 0 2px var(--surface)}
+.lgstack .lg{box-shadow:inset 0 0 0 1px var(--line-2),0 0 0 2px var(--surface)}
 .lgstack .lg + .lg{margin-left:-4px}
 .av{display:inline-grid;place-items:center;flex:none;width:30px;height:30px;border-radius:50%;font:700 11px/1 var(--sans)}
 .av.xs{width:20px;height:20px;font-size:8.5px} .av.sm{width:26px;height:26px;font-size:10px} .av.big{width:40px;height:40px;font-size:14px}
-.av-0{background:#2A3A66;color:#D5E0FF} .av-1{background:#5A3222;color:#FFD9C9} .av-2{background:#1E4A33;color:#C4F0D7}
+.av-0{background:#DBE6FF;color:#1E3A8A} .av-1{background:#FDE1D3;color:#7C2D12} .av-2{background:#D9F2E3;color:#14532D}
 .av.v-approved{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--accent)}
 .av.v-rejected{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--high)}
 .dot{display:inline-block;width:8px;height:8px;border-radius:2px;flex:none}
@@ -130,7 +130,7 @@ body[data-screen="signin"] .top{display:none}
 .tools{gap:8px;padding:0 11px 0 6px}
 .tools .lgstack .lg{width:20px;height:20px;border-radius:5px}
 .tools .lgstack .lg svg,.tools .lgstack .lg .ic{width:12px;height:12px}
-.tools .lgstack .lg{box-shadow:0 0 0 2px var(--surface-2)}
+.tools .lgstack .lg{box-shadow:inset 0 0 0 1px var(--line-2),0 0 0 2px var(--surface-2)}
 .acct{position:relative;margin-left:2px}
 .avbtn{border:0;background:none;padding:0;border-radius:50%;display:block;transition:transform .12s var(--ease)}
 .avbtn:active{transform:scale(.95)}
@@ -149,19 +149,19 @@ body[data-screen="signin"] .top{display:none}
 .um-sep{height:1px;background:var(--line);margin:6px 0}
 
 /* ---------- review: find, read, decide ---------- */
-#screen-review{flex:1;min-height:0;grid-template-columns:252px minmax(0,1fr) 428px}
+#screen-review{flex:1;min-height:0;grid-template-columns:192px minmax(0,1fr) 352px}
 .rail{min-height:0;overflow-y:auto;border-right:1px solid var(--line);padding:14px 12px 24px;background:var(--surface)}
 .railh{font-size:12px;font-weight:500;color:var(--muted);margin:18px 6px 10px}
 #thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 6px}
 .thumb{border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px}
-.tsheet{position:relative;display:block;width:100%;aspect-ratio:210 / 297;background:#fff;border-radius:2px;opacity:.6;transition:opacity .15s}
+.tsheet{position:relative;display:block;width:100%;aspect-ratio:210 / 297;background:#fff;border-radius:2px;box-shadow:0 0 0 1px var(--line-2);transition:box-shadow .15s}
 .tsheet canvas{width:100%;height:100%;display:block;border-radius:2px}
-.thumb:hover .tsheet{opacity:.85}
+.thumb:hover .tsheet{box-shadow:0 0 0 1px var(--muted)}
 .thumb[aria-current="true"] .tsheet{opacity:1;box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--ink)}
 .tdots{position:absolute;inset:0}
 .tdot{position:absolute;left:-3px;width:6px;height:6px;border-radius:2px;margin-top:-1px}
 .tdot.s-high{background:var(--high)} .tdot.s-medium{background:var(--medium)} .tdot.s-low{background:var(--low)}
-.tdot.st-approved{background:var(--accent)} .tdot.st-rejected{background:#55555E}
+.tdot.st-approved{background:var(--accent)} .tdot.st-rejected{background:#C7C7CC}
 .tdot.sel{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--ink)}
 .tn{font-size:11.5px;color:var(--muted);display:flex;gap:4px;align-items:baseline;font-variant-numeric:tabular-nums}
 .tn .tc{display:inline-grid;place-items:center;min-width:16px;height:16px;padding:0 4px;border-radius:4px;background:var(--raise);color:var(--ink-2);font-size:10.5px;font-weight:700}
@@ -191,16 +191,17 @@ body[data-screen="signin"] .top{display:none}
 
 .docpane{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--canvas)}
 #scroller{flex:1;min-height:0;overflow:auto;position:relative;overscroll-behavior:contain}
-#pages{padding:20px var(--pad-x) 112px}
+#pages{padding:16px var(--pad-x) 24px}
 .pg{display:grid;grid-template-columns:var(--gutter) auto;width:max-content;margin:0 auto 20px;padding-right:var(--gutter-r)}
-.gut{position:relative}
-.sheet{position:relative;background:#fff;border-radius:2px;box-shadow:0 16px 48px -20px rgba(0,0,0,.9)}
+/* the marker rail stays at the left edge when the page is wider than its column */
+.gut{position:sticky;left:0;z-index:3;background:var(--canvas)}
+.sheet{position:relative;background:#fff;border-radius:2px;box-shadow:0 0 0 1px rgba(24,24,27,.06),0 2px 12px -4px rgba(24,24,27,.14)}
 .sheet canvas{display:block;width:100%;height:100%;border-radius:2px}
 .hls{position:absolute;inset:0}
 .loaderr{max-width:480px;margin:80px auto;color:var(--ink-2);text-align:center}
-.dock{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;gap:2px;
-  height:40px;padding:0 4px;background:rgba(24,24,28,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  border-radius:var(--r-lg);box-shadow:var(--pop);font-size:13px;color:var(--ink-2);white-space:nowrap;z-index:5}
+/* the document bar is docked under the pages, opaque, so nothing scrolls under it */
+.dock{flex:none;display:flex;align-items:center;justify-content:flex-end;gap:2px;height:var(--dock);padding:0 10px;
+  background:var(--surface);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2);white-space:nowrap}
 .dock button{display:inline-grid;place-items:center;height:32px;min-width:32px;border:0;border-radius:var(--r-sm);background:none;color:var(--ink-2);transition:transform .12s var(--ease)}
 .dock button:hover{background:var(--raise);color:var(--ink)}
 .dock button:active{transform:scale(.94)}
@@ -216,8 +217,8 @@ body[data-screen="signin"] .top{display:none}
 .hl.st-rejected{background:transparent;box-shadow:inset 0 -2px 0 #C7C7CC}
 .hl.off,.mk.off{display:none}
 .mk,.mk-mini{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:6px;border:0;padding:0;
-  font:700 11.5px/1 var(--sans);font-variant-numeric:tabular-nums;color:#121214}
-.mk{position:absolute;right:9px;transition:transform .15s var(--ease)}
+  font:700 11.5px/1 var(--sans);font-variant-numeric:tabular-nums;color:#fff}
+.mk{position:absolute;right:6px;transition:transform .15s var(--ease)}
 .s-high.mk,.s-high.mk-mini{background:var(--high)}
 .s-medium.mk,.s-medium.mk-mini{background:var(--medium)}
 .s-low.mk,.s-low.mk-mini{background:var(--low)}
@@ -247,7 +248,7 @@ body[data-screen="signin"] .top{display:none}
 .fbtn[aria-expanded="true"]{box-shadow:inset 0 0 0 1.5px var(--ink-2);color:var(--ink)}
 .fbtn.on{background:var(--ink);box-shadow:none;color:var(--bg)}
 .fbtn.on .caret{color:var(--bg)}
-.fbtn .fval{font-weight:400;max-width:110px;overflow:hidden;text-overflow:ellipsis;padding-left:7px;border-left:1px solid rgba(0,0,0,.2)}
+.fbtn .fval{font-weight:400;max-width:110px;overflow:hidden;text-overflow:ellipsis;padding-left:7px;border-left:1px solid rgba(255,255,255,.3)}
 .fbtn.fx{box-shadow:none;background:none;color:var(--muted);padding:0 8px}
 .fmenu{position:absolute;left:0;top:calc(100% + 6px);z-index:30;min-width:232px;padding:5px;background:var(--surface-2);border-radius:var(--r-lg);box-shadow:var(--pop);
   transform-origin:top left;transition:opacity .16s var(--ease),transform .16s var(--ease)}
@@ -279,15 +280,15 @@ body[data-screen="signin"] .top{display:none}
 .cfield{margin-bottom:12px}
 .clabel{display:block;font-size:12.5px;font-weight:500;color:var(--muted);margin:0 0 6px}
 .cquote,.csugg{font-size:15px;line-height:1.55;border-radius:var(--r);padding:10px 12px;
-  box-shadow:inset 0 0 0 1px var(--line-2),0 8px 20px -14px rgba(0,0,0,.9)}
-.cquote{color:var(--ink-2);background:var(--surface-2)}
-.csugg{color:var(--ink);background:var(--raise)}
+  box-shadow:0 0 0 1px rgba(24,24,27,.08),0 1px 2px rgba(24,24,27,.05),0 6px 16px -10px rgba(24,24,27,.18)}
+.cquote{color:var(--ink-2);background:var(--surface)}
+.csugg{color:var(--ink);background:var(--surface)}
 .csugg del{color:var(--high);text-decoration-thickness:1.5px}
 .csugg ins{text-decoration:none;background:var(--accent-soft);color:var(--accent);border-radius:3px;padding:0 3px}
 .csugg .same{color:var(--muted)}
 .cedited{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);margin:7px 0 0}
 .cedited .ic{width:13px;height:13px}
-.cinput{display:block;width:100%;font:15px/1.55 var(--sans);color:var(--ink);background:var(--raise);border:0;
+.cinput{display:block;width:100%;font:15px/1.55 var(--sans);color:var(--ink);background:var(--surface);border:0;
   box-shadow:inset 0 0 0 1.5px var(--ink-2);border-radius:var(--r);padding:10px 12px;resize:vertical;min-height:64px;field-sizing:content}
 .cinput:focus{outline:none;box-shadow:inset 0 0 0 1.5px var(--ink)}
 .cedit{display:flex;align-items:center;gap:6px;margin-top:8px}
@@ -302,7 +303,7 @@ body[data-screen="signin"] .top{display:none}
 .cmiss{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--high);margin:-6px 0 12px}
 .cacts{display:flex;gap:6px;flex-wrap:wrap}
 .btn.approve{background:var(--accent);box-shadow:none;color:var(--accent-ink)}
-.btn.approve:hover{background:#5BE3A1}
+.btn.approve:hover{background:#065F46}
 .btn.approve[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)}
 .btn.reject:hover{box-shadow:inset 0 0 0 1px var(--high);color:var(--high)}
 .btn.reject[aria-pressed="true"]{background:var(--high-soft);box-shadow:inset 0 0 0 1.5px var(--high);color:var(--high)}
@@ -329,12 +330,12 @@ body[data-screen="signin"] .top{display:none}
 .rtitle{font-size:13.5px;font-weight:500;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row.sel .rtitle{color:var(--ink)}
 .row.st-rejected .rtitle{color:var(--muted)}
-.rmeta{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden}
-.rmeta > :nth-child(n+4):not(.stat){display:none}
+.rmeta{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted);white-space:nowrap;overflow:visible}
+.rmeta > :nth-child(n+4):not(.stat):not(.rvoters){display:none}
 .rkey{font-weight:500;color:var(--ink-2);font-variant-numeric:tabular-nums}
 .rside{display:flex;align-items:center;gap:8px}
 .rside .lgstack{display:none}
-.rvoters{display:inline-flex}
+.rvoters{display:inline-flex;margin-left:auto;align-items:center;padding-right:4px}
 .rvoters{gap:4px}
 .empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:40px 20px;color:var(--muted);text-align:center}
 .empty .ic{width:26px;height:26px;margin-bottom:4px}
@@ -384,11 +385,11 @@ body[data-screen="signin"] .top{display:none}
 .ex-none{color:var(--muted)}
 
 /* ---------- connect your tools ---------- */
-.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:24px;background:rgba(0,0,0,.62);
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:24px;background:rgba(24,24,27,.32);
   backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);transition:opacity .2s var(--ease)}
 @starting-style{.modal{opacity:0}}
-.modal-card{width:100%;max-width:720px;max-height:calc(100dvh - 48px);overflow:auto;background:var(--surface);border-radius:14px;
-  box-shadow:0 0 0 1px var(--line-2),0 40px 80px -24px rgba(0,0,0,.9);padding:24px 24px 18px;transition:transform .22s var(--ease),opacity .22s var(--ease)}
+.modal-card{width:100%;max-width:720px;max-height:calc(100dvh - 136px);overflow:auto;background:var(--surface);border-radius:14px;
+  box-shadow:0 0 0 1px rgba(24,24,27,.08),0 30px 80px -24px rgba(24,24,27,.4);padding:24px 24px 18px;transition:transform .22s var(--ease),opacity .22s var(--ease)}
 @starting-style{.modal-card{opacity:0;transform:scale(.97) translateY(6px)}}
 .mhead{display:flex;align-items:flex-start;gap:16px}
 .mhead h2{margin:0;font-size:22px;font-weight:700;letter-spacing:-.02em}
@@ -417,23 +418,29 @@ body[data-screen="signin"] .top{display:none}
 .mfoot{display:flex;align-items:center;gap:16px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
 .mfoot p{margin:0;font-size:12.5px;color:var(--muted);flex:1}
 
-#toast{position:fixed;left:50%;top:62px;transform:translate(-50%,-6px);background:var(--ink);color:var(--bg);
-  padding:9px 14px;border-radius:var(--r);font-size:13px;font-weight:500;z-index:70;pointer-events:none;
+/* toasts sit bottom-left: on the review screen in the empty left end of the
+   document bar, never on the page; with a dialog open, below it */
+#toast{position:fixed;left:16px;bottom:16px;max-width:300px;transform:translateY(6px);background:var(--ink);color:var(--bg);
+  padding:9px 15px;border-radius:var(--r);font-size:13px;font-weight:500;line-height:18px;z-index:70;pointer-events:none;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   opacity:0;visibility:hidden;transition:opacity .18s var(--ease),transform .18s var(--ease),visibility 0s .18s}
-#toast.on{opacity:1;visibility:visible;transform:translate(-50%,0);transition:opacity .18s var(--ease),transform .18s var(--ease)}
+#toast.on{opacity:1;visibility:visible;transform:none;transition:opacity .18s var(--ease),transform .18s var(--ease)}
+body.modal-open[data-screen] #toast{left:50%;bottom:16px;transform:translate(-50%,6px)}
+body.modal-open[data-screen] #toast.on{transform:translate(-50%,0)}
+body[data-screen="review"] #toast{left:12px;bottom:6px}
 
 /* wide: the rail has the filters, so the inspector does not repeat them */
-@media (min-width:1280px){ #panel .fdetails{display:none} }
+@media (min-width:1280px){ #panel .fdetails{display:none} body[data-screen="review"] #toast{left:204px} }
 /* middle widths: no rail; the filters fold into the inspector as a dropdown bar */
 @media (max-width:1279px){
-  #screen-review{grid-template-columns:minmax(0,1fr) 400px}
+  #screen-review{grid-template-columns:minmax(0,1fr) 372px}
   .rail{display:none}
-  :root{--pad-x:14px;--gutter:36px;--gutter-r:36px}
+  :root{--pad-x:10px}
   .prog .bar{display:none}
 }
 @media (max-width:960px){ .prog,.docmeta span{display:none} .ex-stats{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media (max-width:760px){
-  :root{--gutter:32px;--gutter-r:0px;--pad-x:8px}
+  :root{--gutter:30px;--gutter-r:0px;--pad-x:6px;--dock:44px}
   .top{height:52px;padding:0 10px 0 12px;gap:8px}
   .brand{gap:8px}
   .wm,.crumb{display:none}
@@ -443,11 +450,14 @@ body[data-screen="signin"] .top{display:none}
   #screen-review{position:relative}
   body[data-screen="review"] #screen-review{display:block}
   .docpane{height:100%}
-  #pages{padding:8px var(--pad-x) calc(var(--peek) + 80px)}
+  #pages{padding:8px var(--pad-x) calc(var(--peek) + var(--dock) + 16px)}
   .pg{margin-bottom:12px}
-  .dock{bottom:calc(var(--peek) + 12px);height:40px}
+  .docpane{gap:0}
+  .dock{position:fixed;left:0;right:0;bottom:var(--peek);z-index:25;height:var(--dock);border-radius:0;border-top:0;
+    justify-content:center;box-shadow:0 -1px 0 var(--line)}
+  .mk{right:3px}
   #panel{position:fixed;left:0;right:0;bottom:0;height:min(88dvh,780px);z-index:30;border:0;overflow-y:auto;
-    border-radius:14px 14px 0 0;box-shadow:0 -16px 32px -12px rgba(0,0,0,.85),0 -1px 0 var(--line-2);
+    border-radius:14px 14px 0 0;box-shadow:0 -12px 36px -12px rgba(24,24,27,.28),0 -1px 0 var(--line);
     transform:translateY(calc(100% - var(--peek)));transition:transform .32s cubic-bezier(.32,.72,0,1)}
   body.sheet-open #panel{transform:none}
   body:not(.sheet-open) #panel > :not(.sheetbtn):not(#peek){visibility:hidden}
@@ -471,7 +481,11 @@ body[data-screen="signin"] .top{display:none}
   .btn.show{display:inline-flex}
   .pfoot{display:none}
   .dempty .keys{display:none}
-  #toast{top:60px;max-width:calc(100vw - 32px);text-align:center}
+  body[data-screen] #toast{left:12px;right:12px;max-width:none;text-align:center;bottom:16px}
+  body[data-screen="review"] #toast{bottom:calc(var(--peek) + var(--dock) + 8px)}
+  body.sheet-open[data-screen] #toast{bottom:auto;top:60px}
+  body.modal-open[data-screen] #toast{left:12px;right:12px;bottom:auto;top:16px;transform:translateY(-6px)}
+  body.modal-open[data-screen] #toast.on{transform:none}
   .menu{position:fixed;left:8px;right:8px;top:56px;width:auto}
   #screen-export{padding:4px 12px 32px}
   .ex-head h1{font-size:24px}
@@ -559,7 +573,7 @@ body[data-screen="signin"] .top{display:none}
     </div>
     <ol class="steps"><li>Connect the tools you use</li><li>They read the document</li><li>Your team approves or rejects</li></ol>
     <ul id="toolsgrid"></ul>
-    <div class="mfoot"><p>Demo: nothing is connected and nothing leaves this page.</p>
+    <div class="mfoot"><p>Demo states: no real connection; nothing leaves this page.</p>
       <button class="btn primary" type="button" data-close-tools>Done</button></div>
   </div>
 </div>
@@ -644,7 +658,11 @@ if (!votes){
 let edits = lsGet('edits', {});                     // id -> {text, by, at}
 const conn = Object.assign(Object.fromEntries(D.agents.map(a => [a.key, !!a.connected])), lsGet('tools', {}));
 const connecting = new Set();
-let zoom = lsGet('zoom', 1);
+/* Zoom is relative to the page fitting its column. A phone opens at a reading
+   zoom instead (the page about 1.05x its size in points, body text near 11px)
+   and keeps its own setting; null means « use the default for this screen ». */
+const zkey = () => MOBILE.matches ? 'zoom-phone' : 'zoom';
+let zoom = lsGet(zkey(), null);
 const filt = {sev: new Set(), type: new Set(), agent: new Set()};
 let query = '', openDrop = null;
 let tab = 'all', sel = null, editing = null, listTop = false;
@@ -963,9 +981,9 @@ function rowHTML(f){
       <span class="rmain">
         <span class="rtitle">${esc(f.title)}</span>
         <span class="rmeta"><span class="rkey">${f.key}</span><span class="sevw s-${f.severity}">${SEV[f.severity]}</span><span>${TYPES[f.type]}</span><span>Page ${f.page}</span>${
-          s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : ''}</span>
+          s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : ''}${votersHTML(f)}</span>
       </span>
-      <span class="rside">${logos(agentsOf(f))}${votersHTML(f)}</span>
+      <span class="rside">${logos(agentsOf(f))}</span>
     </button>`;
 }
 
@@ -991,7 +1009,7 @@ function cardHTML(f){
     : `<div class="csugg">${diffHTML(f.quote, text)}</div>
        ${ed ? `<p class="cedited">${ic('pencil-simple')}Edited by ${esc(TEAM[ed.by] ? TEAM[ed.by].name : ed.by)}, ${ago(ed.at)}</p>` : ''}`;
   return `${head}
-    <div class="cagents">${logos(ags)}<span>Found by ${esc(names(ags.map(k => AG[k].name)))}</span></div>
+    <div class="cagents">${INLINE ? '' : logos(ags)}<span>Found by ${esc(names(ags.map(k => AG[k].name)))}</span></div>
     <div class="cfield"><div class="clabel">Current text</div><div class="cquote">${esc(f.quote)}</div></div>
     <div class="cfield"><div class="clabel">Suggestion</div>${suggestion}</div>
     ${variants.length && editing !== f.id ? `<div class="cfield"><div class="clabel">Alternative</div>${variants.map((v, i) =>
@@ -1098,7 +1116,7 @@ function renderPeek(){
 function setSheet(open){
   document.body.classList.toggle('sheet-open', open);
   const b = $('#sheetbtn'); if (b) b.setAttribute('aria-expanded', open);
-  if (open && !INLINE){ const p = $('#panel'); if (p) p.scrollTop = 0; }   // the pinned card comes first
+  if (!open || !INLINE){ const p = $('#panel'); if (p) p.scrollTop = 0; }   // folded, or the pinned card first
   else if (open && sel){
     const li = $(`#list .row[data-id="${sel}"]`);
     if (li) requestAnimationFrame(() => li.scrollIntoView({block: 'start'}));
@@ -1115,7 +1133,8 @@ function select(id, from){
   const f = id && byId[id];
   if (!f) return;
   if (from !== 'doc' && !(MOBILE.matches && document.body.classList.contains('sheet-open'))) scrollDocTo(f);
-  if (from !== 'list'){
+  // with the phone sheet folded the list is out of sight: leave it (and the peek) where they are
+  if (from !== 'list' && !(MOBILE.matches && !document.body.classList.contains('sheet-open'))){
     const li = $(`#list .row[data-id="${id}"]`);
     if (li) li.scrollIntoView({block: INLINE ? 'start' : 'nearest', behavior: 'auto'});
   }
@@ -1223,7 +1242,7 @@ function renderExport(){
 function toast(m){
   const t = $('#toast'); if (!t) return;
   t.textContent = m; t.classList.add('on');
-  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 2400);
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 2500);
 }
 
 /* ---------- keyboard: j/k walk the list, a approves, x rejects, e edits ---------- */
@@ -1255,7 +1274,7 @@ addEventListener('keydown', e => {
    The document: PDF.js pages, highlights and gutter markers
    ===================================================================== */
 const scroller = $('#scroller'), host = $('#pages');
-const MAXW = 880;
+const MAXW = 848;   // the page's widest; both directions show it at this scale
 let pdfjs = null, doc = null, mounting = null;
 const pages = [];          // {n, pg, el, sheet, canvas, hls, gut, w, h (pt), task, painted}
 
@@ -1267,10 +1286,26 @@ async function lib(){
   return pdfjs;
 }
 const cssNum = name => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0;
-function sheetWidth(){
-  // the gutter on the left holds the markers; --gutter-r balances it on wide screens
+const PHONE_READ = 1.05;   // a phone shows the page at about 1.05 CSS px per point
+function fitWidth(){
+  // the rail on the left holds the markers, so they never sit on the text
   const avail = scroller.clientWidth - cssNum('--gutter') - cssNum('--gutter-r') - cssNum('--pad-x') * 2;
-  return Math.round(Math.max(220, Math.min(avail, MAXW)) * zoom);
+  return Math.max(220, Math.min(avail, MAXW));
+}
+function zoomNow(){
+  if (zoom != null) return zoom;
+  return MOBILE.matches && pages.length ? Math.max(1, pages[0].w * PHONE_READ / fitWidth()) : 1;
+}
+function sheetWidth(){ return Math.round(fitWidth() * zoomNow()); }
+/* When the page is wider than its column (a phone at reading zoom), start at
+   the text column, just right of the marker rail, instead of the page margin. */
+function sheetLeft(P){
+  return P.sheet.getBoundingClientRect().left - scroller.getBoundingClientRect().left + scroller.scrollLeft;
+}
+function alignText(){
+  if (!pages.length || scroller.scrollWidth <= scroller.clientWidth + 2) return;
+  const P = pages[0], minx = Math.min(...pages.map(q => q.minx || 0));
+  scroller.scrollLeft = Math.max(0, sheetLeft(P) + minx / P.w * P.sheet.clientWidth - cssNum('--gutter') - 10);
 }
 
 function mount(){
@@ -1294,6 +1329,7 @@ function mount(){
     for (const f of F) if (f.rects === null) f.rects = false;
     drawMarks();
     render();
+    alignText();
     thumbs();
     document.body.classList.add('ready');
   })().catch(err => {
@@ -1312,7 +1348,7 @@ function layout(){
   }
   pages.forEach(paint);
   placeMarkers();
-  const zv = $('#zoomval'); if (zv) zv.textContent = Math.round(zoom * 100) + '%';
+  const zv = $('#zoomval'); if (zv) zv.textContent = Math.round(zoomNow() * 100) + '%';
 }
 function paint(P){
   const w = P.sheet.clientWidth || sheetWidth();
@@ -1347,6 +1383,8 @@ async function index(P){
     return {str: it.str, x: tr[4], base: tr[5], h, w: it.width,
             family: (tc.styles[it.fontName] || {}).fontFamily || 'sans-serif'};
   });
+  const xs = items.filter(it => it.str.trim()).map(it => it.x);
+  P.minx = xs.length ? Math.min(...xs) : 0;
   let s = ''; const map = [];
   items.forEach((it, i) => {
     [...it.str].forEach((ch, off) => {
@@ -1440,7 +1478,16 @@ function scrollDocTo(f){
   const top = P.sheet.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop
             + (r ? r.y * P.sheet.clientHeight - scroller.clientHeight * 0.3 : -16);
   const opts = {top: Math.max(0, top), behavior: REDUCED ? 'auto' : 'smooth'};
-  if (r && zoom > 1) opts.left = Math.max(0, r.x * P.sheet.clientWidth - scroller.clientWidth * 0.3);
+  if (r && scroller.scrollWidth > scroller.clientWidth + 2){
+    // keep the lines' starts in view (aligned to the text column) and move
+    // sideways only as far as it takes to show the whole highlight
+    const W = P.sheet.clientWidth, sl = sheetLeft(P), g = cssNum('--gutter') + 10;
+    const minx = Math.min(...pages.map(q => q.minx || 0));
+    let left = sl + minx / P.w * W - g;                                  // text column aligned
+    const need = sl + (r.x + r.w) * W + 12 - scroller.clientWidth;      // the highlight's end in view
+    if (left < need) left = Math.min(need, sl + r.x * W - g);           // but never past its start
+    opts.left = Math.max(0, left);
+  }
   scroller.scrollTo(opts);
 }
 function goPage(n){
@@ -1462,10 +1509,14 @@ function currentPage(){
 scroller.addEventListener('scroll', () => requestAnimationFrame(currentPage), {passive: true});
 $('#prevpage') && ($('#prevpage').onclick = () => goPage(Math.max(1, cur - 1)));
 $('#nextpage') && ($('#nextpage').onclick = () => goPage(Math.min(pages.length, cur + 1)));
-function setZoom(z){ zoom = Math.max(0.6, Math.min(2, Math.round(z * 10) / 10)); lsSet('zoom', zoom); layout(); }
-$('#zoomin') && ($('#zoomin').onclick = () => setZoom(zoom + 0.1));
-$('#zoomout') && ($('#zoomout').onclick = () => setZoom(zoom - 0.1));
-$('#zoomval') && ($('#zoomval').onclick = () => setZoom(1));
+function setZoom(z){
+  zoom = z == null ? null : Math.max(0.6, Math.min(2.6, Math.round(z * 10) / 10));
+  lsSet(zkey(), zoom); layout(); alignText();
+}
+$('#zoomin') && ($('#zoomin').onclick = () => setZoom(zoomNow() + 0.1));
+$('#zoomout') && ($('#zoomout').onclick = () => setZoom(zoomNow() - 0.1));
+$('#zoomval') && ($('#zoomval').onclick = () => setZoom(null));
+MOBILE.addEventListener('change', () => { zoom = lsGet(zkey(), null); layout(); });
 let rt = 0;
 new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(layout, 120); }).observe(scroller);
 
