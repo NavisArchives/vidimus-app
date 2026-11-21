@@ -20,6 +20,15 @@
     {"key": "reviewer",     "name": "Team review",  "mono": "TR", "kind": "People",         "connected": true,
      "about": "Findings your colleagues flag by hand."}
   ],
+  "workspace": "Oeverlicht Custody",
+  "library": [
+    {"title": "Custody agreement, client terms v3", "subtitle": "Oeverlicht Custody · retail clients", "pages": 12,
+     "findings": 31, "approved": 26, "rejected": 5, "status": "done", "updated_days_ago": 9, "team": ["lena", "noah"]},
+    {"title": "AML and CFT policy 2026", "subtitle": "Oeverlicht Custody · internal policy", "pages": 9,
+     "findings": 14, "status": "waiting", "updated_days_ago": 2, "team": ["sam"]},
+    {"title": "Incident register, third quarter", "subtitle": "Oeverlicht Custody · report to the DASA", "pages": 3,
+     "findings": 6, "approved": 6, "rejected": 0, "status": "done", "updated_days_ago": 23, "team": ["lena", "sam"]}
+  ],
   "team": [
     {"key": "sam",  "name": "Sam Ortega",  "role": "Compliance reviewer", "email": "sam@example.com"},
     {"key": "lena", "name": "Lena Vos",    "role": "Head of Compliance",  "email": "lena@example.com"},

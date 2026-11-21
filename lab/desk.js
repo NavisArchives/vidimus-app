@@ -153,27 +153,45 @@ function wdiff(a, b){
   while (j < m) out.push(['+', B[j++]]);
   return out;
 }
+/* The suggestion reads as the new wording only, with what changed marked in
+   green; the old words are already in « Current text » above it (Andy, 21 Nov). */
 function diffHTML(a, b){
   if (a === b) return '<span class="same">No change</span>';
   return wdiff(a, b).map(([op, t]) => {
     if (op === '=') return esc(t);
-    if (/^\s+$/.test(t)) return ' ';
-    return op === '-' ? `<del>${esc(t)}</del>` : `<ins>${esc(t)}</ins>`;
-  }).join('').replace(/ {2,}/g, ' ');
+    if (op === '-') return '';
+    return /^\s+$/.test(t) ? t : `<ins>${esc(t)}</ins>`;
+  }).join('').replace(/<\/ins>(\s+)<ins>/g, '$1').replace(/ {2,}/g, ' ');
 }
 
 /* =====================================================================
-   Screens: sign in, review, export
+   Screens: sign in, then whatever the template offers (dashboard, reviews,
+   documents, agents, review, export). A screen exists when the template has
+   a #screen-<name> for it.
    ===================================================================== */
+const HOME = document.body.dataset.home || 'review';
+const OTHERS = document.body.dataset.list === 'others';      // the selected finding is not repeated in the list
+const AUTO = 'autoselect' in document.body.dataset;          // open the review on the first open finding
+const NAV_OF = {review: 'documents', export: 'documents'};
+const firstOpen = () => (shown().find(f => tabOf(f) === 'open') || shown()[0] || {}).id || null;
 function route(){
-  let s = (location.hash.match(/^#\/(\w+)/) || [])[1] || (me ? 'review' : 'signin');
+  let s = (location.hash.match(/^#\/(\w+)/) || [])[1] || (me ? HOME : 'signin');
   if (!me) s = 'signin';
-  if (!['signin', 'review', 'export'].includes(s)) s = 'review';
+  if (s !== 'signin' && !$(`#screen-${s}`)) s = HOME;
   document.body.dataset.screen = s;
-  closeMenus(); openDrop = null;
+  closeMenus(); openDrop = null; setNav(false);
+  $$('[data-nav]').forEach(a => a.dataset.nav === (NAV_OF[s] || s) ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
+  renderCrumb(s);
   if (s === 'signin') renderSignin();
   if (s === 'export') renderExport();
-  if (s === 'review'){ render(); if (!doc) mount(); else layout(); }
+  if (s === 'dashboard') renderDashboard();
+  if (s === 'reviews') renderReviews();
+  if (s === 'documents') renderDocuments();
+  if (s === 'agents') renderTools();
+  if (s === 'review'){
+    if (AUTO && !sel) sel = firstOpen();
+    render(); if (!doc) mount(); else { layout(); if (sel) scrollDocTo(byId[sel]); }
+  }
   const main = $(`#screen-${s}`); if (main) main.scrollTop = 0;
 }
 addEventListener('hashchange', route);
@@ -193,9 +211,160 @@ function renderSignin(){
   $$('[data-signin]', host).forEach(b => b.onclick = () => {
     me = b.dataset.signin; lsSet('user', me);
     toast(`Signed in as ${TEAM[me].name}`);
-    go('review');
+    go(HOME);
   });
 }
+
+/* ---------- where am I: the header's breadcrumb ---------- */
+const SCREEN_NAME = {dashboard: 'Dashboard', reviews: 'Reviews', documents: 'Documents', agents: 'Agents'};
+function renderCrumb(s){
+  const host = $('#crumb'); if (!host) return;
+  host.innerHTML = SCREEN_NAME[s] ? `<b>${SCREEN_NAME[s]}</b>`
+    : `<a href="#/documents">Documents</a><span class="cr-sep" aria-hidden="true">/</span><b>${esc(D.document.title)}</b><span class="cr-sub">${esc(D.document.subtitle)}</span>`;
+}
+
+/* ---------- the history: every decision and edit, newest first ---------- */
+function activity(){
+  const ev = [];
+  for (const f of F){
+    for (const [k, x] of Object.entries(votesOf(f))) ev.push({at: x.at, who: k, what: x.v, f});
+    if (edits[f.id] && TEAM[edits[f.id].by]) ev.push({at: edits[f.id].at, who: edits[f.id].by, what: 'edited', f});
+  }
+  return ev.sort((a, b) => b.at - a.at);
+}
+const VERB = {approved: 'approved', rejected: 'rejected', edited: 'edited the suggestion of'};
+function activityHTML(limit){
+  const ev = activity().slice(0, limit || 1e9);
+  if (!ev.length) return '<p class="dnone">No decisions yet.</p>';
+  return `<ul class="alist">${ev.map(e => `<li>${avatar(e.who, 'sm' + (e.what === 'edited' ? '' : ' v-' + e.what))}
+    <span class="atext"><b>${esc(TEAM[e.who].name)}</b> ${VERB[e.what]} <a href="#/review" data-goto="${e.f.id}">${e.f.key}</a>
+      <span class="atitle">${esc(e.f.title)}</span></span><time>${ago(e.at)}</time></li>`).join('')}</ul>`;
+}
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-goto]');
+  if (!g) return;
+  e.preventDefault();
+  sel = g.dataset.goto; editing = null;
+  if (!pass(byId[sel])){ filt.sev.clear(); filt.type.clear(); filt.agent.clear(); query = ''; tab = 'all'; }
+  go('review');
+});
+function greeting(){ const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; }
+const DOC_STATUS = {review: 'In review', waiting: 'Waiting for review', done: 'Done'};
+function libDocs(){
+  const all = F.filter(live), decided = all.filter(f => tabOf(f) !== 'open').length;
+  const touched = activity()[0];
+  return [{title: D.document.title, subtitle: D.document.subtitle, pages: D.document.pages, findings: all.length,
+           decided, status: 'review', updated: touched ? ago(touched.at) : 'today', team: D.team.map(u => u.key), live: true}]
+    .concat((D.library || []).map(d => Object.assign({}, d, {updated: `${d.updated_days_ago} d ago`})));
+}
+
+function renderDashboard(){
+  const host = $('#dashboard-root'); if (!host || !me) return;
+  const all = F.filter(live), n = s => all.filter(f => tabOf(f) === s).length;
+  const decided = all.length - n('open'), on = D.agents.filter(a => conn[a.key]);
+  const openSev = s => all.filter(f => tabOf(f) === 'open' && f.severity === s).length;
+  host.innerHTML = `
+    <div class="pg-head"><h1>${greeting()}, ${esc(TEAM[me].name.split(' ')[0])}</h1>
+      <p>${plural(n('open'), 'finding is', 'findings are')} waiting for a decision in ${esc(D.workspace || 'your workspace')}.</p></div>
+    <div class="dash">
+      <section class="dcard dcont">
+        <span class="dlabel">Continue reviewing</span>
+        <h2>${esc(D.document.title)}</h2><p class="dsub">${esc(D.document.subtitle)}</p>
+        <div class="dprog"><span class="bar"><i style="--p:${all.length ? decided / all.length : 0}"></i></span><span><b>${decided}</b> of ${all.length} decided</span></div>
+        <div class="dsev">${['high', 'medium', 'low'].map(s => `<span><i class="dot s-${s}"></i>${SEV[s]}<b>${openSev(s)}</b><small>open</small></span>`).join('')}</div>
+        <a class="btn primary" href="#/review">Continue review ${ic('arrow-right')}</a>
+      </section>
+      <section class="dcard dstats">
+        ${[['Open', n('open'), ''], ['Approved', n('approved'), 'approved'], ['Rejected', n('rejected'), ''],
+           ['Agents connected', `${on.length}<small> of ${D.agents.length}</small>`, '']].map(([l, v, k]) =>
+          `<div class="dstat${k ? ' st-' + k : ''}"><span>${l}</span><b>${v}</b></div>`).join('')}
+      </section>
+      <section class="dcard dact"><div class="dhead"><h3>Recent activity</h3><a class="linkbtn" href="#/reviews">All reviews</a></div>${activityHTML(5)}</section>
+      <section class="dcard ddocs"><div class="dhead"><h3>Documents</h3><a class="linkbtn" href="#/documents">All documents</a></div>
+        <ul class="dlist2">${libDocs().slice(0, 3).map(d => `<li><span class="dt"><b>${esc(d.title)}</b><span>${DOC_STATUS[d.status]}</span></span>
+          <span class="dn">${d.status === 'review' ? `${d.decided}/${d.findings}` : d.findings}</span></li>`).join('')}</ul></section>
+    </div>`;
+}
+
+let rvTab = 'all';
+function renderReviews(){
+  const host = $('#reviews-root'); if (!host || !me) return;
+  const all = F.filter(live), rows = all.filter(f => rvTab === 'all' || tabOf(f) === rvTab);
+  const n = s => s === 'all' ? all.length : all.filter(f => tabOf(f) === s).length;
+  host.innerHTML = `
+    <div class="pg-head"><h1>Reviews</h1><p>Every finding and every decision, with who made it and when.</p></div>
+    <div class="rv">
+      <section class="dcard rvlist">
+        <div class="dhead"><h3>${esc(D.document.title)}</h3><a class="linkbtn" href="#/review">Open document</a></div>
+        <div class="seg rvtabs" role="tablist" aria-label="Status">${[['all', 'All'], ['open', 'Open'], ['approved', 'Approved'], ['rejected', 'Rejected']].map(([k, l]) =>
+          `<button type="button" role="tab" aria-selected="${rvTab === k}" data-rvtab="${k}">${l}<span class="n">${n(k)}</span></button>`).join('')}</div>
+        <ul class="rvrows">${rows.map(f => { const s = statusOf(f), v = Object.entries(votesOf(f));
+          return `<li><a href="#/review" data-goto="${f.id}" class="rvrow">
+            <span class="mk-mini s-${f.severity} st-${s}">${f.n}</span>
+            <span class="rvmain"><b>${esc(f.title)}</b><span class="rmeta"><span class="rkey">${f.key}</span><span class="sevw s-${f.severity}">${SEV[f.severity]}</span><span>${TYPES[f.type]}</span><span>Page ${f.page}</span>
+              ${s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : '<span class="stat st-open">Open</span>'}</span></span>
+            <span class="rvwho">${v.length ? v.map(([k, x]) => avatar(k, 'xs v-' + x.v)).join('') : ''}</span></a></li>`; }).join('') || '<li class="empty">Nothing here.</li>'}</ul>
+      </section>
+      <section class="dcard rvact"><div class="dhead"><h3>History</h3></div>${activityHTML()}</section>
+      <section class="dcard rvold"><div class="dhead"><h3>Earlier documents</h3></div>
+        <ul class="dlist2">${(D.library || []).filter(d => d.status === 'done').map(d => `<li><span class="dt"><b>${esc(d.title)}</b>
+          <span>${d.findings} findings: ${d.approved} approved, ${d.rejected} rejected, ${d.updated_days_ago} d ago</span></span>
+          <span class="avs">${(d.team || []).map(k => avatar(k, 'xs')).join('')}</span></li>`).join('')}</ul>
+        <p class="pg-note">Sample entries: only ${esc(D.document.title)} is loaded in this demo.</p></section>
+    </div>`;
+  $$('[data-rvtab]', host).forEach(b => b.onclick = () => { rvTab = b.dataset.rvtab; renderReviews(); $(`[data-rvtab="${rvTab}"]`, host).focus(); });
+}
+
+function renderDocuments(){
+  const host = $('#documents-root'); if (!host || !me) return;
+  host.innerHTML = `
+    <div class="pg-head"><h1>Documents</h1><p>Everything your team has had read and reviewed in ${esc(D.workspace || 'this workspace')}.</p></div>
+    <section class="dcard doctable">
+      <div class="dt-head" aria-hidden="true"><span>Document</span><span>Pages</span><span>Findings</span><span>Status</span><span>Updated</span><span>Team</span></div>
+      <ul>${libDocs().map((d, i) => `<li class="dt-row${d.live ? ' live' : ''}">
+        <span class="dt-doc">${ic('file-text')}<span><b>${esc(d.title)}</b><small>${esc(d.subtitle)}</small></span></span>
+        <span class="dt-n" data-l="Pages">${d.pages}</span>
+        <span class="dt-n" data-l="Findings">${d.status === 'review' ? `${d.decided}/${d.findings} decided` : d.findings}</span>
+        <span data-l="Status"><span class="stat st-${d.status === 'done' ? 'approved' : d.status === 'review' ? 'split' : 'open'}">${DOC_STATUS[d.status]}</span></span>
+        <span class="dt-n" data-l="Updated">${esc(d.updated)}</span>
+        <span class="avs">${(d.team || []).map(k => avatar(k, 'xs')).join('')}</span>
+        ${d.live ? `<a class="btn small primary" href="#/review">Open</a>` : `<button type="button" class="btn small" data-sample="${i}">Open</button>`}
+      </li>`).join('')}</ul>
+    </section>
+    <p class="pg-note">Only ${esc(D.document.title)} is loaded in this demo; the other rows are sample entries.</p>`;
+  $$('[data-sample]', host).forEach(b => b.onclick = () => toast(`Sample entry: only ${D.document.title} is loaded`));
+}
+
+/* ---------- the sidebar: folded by default, opened from the header ----------
+   On a desk it pushes the review aside and the choice is remembered; on a
+   phone it is a drawer over the page that closes on every move. */
+function setNav(open){
+  document.body.classList.toggle('nav-open', !!open);
+  if (MOBILE.matches) $('#sidebtn')?.setAttribute('aria-expanded', !!open);
+}
+function setSide(open){
+  document.body.classList.toggle('side-open', !!open);
+  lsSet('side', !!open);
+  $('#sidebtn')?.setAttribute('aria-expanded', !!open);
+}
+if ($('#sidebtn')){
+  if (lsGet('side', false)) document.body.classList.add('side-open');
+  $('#sidebtn').setAttribute('aria-expanded', !MOBILE.matches && document.body.classList.contains('side-open'));
+  $('#sidebtn').onclick = e => {
+    e.stopPropagation();
+    if (MOBILE.matches) setNav(!document.body.classList.contains('nav-open'));
+    else setSide(!document.body.classList.contains('side-open'));
+  };
+}
+$('#wsbtn') && ($('#wsbtn').onclick = e => {
+  e.stopPropagation();
+  const m = $('#wsmenu');
+  if (!m.hidden){ closeMenus(); return; }
+  m.innerHTML = `<div class="um-label">Workspaces</div>
+    <button type="button" class="um-item" role="menuitemradio" aria-checked="true">${ic('buildings')}<span>${esc(D.workspace || 'Workspace')}</span>${ic('check', 'um-check')}</button>
+    <p class="ws-note">This demo has one workspace.</p>`;
+  m.hidden = false; e.currentTarget.setAttribute('aria-expanded', 'true'); $('button', m)?.focus();
+});
 
 /* ---------- top bar: progress, tools, account ---------- */
 function renderTop(){
@@ -230,8 +399,8 @@ function renderUserMenu(){
   $('[data-signout]', host).onclick = () => { me = null; lsSet('user', null); closeMenus(); go('signin'); };
 }
 function closeMenus(){
-  const m = $('#usermenu'), b = $('#avatarbtn');
-  if (m && !m.hidden){ m.hidden = true; b && b.setAttribute('aria-expanded', 'false'); }
+  for (const [m, b] of [[$('#usermenu'), $('#avatarbtn')], [$('#wsmenu'), $('#wsbtn')]])
+    if (m && !m.hidden){ m.hidden = true; b && b.setAttribute('aria-expanded', 'false'); }
 }
 $('#avatarbtn') && ($('#avatarbtn').onclick = e => {
   e.stopPropagation();
@@ -242,7 +411,9 @@ $('#avatarbtn') && ($('#avatarbtn').onclick = e => {
 
 /* ---------- connect your tools: a full pop-up, sample states only ---------- */
 function renderTools(){
-  const host = $('#toolsgrid'); if (!host) return;
+  for (const host of $$('#toolsgrid,[data-toolsgrid]')) toolsInto(host);
+}
+function toolsInto(host){
   host.innerHTML = D.agents.map(a => {
     const on = conn[a.key], busy = connecting.has(a.key);
     return `<li class="tcard${on ? ' on' : ''}${busy ? ' busy' : ''}">
@@ -316,16 +487,11 @@ function renderFilters(){
         ? `<label class="search">${ic('magnifying-glass')}<input type="search" placeholder="Search findings" aria-label="Search findings" data-q></label>
            ${Object.keys(GROUPS).map(g => `<div class="fgroup" role="group" aria-label="${GROUPS[g]}"><div class="flabel">${GROUPS[g]}</div><div class="fitems" data-items="${g}"></div></div>`).join('')}
            <button type="button" class="linkbtn fclear" data-clear hidden>Clear filters</button>`
-        : `<div class="fbar"><label class="search">${ic('magnifying-glass')}<input type="search" placeholder="Search" aria-label="Search findings" data-q></label>
+        : `<div class="fbar">${host.dataset.search === 'none' ? '' : `<label class="search">${ic('magnifying-glass')}<input type="search" placeholder="Search" aria-label="Search findings" data-q></label>`}
            ${Object.keys(GROUPS).map(g => `<div class="fdrop"><button type="button" class="fbtn" aria-haspopup="true" aria-expanded="false" data-dropbtn="${hi}:${g}"></button>
              <div class="fmenu" role="menu" aria-label="${GROUPS[g]}" data-menu="${hi}:${g}" hidden></div></div>`).join('')}
            <button type="button" class="fbtn fx" data-clear hidden title="Clear filters">${ic('x')}<span>Clear</span></button></div>`;
-      $('[data-q]', host).addEventListener('input', e => {
-        query = e.target.value.trim().toLowerCase();
-        $$('[data-q]').forEach(q => { if (q !== e.target) q.value = e.target.value; });
-        if (sel && !pass(byId[sel])) sel = null;
-        listTop = true; render();
-      });
+      const q = $('[data-q]', host); if (q) q.addEventListener('input', onQuery);
     }
     if (facets){
       for (const g of Object.keys(GROUPS))
@@ -345,6 +511,37 @@ function renderFilters(){
   const n = filt.sev.size + filt.type.size + filt.agent.size;
   $$('[data-fcount]').forEach(el => el.textContent = n ? `${n} on` : '');
 }
+/* Search: typed anywhere, kept in step everywhere. A [data-searchbox] is a
+   magnifier that opens into the field (also with /) and folds away again. */
+let searchOpen = false;
+function onQuery(e){
+  query = e.target.value.trim().toLowerCase();
+  $$('[data-q]').forEach(q => { if (q !== e.target) q.value = e.target.value; });
+  if (sel && !pass(byId[sel])) sel = null;
+  listTop = true; render();
+}
+function renderSearchBox(){
+  for (const h of $$('[data-searchbox]')){
+    if (!h.dataset.built){
+      h.dataset.built = '1';
+      h.innerHTML = `<button type="button" class="sbtn" data-sopen aria-label="Search findings" title="Search (/)">${ic('magnifying-glass')}</button>
+        <label class="search sfield">${ic('magnifying-glass')}<input type="search" placeholder="Search findings" aria-label="Search findings" data-q>
+        <button type="button" class="sclose" data-sclose aria-label="Close search">${ic('x')}</button></label>`;
+      const q = $('[data-q]', h);
+      q.addEventListener('input', onQuery);
+      q.addEventListener('keydown', e => { if (e.key === 'Escape'){ e.stopPropagation(); closeSearch(); } });
+      $('[data-sopen]', h).onclick = () => { searchOpen = true; renderSearchBox(); q.focus(); };
+      $('[data-sclose]', h).onclick = closeSearch;
+    }
+    h.classList.toggle('open', searchOpen || !!query);
+  }
+}
+function closeSearch(){
+  searchOpen = false;
+  if (query){ query = ''; $$('[data-q]').forEach(q => q.value = ''); listTop = true; }
+  render(); $('[data-sopen]')?.focus();
+}
+
 /* On narrow screens folded filter areas close; on a desk they stay open. */
 for (const d of $$('details[data-fold]')){
   const mq = d.dataset.fold ? matchMedia(d.dataset.fold) : MOBILE;
@@ -371,8 +568,11 @@ document.addEventListener('click', e => {
   if (openDrop && !e.target.closest('.fmenu')){ openDrop = null; renderFilters(); }
 });
 document.addEventListener('pointerdown', e => {
-  const m = $('#usermenu');
-  if (m && !m.hidden && !m.contains(e.target) && !e.target.closest('#avatarbtn')) closeMenus();
+  for (const [m, b] of [['#usermenu', '#avatarbtn'], ['#wsmenu', '#wsbtn']]){
+    const el = $(m);
+    if (el && !el.hidden && !el.contains(e.target) && !e.target.closest(b)) closeMenus();
+  }
+  if (document.body.classList.contains('nav-open') && !e.target.closest('#side,#sidebtn')) setNav(false);
 });
 
 function renderTabs(){
@@ -399,9 +599,9 @@ function rowHTML(f){
       <span class="rmain">
         <span class="rtitle">${esc(f.title)}</span>
         <span class="rmeta"><span class="rkey">${f.key}</span><span class="sevw s-${f.severity}">${SEV[f.severity]}</span><span>${TYPES[f.type]}</span><span>Page ${f.page}</span>${
-          s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : ''}${votersHTML(f)}</span>
+          s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : ''}</span>
       </span>
-      <span class="rside">${logos(agentsOf(f))}</span>
+      <span class="rside">${logos(agentsOf(f))}${votersHTML(f)}</span>
     </button>`;
 }
 
@@ -418,7 +618,10 @@ function cardHTML(f){
   const head = INLINE ? '' : `
     <header class="chead"><span class="mk-mini s-${f.severity} st-${statusOf(f)}">${f.n}</span><span class="ckey">${f.key}</span>
       <span class="sevw s-${f.severity}">${SEV[f.severity]}</span><span class="ctype">${TYPES[f.type]}</span>
-      <button type="button" class="cpage" data-show>${ic('crosshair-simple')}Page ${f.page}</button></header>
+      <button type="button" class="cpage" data-show>${ic('crosshair-simple')}Page ${f.page}</button>${
+      'cardnav' in document.body.dataset ? (() => { const fs = shown(), i = fs.findIndex(x => x.id === f.id);
+        return `<span class="cnav"><button type="button" data-step="-1" aria-label="Previous finding (K)"${i <= 0 ? ' disabled' : ''}>${ic('caret-up')}</button>
+          <span>${i + 1} of ${fs.length}</span><button type="button" data-step="1" aria-label="Next finding (J)"${i >= fs.length - 1 ? ' disabled' : ''}>${ic('caret-down')}</button></span>`; })() : ''}</header>
     <h2 class="ctitle">${esc(f.title)}</h2>`;
   const suggestion = editing === f.id
     ? `<textarea class="cinput" id="ta-${f.id}" rows="2" spellcheck="true" aria-label="Suggestion for ${f.key}">${esc(text)}</textarea>
@@ -468,12 +671,16 @@ function wireCard(el, f){
   $('.reject', el).onclick = () => vote(f.id, 'rejected');
   $('.edit', el).onclick = () => editing === f.id ? (editing = null, render()) : startEdit(f.id);
   $$('[data-show]', el).forEach(b => b.onclick = () => showInDoc(f));
+  $$('[data-step]', el).forEach(b => b.onclick = () => {
+    const fs = shown(), i = fs.findIndex(x => x.id === f.id), nx = fs[i + +b.dataset.step];
+    if (nx) select(nx.id, 'key');
+  });
 }
 
 function renderList(){
   const host = $('#list'); if (!host) return;
   if (listTop){ host.scrollTop = 0; listTop = false; }
-  const fs = shown();
+  const fs = shown().filter(f => !(OTHERS && f.id === sel));
   if (!fs.length){
     host.innerHTML = `<li class="empty">${ic('funnel-simple')}<b>${F.some(live) ? 'No findings match' : 'No tools are connected'}</b>
       <span>${F.some(live) ? 'Try another filter or clear them.' : 'Connect a tool to see what it finds.'}</span>
@@ -669,16 +876,23 @@ addEventListener('keydown', e => {
     if ($('#toolsmodal') && !$('#toolsmodal').hidden) return closeTools();
     if (openDrop){ openDrop = null; renderFilters(); return; }
     if ($('#usermenu') && !$('#usermenu').hidden){ closeMenus(); $('#avatarbtn')?.focus(); return; }
+    if ($('#wsmenu') && !$('#wsmenu').hidden){ closeMenus(); $('#wsbtn')?.focus(); return; }
+    if (document.body.classList.contains('nav-open')){ setNav(false); $('#sidebtn')?.focus(); return; }
     if (document.body.classList.contains('sheet-open')) return setSheet(false);
     if (editing){ editing = null; render(); return; }
-    if (sel){ sel = null; render(); }
+    if (sel && !AUTO){ sel = null; render(); }
     return;
   }
   if (document.body.dataset.screen !== 'review' || document.body.classList.contains('modal-open')) return;
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   if (/^(TEXTAREA|INPUT|SELECT)$/.test(e.target.tagName)) return;
   const k = e.key.toLowerCase();
-  if (k === '/'){ const q = $$('[data-q]').find(x => x.offsetParent); if (q){ e.preventDefault(); q.focus(); } return; }
+  if (k === '/'){
+    e.preventDefault();
+    if ($('[data-searchbox]') && !searchOpen){ searchOpen = true; renderSearchBox(); }
+    const q = $$('[data-q]').find(x => x.offsetParent); if (q) q.focus();
+    return;
+  }
   const fs = shown(); if (!fs.length) return;
   const i = fs.findIndex(f => f.id === sel);
   if (k === 'j'){ e.preventDefault(); select(fs[i < 0 ? 0 : Math.min(i + 1, fs.length - 1)].id, 'key'); }
@@ -748,6 +962,7 @@ function mount(){
     drawMarks();
     render();
     alignText();
+    if (sel) scrollDocTo(byId[sel]);
     thumbs();
     document.body.classList.add('ready');
   })().catch(err => {
@@ -964,7 +1179,11 @@ function thumbMarks(){
 
 /* ---------- everything that follows from the state ---------- */
 function render(){
-  renderTop(); renderFilters(); renderTabs(); renderList(); renderDetail(); renderPeek();
+  // with a pinned card there is always a finding in it: when filters or search hide
+  // the current one, the first one that matches takes its place
+  if (AUTO && document.body.dataset.screen === 'review' && (!sel || !pass(byId[sel]))) sel = firstOpen();
+  renderTop(); renderSearchBox(); renderFilters(); renderTabs(); renderList(); renderDetail(); renderPeek();
+  if (document.body.dataset.screen === 'agents') renderTools();
   if ($('#toolsmodal') && !$('#toolsmodal').hidden) renderTools();
   paintMarks();
 }
