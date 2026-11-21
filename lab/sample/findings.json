@@ -1,0 +1,204 @@
+{
+  "about": "Invented sample. The document, the firm, the regulator and the framework are made up, and so are these findings: the mistakes were put in note.html on purpose. Each quote must appear exactly once on its page of note.pdf (lab/build.py checks it).",
+  "document": {
+    "title": "Compliance note CN-2026-07",
+    "subtitle": "Oeverlicht Custody · CAFR licence application",
+    "file": "note.pdf",
+    "pages": 4
+  },
+  "agents": [
+    {"key": "claude",       "name": "Claude",       "mono": "CL", "kind": "AI model",       "connected": true,
+     "about": "Reads for figures, references and consistency."},
+    {"key": "chatgpt",      "name": "ChatGPT",      "mono": "GP", "kind": "AI model",       "connected": true,
+     "about": "Reads for terminology and figures."},
+    {"key": "gemini",       "name": "Gemini",       "mono": "GE", "kind": "AI model",       "connected": true,
+     "about": "Cross-checks numbers, names and dates."},
+    {"key": "grok",         "name": "Grok",         "mono": "GR", "kind": "AI model",       "connected": false,
+     "about": "A second opinion on references and deadlines."},
+    {"key": "languagetool", "name": "LanguageTool", "mono": "LT", "kind": "Language check", "connected": true,
+     "about": "Spelling and grammar. Runs on your own machine."},
+    {"key": "reviewer",     "name": "Team review",  "mono": "TR", "kind": "People",         "connected": true,
+     "about": "Findings your colleagues flag by hand."}
+  ],
+  "workspace": "Oeverlicht Custody",
+  "library": [
+    {"title": "Custody agreement, client terms v3", "subtitle": "Oeverlicht Custody · retail clients", "pages": 12,
+     "findings": 31, "approved": 26, "rejected": 5, "status": "done", "updated_days_ago": 9, "team": ["lena", "noah"]},
+    {"title": "AML and CFT policy 2026", "subtitle": "Oeverlicht Custody · internal policy", "pages": 9,
+     "findings": 14, "status": "waiting", "updated_days_ago": 2, "team": ["sam"]},
+    {"title": "Incident register, third quarter", "subtitle": "Oeverlicht Custody · report to the DASA", "pages": 3,
+     "findings": 6, "approved": 6, "rejected": 0, "status": "done", "updated_days_ago": 23, "team": ["lena", "sam"]}
+  ],
+  "team": [
+    {"key": "sam",  "name": "Sam Ortega",  "role": "Compliance reviewer", "email": "sam@example.com"},
+    {"key": "lena", "name": "Lena Vos",    "role": "Head of Compliance",  "email": "lena@example.com"},
+    {"key": "noah", "name": "Noah Brandt", "role": "Legal counsel",       "email": "noah@example.com"}
+  ],
+  "decisions": [
+    {"finding": "f01", "by": "lena", "verdict": "approved", "minutes_ago": 118},
+    {"finding": "f05", "by": "lena", "verdict": "approved", "minutes_ago": 96},
+    {"finding": "f05", "by": "noah", "verdict": "approved", "minutes_ago": 61},
+    {"finding": "f06", "by": "noah", "verdict": "approved", "minutes_ago": 52},
+    {"finding": "f11", "by": "lena", "verdict": "approved", "minutes_ago": 44},
+    {"finding": "f11", "by": "noah", "verdict": "rejected", "minutes_ago": 40},
+    {"finding": "f14", "by": "noah", "verdict": "rejected", "minutes_ago": 31}
+  ],
+  "findings": [
+    {
+      "id": "f01", "page": 1, "severity": "high", "type": "figures",
+      "quote": "minimum capital of €150,000",
+      "suggestion": "minimum capital of €125,000",
+      "title": "Class 2 minimum capital differs from Table 1",
+      "note": "Table 1 on page 2 gives €125,000 for class 2. €150,000 is the amount for class 3.",
+      "agents": ["claude", "chatgpt", "reviewer"]
+    },
+    {
+      "id": "f02", "page": 1, "severity": "low", "type": "language",
+      "quote": "The licence are expected",
+      "suggestion": "The licence is expected",
+      "title": "Subject and verb disagree: ‘licence are’",
+      "note": "‘Licence’ is singular, so the verb is ‘is’.",
+      "agents": ["languagetool", "gemini"]
+    },
+    {
+      "id": "f03", "page": 1, "severity": "medium", "type": "terminology",
+      "quote": "asset-referenced tokens",
+      "suggestion": "asset-linked tokens",
+      "title": "Term differs from the note’s own definition",
+      "note": "Section 8 defines ‘asset-linked token’. Use the defined term, as the same sentence does for ‘e-money tokens’.",
+      "agents": ["chatgpt", "claude"],
+      "variants": [{"agent": "claude", "text": "tokens whose value is linked to other assets"}]
+    },
+    {
+      "id": "f04", "page": 1, "severity": "low", "type": "terminology",
+      "quote": "assesses the issuer's prospectus",
+      "suggestion": "assesses the issuer's white paper",
+      "title": "‘Prospectus’ where the note means the white paper",
+      "note": "Under the CAFR an issuer publishes a white paper (section 8), and the next sentence says ‘white paper’ too.",
+      "agents": ["grok"]
+    },
+    {
+      "id": "f05", "page": 2, "severity": "high", "type": "reference",
+      "quote": "Article 62 CAFR divides",
+      "suggestion": "Article 26 CAFR divides",
+      "title": "Wrong article number for the capital requirements",
+      "note": "Footnote 1 and the definitions both give Article 26 CAFR. The digits look swapped.",
+      "agents": ["claude", "grok"]
+    },
+    {
+      "id": "f06", "page": 2, "severity": "high", "type": "figures",
+      "quote": "One quarter of that is €435,000",
+      "suggestion": "One quarter of that is €535,000",
+      "title": "Arithmetic: a quarter of €2,140,000 is €535,000",
+      "note": "2,140,000 divided by 4 is 535,000. The conclusion of the sentence still holds; the amount does not.",
+      "agents": ["claude", "gemini"]
+    },
+    {
+      "id": "f07", "page": 2, "severity": "medium", "type": "figures",
+      "quote": "€1,000,0000",
+      "suggestion": "€1,000,000",
+      "title": "Amount with one digit too many",
+      "note": "‘1,000,0000’ is not a valid amount. €1,000,000 is the likely meaning; check it against the quarterly figures.",
+      "agents": ["chatgpt"]
+    },
+    {
+      "id": "f08", "page": 2, "severity": "low", "type": "language",
+      "quote": "never stores it's keys",
+      "suggestion": "never stores its keys",
+      "title": "‘It’s’ where the possessive ‘its’ is meant",
+      "note": "‘It’s’ means ‘it is’. The possessive has no apostrophe.",
+      "agents": ["languagetool", "reviewer"],
+      "variants": [{"agent": "reviewer", "text": "never stores the keys"}]
+    },
+    {
+      "id": "f09", "page": 2, "severity": "medium", "type": "reference",
+      "quote": "(see section 7.2)",
+      "suggestion": "(see Table 2)",
+      "title": "Reference to a section that does not exist",
+      "note": "Section 7 has no subsections. The 24-hour deadline for a reconciliation difference is in Table 2.",
+      "agents": ["claude"]
+    },
+    {
+      "id": "f10", "page": 3, "severity": "high", "type": "consistency",
+      "quote": "Because 80% of client assets are kept in cold storage",
+      "suggestion": "Because at least 90% of client assets are kept in cold storage",
+      "title": "80% in cold storage, where sections 1 and 4 say 90%",
+      "note": "Section 1 and section 4 both say at least 90% is kept in cold storage.",
+      "agents": ["gemini", "claude"]
+    },
+    {
+      "id": "f11", "page": 3, "severity": "high", "type": "figures",
+      "quote": "15% money market funds",
+      "suggestion": "5% money market funds",
+      "title": "The parts of the reserve add up to 110%",
+      "note": "60% + 35% + 15% = 110%. One of the three shares is wrong; confirm with Treasury before the text changes.",
+      "agents": ["claude", "chatgpt", "gemini"]
+    },
+    {
+      "id": "f12", "page": 3, "severity": "high", "type": "consistency",
+      "quote": "financial intelligence unit within 30 days",
+      "suggestion": "financial intelligence unit within 14 days",
+      "title": "Reporting deadline differs from Table 2",
+      "note": "Table 2, just above, gives 14 days for an unusual transaction.",
+      "agents": ["grok", "reviewer"]
+    },
+    {
+      "id": "f13", "page": 3, "severity": "medium", "type": "reference",
+      "quote": "See Table 3 for the full list",
+      "suggestion": "See Table 2 for the full list",
+      "title": "There is no Table 3",
+      "note": "The note has two tables. The reporting deadlines are in Table 2.",
+      "agents": ["chatgpt"]
+    },
+    {
+      "id": "f14", "page": 3, "severity": "medium", "type": "terminology",
+      "quote": "The crypto service provider keeps a register",
+      "suggestion": "Oeverlicht keeps a register",
+      "title": "Term differs from ‘crypto-asset service provider’",
+      "note": "Section 8 defines ‘crypto-asset service provider’. Here it means Oeverlicht itself, so the name is clearest.",
+      "agents": ["gemini", "chatgpt"],
+      "variants": [{"agent": "chatgpt", "text": "The crypto-asset service provider keeps a register"}]
+    },
+    {
+      "id": "f15", "page": 3, "severity": "low", "type": "language",
+      "quote": "notifed",
+      "suggestion": "notified",
+      "title": "Spelling: ‘notified’",
+      "note": "Missing letter: notified.",
+      "agents": ["languagetool"]
+    },
+    {
+      "id": "f16", "page": 4, "severity": "high", "type": "figures",
+      "quote": "submitted on 31 June 2026",
+      "suggestion": "submitted on 30 June 2026",
+      "title": "The date does not exist: June has 30 days",
+      "note": "There is no 31 June. Check the date on the DASA’s acknowledgement of receipt.",
+      "agents": ["reviewer", "claude"],
+      "variants": [{"agent": "claude", "text": "submitted on 1 July 2026"}]
+    },
+    {
+      "id": "f17", "page": 4, "severity": "low", "type": "language",
+      "quote": "governance and the the custody",
+      "suggestion": "governance and the custody",
+      "title": "Repeated word: ‘the the’",
+      "note": "‘The’ appears twice in a row.",
+      "agents": ["languagetool"]
+    },
+    {
+      "id": "f18", "page": 4, "severity": "medium", "type": "consistency",
+      "quote": "decision period of 20 working days",
+      "suggestion": "decision period of 25 working days",
+      "title": "Decision period: 20 working days here, 25 above",
+      "note": "The paragraph above the list gives 25 working days.",
+      "agents": ["chatgpt", "grok"]
+    },
+    {
+      "id": "f19", "page": 4, "severity": "medium", "type": "consistency",
+      "quote": "Oeverlight Custody B.V. declares",
+      "suggestion": "Oeverlicht Custody B.V. declares",
+      "title": "Company name misspelt",
+      "note": "Everywhere else it is Oeverlicht, with ‘ch’. In a declaration the exact name matters.",
+      "agents": ["gemini", "reviewer"]
+    }
+  ]
+}

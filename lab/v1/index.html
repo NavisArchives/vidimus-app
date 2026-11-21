@@ -1,0 +1,2106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>Vidimus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap">
+<style>
+/* Vidimus lab · v1 « Paper » (round 2)
+   Light and cool-neutral. A sidebar folded away, its toggle at the far left
+   of the header where a logo would sit; the pages on a grey table with one bar under
+   them (shortcuts, pages, zoom) that hides behind a small arrow; three
+   floating cards on the right: the findings header, the selected finding
+   (the Revision 1 card), the other findings folded together underneath.
+   Colour: near-black for structure, emerald for approval (and only approval),
+   three severity colours that appear nowhere else. Shape rule: cards 16px,
+   controls 9px, menu rows 7px; avatars, markers and logos round.
+   Motion: press feedback (scale .97), pop-ups scale in from .97 in 160ms,
+   the sidebar slides in 240ms, nothing animates on keyboard navigation. */
+:root{
+  --bg:#F1F1F2; --surface:#FFFFFF; --surface-2:#FAFAFA; --hover:#F4F4F5;
+  --ink:#18181B; --ink-2:#3F3F46; --muted:#66666E;
+  --line:#E4E4E7; --line-2:#D4D4D8;
+  --accent:#047857; --accent-2:#065F46; --accent-soft:#ECFDF5; --accent-hl:rgba(0,190,110,.3);
+  --high:#D02E2E; --high-soft:#FEF2F2; --high-hl:rgba(255,64,64,.28);
+  --medium:#B45309; --medium-soft:#FFF7E6; --medium-hl:rgba(255,190,0,.47);
+  --low:#5B6B82; --low-soft:#F1F5F9; --low-hl:rgba(60,110,180,.2);
+  --r-card:16px; --r-lg:14px; --r:9px; --r-sm:7px;
+  --ring:0 0 0 1px rgba(24,24,27,.06);
+  --float:0 0 0 1px rgba(24,24,27,.06),0 1px 2px rgba(24,24,27,.04),0 10px 28px -14px rgba(24,24,27,.18);
+  --pop:0 0 0 1px rgba(24,24,27,.08),0 16px 40px -12px rgba(24,24,27,.28);
+  --ease:cubic-bezier(.23,1,.32,1);
+  --side:232px; --top:58px; --col:432px; --lane:404px; --lane-gap:32px;
+  /* the lane's spacing grid: 8 px steps (4 and 12 for fine steps); every card shares the 24 px inner edge */
+  --g1:4px; --g2:8px; --g3:12px; --g4:16px; --g6:24px; --g8:32px;
+  --gutter:0px; --gutter-r:0px; --pad-x:12px; --peek:164px; --dock:44px;
+  --sans:'Geist',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:inherit}
+input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:var(--r-sm)}
+[hidden]{display:none !important}
+.ic{width:16px;height:16px;flex:none;vertical-align:middle}
+kbd{font:500 10.5px/1 var(--sans);min-width:18px;height:18px;display:inline-grid;place-items:center;padding:0 4px;
+  border-radius:5px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line),0 1px 0 var(--line);color:var(--ink-2)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- frame: header on top, sidebar and screens below ---------- */
+.screen{display:none}
+body[data-screen="signin"] #screen-signin{display:flex}
+body[data-screen="signin"] .app{display:none}
+.app{height:100%;display:grid;grid-template-rows:var(--top) minmax(0,1fr);grid-template-columns:auto minmax(0,1fr)}
+/* the sidebar toggle takes the logo's place at the far left of the header; it never moves */
+.top{grid-column:1 / -1;display:flex;align-items:center;gap:10px;padding:0 16px 0 10px;position:relative;z-index:20}
+.side{grid-row:2;width:0;overflow:hidden;visibility:hidden;transition:width .24s var(--ease),visibility 0s .24s}
+body.side-open .side{width:var(--side);visibility:visible;transition:width .24s var(--ease)}
+.content{grid-row:2;grid-column:2;min-width:0;min-height:0;display:flex;flex-direction:column}
+.content > .screen{flex:1;min-height:0}
+body[data-screen="review"] #screen-review{display:grid}
+body[data-screen="dashboard"] #screen-dashboard,body[data-screen="reviews"] #screen-reviews,
+body[data-screen="documents"] #screen-documents,body[data-screen="agents"] #screen-agents,
+body[data-screen="export"] #screen-export{display:block;overflow:auto}
+
+/* ---------- shared pieces ---------- */
+.logo{width:24px;height:24px;color:var(--ink);flex:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:34px;padding:0 13px;
+  border-radius:var(--r);border:0;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line-2);color:var(--ink);
+  font-weight:500;font-size:13.5px;white-space:nowrap;text-decoration:none;transition:transform .12s var(--ease),background-color .15s,box-shadow .15s}
+.btn:hover{box-shadow:inset 0 0 0 1px #A1A1AA}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--ink);box-shadow:none;color:#fff}
+.btn.primary:hover{background:#2E2E33}
+.btn:disabled{opacity:.45;cursor:default;transform:none}
+.btn.small{height:30px;padding:0 11px;font-size:13px}
+.btn.ghost{box-shadow:none;background:none;color:var(--ink-2)}
+.btn.ghost:hover{background:var(--hover)}
+.iconbtn{display:inline-grid;place-items:center;width:34px;height:34px;border:0;border-radius:var(--r);background:none;color:var(--ink-2);
+  transition:transform .12s var(--ease),background-color .15s}
+.iconbtn:hover{background:rgba(24,24,27,.06);color:var(--ink)}
+.iconbtn:active{transform:scale(.94)}
+.iconbtn .ic{width:18px;height:18px}
+.linkbtn{display:inline-flex;align-items:center;min-height:28px;background:none;border:0;padding:0;color:var(--ink-2);text-decoration:underline;text-decoration-color:var(--line-2);
+  text-underline-offset:3px;font-size:13px}
+.linkbtn:hover{color:var(--ink);text-decoration-color:var(--ink)}
+.lg{display:inline-grid;place-items:center;flex:none;width:22px;height:22px;border-radius:50%;background:#fff;
+  box-shadow:0 0 0 1px var(--line);color:#111}
+.lg svg,.lg .ic{width:13px;height:13px}
+.lg-languagetool svg{fill:#45A1FC}
+.lg-reviewer{color:var(--ink-2)}
+.lgstack{display:inline-flex}
+.lgstack .lg{box-shadow:0 0 0 1px var(--line),0 0 0 3px var(--surface)}
+.lgstack .lg + .lg{margin-left:-5px}
+.av{display:inline-grid;place-items:center;flex:none;width:30px;height:30px;border-radius:50%;font:600 11.5px/1 var(--sans);letter-spacing:.01em}
+.av.xs{width:20px;height:20px;font-size:8.5px} .av.sm{width:26px;height:26px;font-size:10px} .av.big{width:40px;height:40px;font-size:14px}
+.av-0{background:#DBE6FF;color:#1E3A8A} .av-1{background:#FDE1D3;color:#7C2D12} .av-2{background:#D9F2E3;color:#14532D}
+.av.v-approved{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--accent)}
+.av.v-rejected{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--high)}
+.avs{display:inline-flex;gap:3px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex:none}
+.dot.s-high{background:var(--high)} .dot.s-medium{background:var(--medium)} .dot.s-low{background:var(--low)}
+.sevw{font-weight:500}
+.sevw.s-high{color:var(--high)} .sevw.s-medium{color:var(--medium)} .sevw.s-low{color:var(--low)}
+.stat{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 7px 0 5px;border-radius:999px;font-size:12px;font-weight:500;
+  background:var(--hover);color:var(--ink-2);white-space:nowrap}
+.stat .ic{width:13px;height:13px}
+.stat.st-approved{background:var(--accent-soft);color:var(--accent)}
+.stat.st-split{background:var(--medium-soft);color:var(--medium)}
+.stat.st-open{padding:0 8px}
+.seg{display:flex;padding:3px;border-radius:var(--r);background:var(--hover);gap:2px}
+.seg button{flex:1;height:28px;padding:0 10px;border:0;border-radius:var(--r-sm);background:none;color:var(--muted);font-weight:500;font-size:13px;white-space:nowrap;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-checked="true"],.seg button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(24,24,27,.1),var(--ring)}
+.seg .n{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.fcard,.dcard{background:var(--surface);border-radius:var(--r-card);box-shadow:var(--float)}
+.menu{position:absolute;width:280px;background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--pop);padding:6px;z-index:40;
+  transition:opacity .16s var(--ease),transform .16s var(--ease)}
+@starting-style{.menu{opacity:0;transform:scale(.97)}}
+.um-me{display:flex;gap:12px;align-items:center;padding:10px 10px 12px}
+.um-me > span{display:flex;flex-direction:column;line-height:1.35;min-width:0}
+.um-me b{font-weight:600}
+.um-me span span{font-size:12.5px;color:var(--muted)}
+.um-label{font-size:12px;font-weight:500;color:var(--muted);padding:10px 10px 4px;border-top:1px solid var(--line)}
+.menu > .um-label:first-child{border-top:0}
+.um-item{display:flex;align-items:center;gap:10px;width:100%;height:38px;padding:0 10px;border:0;border-radius:var(--r-sm);background:none;text-align:left;font-size:13.5px}
+.um-item:hover{background:var(--hover)}
+.um-item > .ic{color:var(--muted)}
+.um-check{margin-left:auto;color:var(--accent) !important}
+.um-sep{height:1px;background:var(--line);margin:6px 0}
+.ws-note{margin:4px 10px 8px;font-size:12.5px;color:var(--muted)}
+
+/* ---------- sign in ---------- */
+#screen-signin{height:100%;align-items:center;justify-content:center;padding:24px;overflow:auto}
+.si-card{width:100%;max-width:420px;background:var(--surface);border-radius:18px;box-shadow:var(--float);padding:32px 28px 24px}
+.si-brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:16px;letter-spacing:-.01em}
+.si-title{font-size:24px;font-weight:600;letter-spacing:-.025em;line-height:1.2;margin:28px 0 8px}
+.si-sub{color:var(--muted);margin:0 0 22px;font-size:14.5px}
+.si-users{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.si-user{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border:0;border-radius:12px;background:var(--surface);
+  box-shadow:inset 0 0 0 1px var(--line);text-align:left;transition:background-color .15s,box-shadow .15s,transform .12s var(--ease)}
+.si-user:hover{background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line-2)}
+.si-user:active{transform:scale(.99)}
+.si-who{flex:1;display:flex;flex-direction:column;line-height:1.35;min-width:0}
+.si-who b{font-weight:600}
+.si-who span{font-size:13px;color:var(--muted)}
+.si-go{color:var(--muted);transition:transform .15s var(--ease)}
+.si-user:hover .si-go{transform:translateX(2px);color:var(--ink)}
+.si-note{margin:20px 0 0;font-size:12.5px;color:var(--muted)}
+
+/* ---------- header ---------- */
+.home{display:flex;align-items:center;gap:9px;text-decoration:none;flex:none;min-height:32px}
+.wm{font-weight:600;font-size:15px;letter-spacing:-.01em}
+.vr{width:1px;height:20px;background:var(--line-2);flex:none;margin:0 2px}
+#crumb{display:flex;align-items:baseline;gap:8px;min-width:0;flex:1;white-space:nowrap;font-size:13.5px}
+#crumb b{font-weight:500;overflow:hidden;text-overflow:ellipsis}
+#crumb a{color:var(--muted);text-decoration:none}
+#crumb a:hover{color:var(--ink)}
+.cr-sep{color:var(--line-2)}
+.cr-sub{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.topright{display:flex;align-items:center;gap:8px;flex:none}
+body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:none !important}
+.prog{display:flex;flex-direction:column;align-items:flex-end;gap:5px;font-size:12.5px;color:var(--muted);margin-right:8px}
+.prog b{color:var(--ink);font-weight:600}
+.bar{display:block;width:112px;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:calc(var(--p,0) * 100%);background:var(--accent);transition:width .3s var(--ease)}
+.acct{position:relative;margin-left:2px}
+.avbtn{border:0;background:none;padding:0;border-radius:50%;display:block;transition:transform .12s var(--ease)}
+.avbtn:active{transform:scale(.95)}
+.avbtn:hover .av{box-shadow:0 0 0 3px rgba(24,24,27,.08)}
+#usermenu{right:0;top:calc(100% + 8px);transform-origin:top right}
+
+/* ---------- sidebar ---------- */
+.side-in{width:var(--side);height:100%;display:flex;flex-direction:column;padding:6px 10px 16px;overflow-y:auto}
+.side-brand{display:none;align-items:center;gap:9px;font-weight:600;font-size:15px;padding:4px 12px 18px}
+.side-nav{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.side-nav a{display:flex;align-items:center;gap:12px;height:40px;padding:0 9px;border-radius:10px;color:var(--ink-2);text-decoration:none;font-weight:500;
+  transition:background-color .15s}
+.side-nav a .ic{width:18px;height:18px;color:var(--muted)}
+.side-nav a:hover{background:rgba(24,24,27,.05);color:var(--ink)}
+.side-nav a[aria-current="page"]{background:var(--accent-soft);color:var(--ink);font-weight:600}
+.side-nav a[aria-current="page"] .ic{color:var(--accent)}
+.side-sep{height:1px;background:var(--line-2);margin:auto 6px 16px}   /* pushes the workspace to the foot */
+.side-label{display:block;font-size:12.5px;color:var(--muted);margin:0 6px 8px}
+.side-ws{position:relative}
+.wsbtn{display:flex;align-items:center;gap:10px;width:100%;height:42px;padding:0 10px;border:0;border-radius:11px;background:var(--surface);
+  box-shadow:inset 0 0 0 1px var(--line-2);text-align:left;font-weight:500;font-size:13.5px;transition:transform .12s var(--ease)}
+.wsbtn span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wsbtn:active{transform:scale(.98)}
+.wsbtn .ic{color:var(--muted)}
+#wsmenu{left:0;top:calc(100% + 6px);width:100%;transform-origin:top left}
+
+/* ---------- review: the pages with their bar, three cards ---------- */
+#screen-review{grid-template-columns:minmax(0,1fr);padding:2px 12px 0 4px}
+.docpane{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column}
+/* the bar spans the page's column only (the desk sets its left and width from the page) */
+/* it floats over the page like a pop-up: the page always runs to the bottom, showing or hiding it changes nothing else */
+.dock{position:absolute;bottom:16px;left:0;z-index:6;max-width:100%}
+/* the bar under the pages: shortcuts, pages, zoom. It hides, and a small arrow brings it back. Never on the page. */
+.dock{flex:none;display:flex;align-items:center;gap:2px;height:var(--dock);padding:0 6px 0 16px;background:var(--surface);
+  border-radius:var(--r-lg);box-shadow:var(--float);font-size:12.5px;color:var(--muted);white-space:nowrap;container-type:inline-size;
+  transition:opacity .2s var(--ease),transform .2s var(--ease)}
+@starting-style{.dock{opacity:0;transform:translateY(8px)}}
+.dkeys{flex:1;min-width:0;display:flex;align-items:center;gap:16px;margin:0;overflow:hidden}
+.dkeys span{display:inline-flex;align-items:center;gap:5px}
+.dkeys kbd + kbd{margin-left:-1px}
+@container (max-width:640px){ .dkeys .k4{display:none} }
+@container (max-width:560px){ .dkeys{visibility:hidden} }
+.dctl{display:flex;align-items:center;gap:2px}
+.dock button{display:inline-grid;place-items:center;height:32px;min-width:32px;border:0;border-radius:999px;background:none;color:var(--ink-2);
+  transition:transform .12s var(--ease),background-color .15s}
+.dock button:hover{background:var(--hover);color:var(--ink)}
+.dock button:active{transform:scale(.94)}
+.dsep{width:1px;height:18px;background:var(--line);margin:0 6px;flex:none}
+#pageno{min-width:52px;text-align:center;font-size:13px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+#zoomval{min-width:48px;font-size:12.5px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.dockshow{display:none}
+body.dock-off .dock{display:none}
+body.dock-off .dockshow{display:grid;place-items:center;position:absolute;bottom:0;z-index:6;transform:translateX(-50%);width:56px;height:28px;border:0;border-radius:10px 10px 0 0;
+  background:var(--ink);box-shadow:0 -2px 12px -4px rgba(24,24,27,.35);color:#fff;transition:opacity .2s var(--ease),transform .2s var(--ease)}
+@starting-style{body.dock-off .dockshow{opacity:0;transform:translate(-50%,6px)}}
+.dockshow:hover{background:#000;color:#fff}
+body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
+.dockshow .ic{width:15px;height:15px}
+#scroller{flex:1;min-height:0;overflow:auto;position:relative;overscroll-behavior:contain;border-radius:var(--r-card)}
+#pages{padding:4px var(--pad-x) calc(var(--dock) + 40px)}
+.pg{display:grid;grid-template-columns:var(--gutter) auto;width:max-content;margin:0 auto 20px;padding-right:var(--gutter-r)}
+/* the marker rail stays at the left edge when the page is wider than its column */
+/* no numbers in a margin: each highlight carries its own number */
+.gut{width:0;overflow:hidden;visibility:hidden}
+.sheet{position:relative;background:#fff;border-radius:4px;box-shadow:0 0 0 1px rgba(24,24,27,.05),0 2px 12px -4px rgba(24,24,27,.14)}
+.sheet canvas{display:block;width:100%;height:100%;border-radius:4px}
+.hls{position:absolute;inset:0}
+.loaderr{max-width:480px;margin:80px auto;color:var(--ink-2);text-align:center}
+
+/* highlights are translucent tints, not blends: the letters show through whatever the browser does while repainting */
+/* each highlight: a box outlined in its severity colour, a light tint, and its number in a small badge at the top right */
+.hl{position:absolute;border-radius:3px;cursor:pointer;box-shadow:inset 0 0 0 1px var(--hlc);transition:filter .15s}
+.hl.s-high{--hlc:var(--high);background:var(--high-hl)} .hl.s-medium{--hlc:var(--medium);background:var(--medium-hl)} .hl.s-low{--hlc:var(--low);background:var(--low-hl)}
+.hl.first::after{content:attr(data-n);position:absolute;top:-11px;left:calc(100% - 7px);z-index:1;min-width:15px;height:15px;padding:0 3px;border-radius:5px;
+  display:grid;place-items:center;background:var(--hlc);color:#fff;font:600 9.5px/1 var(--sans);font-variant-numeric:tabular-nums;
+  box-shadow:0 0 0 1.5px #fff;pointer-events:none}
+.hl.hover{filter:saturate(1.5) brightness(.93)}
+.hl.sel{outline:2px solid var(--ink);outline-offset:2px}
+.hl.st-approved{--hlc:var(--accent);background:var(--accent-hl)}
+.hl.st-rejected{--hlc:#A1A1AA;background:transparent}
+.hl.off,.mk.off{display:none}
+.mk,.mk-mini{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;border:0;padding:0;
+  font:600 11.5px/1 var(--sans);font-variant-numeric:tabular-nums;color:#fff;flex:none}
+.mk{position:absolute;right:6px;box-shadow:0 1px 3px rgba(24,24,27,.25);transition:transform .15s var(--ease)}
+.s-high.mk,.s-high.mk-mini{background:var(--high)}
+.s-medium.mk,.s-medium.mk-mini{background:var(--medium)}
+.s-low.mk,.s-low.mk-mini{background:var(--low)}
+.mk.st-approved,.mk-mini.st-approved{background:var(--accent)}
+.mk.st-rejected,.mk-mini.st-rejected{background:var(--surface);color:var(--muted);box-shadow:inset 0 0 0 1.5px var(--line-2)}
+@media (hover:hover){ .mk:hover,.mk.hover{transform:scale(1.12)} }
+.mk.sel{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--ink)}
+
+/* the right column: three floating cards */
+/* Findings beside the page, as comments are in Google Docs: each card floats at the height of its text and
+   scrolls with the document. Folded, a card shows its row; selected, it opens in place (the Revision 1 card)
+   and the cards around it move aside. The findings card stays pinned at the top of the lane. */
+#docrow{display:grid;grid-template-columns:max-content var(--lane);column-gap:var(--lane-gap);width:max-content;margin:0 auto;padding-right:14px;min-height:100%}
+#lane{position:relative;padding:0 0 24px}
+/* the pinned findings card sits on a strip of the table, so the cards slide under it and fade out at its edge */
+.lanehead{position:sticky;top:0;z-index:4;margin:0 -14px;padding:4px 14px 14px;
+  background:linear-gradient(var(--bg) calc(100% - 14px),rgba(241,241,242,0))}
+#findhead{padding:var(--g4) var(--g6) var(--g6);display:grid;gap:var(--g4)}
+.cmts{position:absolute;inset:0;list-style:none;margin:0;padding:0}
+.cmt{position:absolute;left:0;right:0;top:0;background:var(--surface);border-radius:var(--r-card);box-shadow:var(--float);
+  transition:transform .22s var(--ease),box-shadow .18s var(--ease)}
+.cmt.fresh{transition:none}
+.cmt > .rowbtn{padding:var(--g4) var(--g4) var(--g4) var(--g6);border-radius:var(--r-card)}
+.cmt:hover,.cmt.hover{box-shadow:0 0 0 1px rgba(24,24,27,.16),0 1px 2px rgba(24,24,27,.05),0 10px 28px -14px rgba(24,24,27,.26)}
+.cmt.st-rejected .rtitle{color:var(--muted)}
+/* the number leaves the card's text: a small square badge on the card's top-right corner, in the finding's colour,
+   like the badge on its highlight; the title then starts on the same edge as everything under it */
+.cmt > .rowbtn{grid-template-columns:minmax(0,1fr) auto}
+.cmt > .rowbtn > .mk-mini{display:none}
+.cmt[data-n]::after{content:attr(data-n);position:absolute;top:-7px;right:-7px;z-index:3;min-width:20px;height:20px;padding:0 5px;border-radius:6px;
+  display:grid;place-items:center;background:var(--cc);color:#fff;font:600 11px/1 var(--sans);font-variant-numeric:tabular-nums;
+  box-shadow:0 0 0 2px var(--bg);pointer-events:none}
+.cmt.s-high{--cc:var(--high)} .cmt.s-medium{--cc:var(--medium)} .cmt.s-low{--cc:var(--low)}
+.cmt.st-approved{--cc:var(--accent)} .cmt.st-rejected{--cc:#A1A1AA}
+.cmt.sel{z-index:2;background:var(--surface-2);box-shadow:var(--pop)}
+/* the open card breathes: more room around and between its parts */
+.cmt.sel > .rowbtn{padding:var(--g6) var(--g4) var(--g2) var(--g6)}
+/* the body spans the card with the same 24 px on both sides, so the card is balanced */
+.cmt .card{padding:0 var(--g6) var(--g6)}
+.cmt .cagents{margin:var(--g1) 0 var(--g6)}
+.cmt .cfield{margin-bottom:var(--g4)}
+.cmt .clabel{margin:0 0 var(--g2)}
+.cmt .cnote{margin:var(--g2) 0 var(--g6)}
+.cmt .cdec{margin-top:var(--g6);padding-top:var(--g4)}
+.cmt .rmeta{row-gap:var(--g2)}
+/* an open card shows its decision once, under Decisions */
+.cmt.sel .rmeta :is(.stat,.rvoters),#detail .rmeta :is(.stat,.rvoters){display:none}
+#panel{display:none}
+#panel > .fcard{flex:none}
+.fhead{display:flex;align-items:center;gap:10px;min-height:34px}
+.fhead h2{margin:0;font-size:16px;font-weight:600;letter-spacing:-.015em;white-space:nowrap}
+[data-searchbox]{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;min-width:0}
+.sbtn{display:inline-grid;place-items:center;width:34px;height:34px;border:0;border-radius:var(--r);background:none;color:var(--ink-2);
+  transition:transform .12s var(--ease),background-color .15s}
+.sbtn:hover{background:var(--hover);color:var(--ink)}
+.sbtn:active{transform:scale(.94)}
+.sbtn .ic{width:18px;height:18px}
+.sfield{display:none}
+[data-searchbox].open{flex:1}
+[data-searchbox].open .sbtn{display:none}
+[data-searchbox].open .sfield{display:flex;flex:1}
+.search{align-items:center;gap:8px;height:34px;padding:0 4px 0 10px;border-radius:var(--r);background:var(--surface);
+  box-shadow:inset 0 0 0 1.5px var(--ink);color:var(--muted);transition:opacity .16s var(--ease)}
+@starting-style{.search{opacity:0}}
+.search input{flex:1;min-width:0;border:0;background:none;outline:none;font-size:13.5px;color:var(--ink)}
+.search input::placeholder{color:var(--muted)}
+.search input::-webkit-search-cancel-button{display:none}
+.sclose{display:grid;place-items:center;width:26px;height:26px;border:0;border-radius:6px;background:none;color:var(--muted)}
+.sclose:hover{background:var(--hover);color:var(--ink)}
+.sclose .ic{width:14px;height:14px}
+.fbar{display:flex;flex-wrap:wrap;gap:6px}
+.fdrop{position:relative}
+.fbtn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 9px 0 11px;border:0;border-radius:var(--r);
+  background:var(--surface);box-shadow:inset 0 0 0 1px var(--line-2);color:var(--ink-2);font-size:13px;font-weight:500;white-space:nowrap;
+  transition:transform .12s var(--ease),box-shadow .15s}
+.fbtn:hover{box-shadow:inset 0 0 0 1px #A1A1AA;color:var(--ink)}
+.fbtn:active{transform:scale(.97)}
+.fbtn .caret{width:13px;height:13px;color:var(--muted)}
+.fbtn[aria-expanded="true"]{box-shadow:inset 0 0 0 1.5px var(--ink);color:var(--ink)}
+.fbtn.on{background:var(--ink);box-shadow:none;color:#fff}
+.fbtn.on .caret{color:rgba(255,255,255,.7)}
+.fbtn .fval{font-weight:400;max-width:110px;overflow:hidden;text-overflow:ellipsis;padding-left:7px;margin-left:1px;
+  border-left:1px solid rgba(255,255,255,.28);color:rgba(255,255,255,.85)}
+.fbtn.fx{box-shadow:none;background:none;color:var(--muted);padding:0 8px}
+.fbtn.fx:hover{color:var(--ink);background:var(--hover)}
+.fmenu{position:absolute;left:0;top:calc(100% + 6px);z-index:30;min-width:232px;padding:5px;background:var(--surface);border-radius:12px;box-shadow:var(--pop);
+  transform-origin:top left;transition:opacity .16s var(--ease),transform .16s var(--ease)}
+@starting-style{.fmenu{opacity:0;transform:scale(.97) translateY(-2px)}}
+.fdrop:last-of-type .fmenu{left:auto;right:0;transform-origin:top right}
+.mitem{display:flex;align-items:center;gap:9px;width:100%;height:34px;padding:0 9px;border:0;border-radius:var(--r-sm);background:none;text-align:left;font-size:13.5px;color:var(--ink)}
+.mitem:hover,.mitem:focus-visible{background:var(--hover);outline:none}
+.mitem .cl{flex:1}
+.mitem .n{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.mitem[data-zero]{color:var(--muted)}
+.cbox{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:5px;box-shadow:inset 0 0 0 1.5px var(--line-2);color:transparent;flex:none}
+.cbox .ic{width:12px;height:12px}
+[aria-checked="true"] > .cbox{background:var(--ink);box-shadow:none;color:#fff}
+.mitem .lg{width:20px;height:20px}
+.mitem .lg svg,.mitem .lg .ic{width:12px;height:12px}
+
+/* card B: the selected finding, the card from Revision 1 (its row on top, then the text boxes and the decisions), floating on its own.
+   It always shows in full; the column scrolls, the card never does. */
+#detail{background:var(--surface-2)}
+#detail:empty{display:none}
+#detail .row{margin:0;background:none;box-shadow:none;border-radius:inherit}
+#detail .rowbtn{padding:16px 14px 6px 16px}
+#detail .row:hover > .rowbtn,#detail .row.hover > .rowbtn{background:none}
+.card{padding:0 16px 18px 52px;cursor:default}
+.cagents{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:2px 0 14px}
+.cfield{margin-bottom:12px}
+.clabel{display:block;font-size:12.5px;font-weight:500;color:var(--muted);margin:0 0 6px 2px}
+.cquote,.csugg{font-size:15px;line-height:1.55;border-radius:11px;padding:10px 13px;background:var(--surface);
+  box-shadow:0 0 0 1px rgba(24,24,27,.07),0 1px 2px rgba(24,24,27,.05),0 6px 16px -10px rgba(24,24,27,.18)}
+.cquote{color:var(--ink-2)}
+.csugg{color:var(--ink)}
+.csugg ins{text-decoration:none;background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:0 3px;box-shadow:inset 0 -1.5px 0 #A7E3C8}
+.csugg .same{color:var(--muted)}
+.cedited{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);margin:7px 0 0 2px}
+.cedited .ic{width:13px;height:13px}
+.cinput{display:block;width:100%;font:15px/1.55 var(--sans);color:var(--ink);background:var(--surface);
+  border:0;box-shadow:inset 0 0 0 1.5px var(--ink),0 6px 16px -10px rgba(24,24,27,.25);border-radius:11px;padding:10px 13px;resize:vertical;min-height:66px;field-sizing:content}
+.cinput:focus{outline:none}
+.cedit{display:flex;align-items:center;gap:6px;margin-top:8px}
+.cedit .hint{font-size:12px;color:var(--muted);margin-left:auto}
+.cvar{display:flex;gap:10px;align-items:center;width:100%;text-align:left;margin-top:6px;padding:8px 10px;border:0;border-radius:11px;background:none;
+  box-shadow:inset 0 0 0 1px var(--line-2);font-size:14px;color:var(--ink-2);transition:box-shadow .15s,transform .12s var(--ease)}
+.cvar:hover{box-shadow:inset 0 0 0 1px #A1A1AA;color:var(--ink)}
+.cvar:active{transform:scale(.99)}
+.cvar .vt{flex:1}
+.cvar .use{font-size:12.5px;font-weight:500;color:var(--ink-2);padding:3px 8px;border-radius:6px;background:var(--hover)}
+.cnote{font-size:14px;line-height:1.55;color:var(--ink-2);margin:4px 2px 16px;max-width:62ch}
+.cmiss{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--high);margin:-6px 0 12px}
+.cacts{display:flex;gap:6px;flex-wrap:wrap}
+.btn.approve{background:var(--accent);box-shadow:none;color:#fff}
+.btn.approve:hover{background:var(--accent-2)}
+.btn.approve[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.btn.reject:hover{box-shadow:inset 0 0 0 1px var(--high);color:var(--high)}
+.btn.reject[aria-pressed="true"]{background:var(--high-soft);box-shadow:inset 0 0 0 1.5px var(--high);color:var(--high)}
+.btn.edit[aria-pressed="true"]{background:var(--ink);box-shadow:none;color:#fff}
+.btn.show{display:none}
+.cdec{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.dlist{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.dlist li{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-2)}
+.dlist b{font-weight:500;color:var(--ink)}
+.dlist .you{color:var(--muted)}
+.verdict{display:inline-flex;align-items:center;gap:3px;font-size:12.5px;font-weight:500}
+.verdict .ic{width:13px;height:13px}
+.verdict.v-approved{color:var(--accent)} .verdict.v-rejected{color:var(--high)}
+.dlist time{margin-left:auto;font-size:12.5px;color:var(--muted);white-space:nowrap}
+.dnone{margin:0 2px;font-size:13.5px;color:var(--muted)}
+.dempty{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px;color:var(--muted);font-size:13.5px}
+.dempty > .ic{width:24px;height:24px;color:var(--ink-2)}
+.dempty b{color:var(--ink);font-weight:600;font-size:15px}
+.dempty .btn{margin:6px 0 4px}
+.dempty .keys{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:12.5px}
+
+/* card C: the other findings, folded together */
+/* card C: the other findings, folded together, rows as in Revision 1 (who decided in the meta line, the tools on the right) */
+.list{list-style:none;margin:0;padding:6px 8px 8px}
+.row{border-radius:12px;scroll-margin-top:6px;position:relative}
+.row + .row::before{content:"";position:absolute;left:46px;right:12px;top:0;height:1px;background:var(--line)}
+.row:hover::before,.row:hover + .row::before{opacity:0}
+.rowbtn{width:100%;display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:12px;align-items:start;text-align:left;border:0;background:none;padding:12px 10px;border-radius:12px}
+.row:hover > .rowbtn,.row.hover > .rowbtn{background:var(--surface-2)}
+.rmain{display:flex;flex-direction:column;gap:4px;min-width:0}
+.rtitle{font-weight:500;font-size:14px;line-height:1.4;color:var(--ink);text-wrap:pretty}
+.row.st-rejected .rtitle{color:var(--muted)}
+.rmeta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:12.5px;color:var(--muted)}
+.rkey{font-weight:500;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.rside{display:flex;flex-direction:column;align-items:flex-end;gap:8px;padding-top:1px}
+.rvoters{display:inline-flex;gap:4px;margin-left:auto;align-items:center}
+.empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:32px 24px;color:var(--muted);text-align:center}
+.empty .ic{width:26px;height:26px;color:var(--line-2);margin-bottom:4px}
+.empty b{color:var(--ink);font-weight:500}
+.empty .btn{margin-top:8px}
+.sheetbtn,#peek{display:none}
+
+/* ---------- dashboard, reviews, documents, agents ---------- */
+.page{max-width:1120px;margin:0 auto;padding:12px 28px 48px}
+.pg-head h1{font-size:28px;font-weight:600;letter-spacing:-.025em;margin:8px 0 4px}
+.pg-head p{margin:0 0 22px;color:var(--muted);font-size:14.5px}
+.pg-note{margin:12px 2px 0;font-size:12.5px;color:var(--muted)}
+.dcard{padding:18px 20px}
+.dhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.dhead h3{margin:0;font-size:15px;font-weight:600}
+.dlabel{font-size:12.5px;font-weight:500;color:var(--muted)}
+.dash{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+.dcont h2{font-size:20px;font-weight:600;letter-spacing:-.02em;margin:6px 0 2px}
+.dsub{margin:0 0 16px;color:var(--muted)}
+.dprog{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted);margin-bottom:14px}
+.dprog .bar{flex:1;width:auto;height:6px;border-radius:3px}
+.dprog b{color:var(--ink)}
+.dsev{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:13.5px;color:var(--ink-2);margin-bottom:18px}
+.dsev span{display:inline-flex;align-items:center;gap:7px}
+.dsev b{font-weight:600;color:var(--ink);margin-left:2px}
+.dsev small{color:var(--muted);font-size:12.5px}
+.dstats{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
+.dstat{display:flex;flex-direction:column;gap:2px}
+.dstat span{font-size:12.5px;color:var(--muted);font-weight:500}
+.dstat b{font-size:28px;font-weight:600;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
+.dstat b small{font-size:14px;color:var(--muted);font-weight:500;letter-spacing:0}
+.dstat.st-approved b{color:var(--accent)}
+.alist{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.alist li{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--ink-2);min-width:0}
+.alist .atext{flex:1;min-width:0}
+.alist b{font-weight:500;color:var(--ink)}
+.alist a{font-weight:500;color:var(--ink);text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:3px;
+  display:inline-block;padding:3px 0;margin:-3px 0}
+.alist .atitle{display:block;color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alist time{font-size:12.5px;color:var(--muted);white-space:nowrap;padding-top:2px}
+.alist .av{margin-top:1px}
+.dlist2{list-style:none;margin:0;padding:0}
+.dlist2 li{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.dlist2 li:first-child{border-top:0;padding-top:0}
+.dlist2 .dt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.35}
+.dlist2 .dt b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dlist2 .dt span{font-size:12.5px;color:var(--muted)}
+.dlist2 .dn{font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.rv{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+.rvlist{grid-row:span 2}
+.rvtabs{margin-bottom:8px}
+.rvrows{list-style:none;margin:0;padding:0}
+.rvrow{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:12px;align-items:start;padding:11px 8px;border-radius:12px;text-decoration:none;color:inherit}
+.rvrows li + li{border-top:1px solid var(--line)}
+.rvrow:hover{background:var(--surface-2)}
+.rvmain{display:flex;flex-direction:column;gap:4px;min-width:0}
+.rvmain b{font-weight:500}
+.rvwho{display:inline-flex;gap:4px;padding-top:2px}
+.doctable{padding:6px 8px}
+.doctable ul{list-style:none;margin:0;padding:0}
+.dt-head,.dt-row{display:grid;grid-template-columns:minmax(0,1fr) 64px 120px 150px 96px 80px 72px;gap:12px;align-items:center;padding:10px 12px}
+.dt-head{font-size:12.5px;color:var(--muted);font-weight:500;border-bottom:1px solid var(--line)}
+.dt-head span:last-child{grid-column:span 2}
+.dt-row + .dt-row{border-top:1px solid var(--line)}
+.dt-row.live{background:var(--surface-2);border-radius:12px}
+.dt-doc{display:flex;align-items:center;gap:12px;min-width:0}
+.dt-doc > .ic{width:20px;height:20px;color:var(--muted)}
+.dt-doc span{display:flex;flex-direction:column;min-width:0;line-height:1.35}
+.dt-doc b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dt-doc small{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dt-n{font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.steps{display:flex;align-items:center;gap:10px;margin:0 0 16px;padding:10px 14px;list-style:none;font-size:13px;color:var(--ink-2);
+  background:var(--surface);border-radius:var(--r);box-shadow:var(--ring);width:max-content;max-width:100%}
+.steps li{display:flex;align-items:center;gap:10px}
+.steps li + li::before{content:"";width:14px;height:1px;background:var(--line-2)}
+.toolsgrid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:880px}
+.tcard{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 12px;padding:16px;border-radius:var(--r-card);background:var(--surface);box-shadow:var(--float)}
+.tlogo .lg{width:42px;height:42px;border-radius:11px;box-shadow:inset 0 0 0 1px var(--line);background:#fff}
+.tlogo .lg svg,.tlogo .lg .ic{width:22px;height:22px}
+.tbody{display:flex;flex-direction:column;justify-content:center;line-height:1.35;min-width:0}
+.tbody b{font-weight:600;font-size:14.5px}
+.tkind{font-size:12.5px;color:var(--muted)}
+.tabout{grid-column:1 / -1;font-size:13px;color:var(--ink-2)}
+.tstate{grid-column:1 / -1;display:flex;align-items:center;gap:8px;min-height:30px;font-size:13px;color:var(--ink-2)}
+.tstate .ok{display:inline-flex;align-items:center;gap:6px;font-weight:500;color:var(--accent)}
+.tstate .linkbtn{margin-left:auto;font-size:12.5px;color:var(--muted)}
+.tstate .btn{width:100%}
+.spin{animation:spin .8s linear infinite;color:var(--ink-2)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- export ---------- */
+.ex{max-width:1120px;margin:0 auto;padding:4px 28px 48px}
+.ex-back{display:inline-flex;align-items:center;gap:6px;min-height:32px;font-size:13px;color:var(--muted);text-decoration:none;margin:8px 0 10px}
+.ex-back:hover{color:var(--ink)}
+.ex-head h1{font-size:28px;font-weight:600;letter-spacing:-.025em;margin:0 0 4px}
+.ex-head p{margin:0 0 22px;color:var(--muted)}
+.ex-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.ex-stat{background:var(--surface);border-radius:var(--r-card);box-shadow:var(--float);padding:14px 16px;display:flex;flex-direction:column;gap:1px}
+.ex-stat span{font-size:12.5px;color:var(--muted);font-weight:500}
+.ex-stat b{font-size:28px;font-weight:600;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
+.ex-stat small{font-size:12.5px;color:var(--muted)}
+.ex-stat.st-approved b{color:var(--accent)}
+.ex-panel{background:var(--surface);border-radius:var(--r-card);box-shadow:var(--float);overflow:hidden}
+.ex-bar{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:12px 14px}
+.ex-opt{display:flex;align-items:center;gap:10px}
+.ex-opt .seg{min-width:220px}
+.ex-label{font-size:12.5px;font-weight:500;color:var(--muted)}
+.ex-bar .btn.primary{margin-left:auto}
+.ex-count{margin:0;padding:10px 16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.ex-tablewrap{overflow-x:auto}
+.ex-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.ex-table th{text-align:left;font-weight:500;font-size:12.5px;color:var(--muted);padding:9px 16px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface-2)}
+.ex-table td{padding:14px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+.ex-table tr:last-child td{border-bottom:0}
+.ex-key{white-space:nowrap}
+.ex-key b{display:block;font-weight:600;font-variant-numeric:tabular-nums}
+.ex-key span{font-size:12.5px;color:var(--muted)}
+.ex-find{min-width:260px}
+.ex-tags{display:flex;gap:10px;font-size:12.5px;color:var(--muted)}
+.ex-find b{display:block;font-weight:500;margin:4px 0 2px}
+.ex-q{display:block;color:var(--muted);font-size:13px}
+.ex-final{min-width:200px;color:var(--ink)}
+.ex-by{min-width:170px}
+.ex-p{display:flex;align-items:center;gap:8px;margin-bottom:6px;white-space:nowrap}
+.ex-p i{font-style:normal;color:var(--muted);font-size:12.5px}
+.ex-none{color:var(--muted)}
+
+/* toasts: bottom-left; on the review screen the desk places them in the bar's
+   empty middle (never on the page, never on the shortcuts) */
+#toast{position:fixed;left:24px;bottom:20px;max-width:340px;transform:translateY(6px);background:var(--ink);color:#fff;
+  padding:9px 15px;border-radius:999px;font-size:13px;font-weight:500;line-height:18px;z-index:70;pointer-events:none;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  opacity:0;visibility:hidden;transition:opacity .18s var(--ease),transform .18s var(--ease),visibility 0s .18s}
+#toast.on{opacity:1;visibility:visible;transform:none;transition:opacity .18s var(--ease),transform .18s var(--ease)}
+.dkeys{transition:opacity .15s var(--ease)}
+.dock.toasting .dkeys{opacity:0}
+
+/* ---------- narrower screens ---------- */
+@media (max-width:1180px){
+  :root{--col:372px;--lane:360px;--lane-gap:20px;--pad-x:8px}
+  #screen-review{gap:10px;padding:2px 16px 16px 10px}
+  .prog .bar{width:84px}
+  .rv{grid-template-columns:minmax(0,1fr)}
+  .rvlist{grid-row:auto}
+  .dt-head,.dt-row{grid-template-columns:minmax(0,1fr) 56px 110px 140px 80px 72px}
+  .dt-head span:nth-child(6),.dt-row .avs{display:none}
+}
+@media (max-width:960px){
+  .prog,.cr-sub{display:none}
+  .dash{grid-template-columns:minmax(0,1fr)}
+  .ex-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* phone: a drawer for the sidebar, the document first, controls in a row above the findings sheet */
+@media (max-width:760px){
+  :root{--gutter-r:0px;--pad-x:6px;--top:54px;--lane:0px;--lane-gap:0px}
+  #docrow{display:block;padding-right:0}
+  #lane{display:none}
+  .top{gap:6px;padding:0 10px 0 6px}
+  .home,.home + .vr{display:none}
+  #crumb > a,#crumb > .cr-sep{display:none}
+  .topright{gap:6px}
+  .btn{height:34px;padding:0 11px}
+  #exportbtn span{display:none}
+  .side{position:fixed;z-index:45;left:0;top:0;bottom:0;width:280px;visibility:hidden;transform:translateX(-100%);background:var(--bg);
+    box-shadow:0 0 40px -10px rgba(24,24,27,.4);transition:transform .26s var(--ease),visibility 0s .26s}
+  body.side-open .side{width:280px;visibility:hidden}
+  body.nav-open .side{visibility:visible;transform:none;transition:transform .26s var(--ease)}
+  .side-in{width:280px;padding-top:16px}
+  .side-brand{display:flex}
+  .app::after{content:"";position:fixed;inset:0;background:rgba(24,24,27,.3);opacity:0;pointer-events:none;transition:opacity .2s;z-index:44}
+  body.nav-open .app::after{opacity:1;pointer-events:auto}
+  body[data-screen="review"] #screen-review{display:block;position:relative;padding:0}
+  .docpane,body.dock-off .docpane{height:100%;gap:0;padding-bottom:0}
+  #scroller{border-radius:0}
+  #pages{padding:6px var(--pad-x) calc(var(--peek) + var(--dock) + 16px)}
+  .pg{margin-bottom:12px}
+  /* the bar is a row above the findings sheet; hidden, a small arrow waits at its right end */
+  .dock{position:fixed;left:0;right:0;bottom:var(--peek);z-index:25;height:var(--dock);justify-content:center;gap:12px;padding:0 8px;
+    border-radius:0;box-shadow:0 -1px 0 var(--line)}
+  .dkeys,.dock .dsep{display:none}
+  #dockhide{position:absolute;right:8px;top:6px}
+  body.dock-off .dockshow{position:fixed;left:auto;right:12px;bottom:calc(var(--peek) + 8px);z-index:25;transform:none;border-radius:999px}
+  .mk{right:3px}
+  #panel{display:flex;flex-direction:column;position:fixed;left:0;right:0;bottom:0;height:min(88dvh,780px);z-index:30;gap:0;padding:0;border-radius:20px 20px 0 0;background:var(--surface);
+    box-shadow:0 -12px 36px -12px rgba(24,24,27,.28),0 -1px 0 var(--line);overflow-y:auto;
+    transform:translateY(calc(100% - var(--peek)));transition:transform .32s cubic-bezier(.32,.72,0,1)}
+  body.sheet-open #panel{transform:none}
+  body:not(.sheet-open) #panel{overflow:hidden}
+  body:not(.sheet-open) #panel > :not(.sheetbtn):not(#peek){visibility:hidden}
+  #panel .fcard{box-shadow:none;border-radius:0;max-height:none;overflow:visible;background:var(--surface)}
+  #findhead{position:static;padding:4px 14px 12px;border-bottom:1px solid var(--line)}
+  #detail{flex:none;background:var(--surface-2) !important;border-bottom:1px solid var(--line)}
+  .sheetbtn{display:flex;justify-content:center;align-items:center;flex:none;height:26px;border:0;background:none;width:100%}
+  .sheetbtn .handle{width:40px;height:4px;border-radius:2px;background:var(--line-2)}
+  #peek{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px 12px;align-items:start;align-content:start;flex:none;
+    padding:2px 16px 16px;min-height:calc(var(--peek) - 26px);cursor:pointer}
+  #peek .ptext{font-size:14px;line-height:1.4;color:var(--ink-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  #peek .ptext:first-child{grid-column:1 / -1}
+  #peek .ptext b{font-weight:500;color:var(--ink)}
+  #peek .phint{grid-column:1 / -1;font-size:13px;color:var(--muted);margin-top:-6px}
+  #peek .pacts{grid-column:1 / -1;display:flex;gap:6px}
+  #peek .pacts .btn{flex:1}
+  body.sheet-open #peek{display:none}
+  .fmenu{position:fixed;left:12px !important;right:12px !important;top:auto;bottom:16px;min-width:0}
+  #detail .rowbtn{padding:14px 12px 6px 14px}
+  .card{padding:0 14px 16px}
+  .btn.show{display:inline-flex}
+  .dempty .keys{display:none}
+  #usermenu{position:fixed;left:8px;right:8px;top:56px;width:auto}
+  .page,.ex{padding:4px 14px 32px}
+  .pg-head h1,.ex-head h1{font-size:24px}
+  .dstats{grid-template-columns:1fr 1fr}
+  .dt-head{display:none}
+  .dt-row{grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:12px}
+  .dt-row .dt-doc{grid-column:1 / -1}
+  .dt-row [data-l]{font-size:12.5px;color:var(--muted)}
+  .dt-row [data-l]::before{content:attr(data-l) ": ";color:var(--muted)}
+  .dt-row .dt-n[data-l="Pages"],.dt-row .dt-n[data-l="Updated"]{display:none}
+  .dt-row > .btn{justify-self:end}
+  .toolsgrid{grid-template-columns:1fr}
+  .steps{flex-direction:column;align-items:flex-start;gap:6px;width:100%}
+  .steps li + li::before{display:none}
+  .ex-stats{gap:8px}
+  .ex-stat{padding:10px 12px} .ex-stat b{font-size:22px}
+  .ex-bar{gap:12px}
+  .ex-opt{width:100%;justify-content:space-between}
+  .ex-opt .seg{min-width:0;flex:1}
+  .ex-bar .btn.primary{width:100%;margin:0}
+  .ex-table thead{display:none}
+  .ex-table,.ex-table tbody,.ex-table tr,.ex-table td{display:block;width:100%}
+  .ex-table tr{padding:12px 16px;border-top:1px solid var(--line)}
+  .ex-table td{padding:3px 0;border:0;min-width:0}
+  .ex-key{display:flex !important;gap:8px;align-items:baseline}
+  .ex-final::before{content:"Final wording";display:block;font-size:12px;color:var(--muted);font-weight:500}
+  /* a small pill above the controls row, not a band across the page */
+  body[data-screen] #toast{left:50%;right:auto;max-width:calc(100vw - 32px);bottom:16px;transform:translate(-50%,6px)}
+  body[data-screen] #toast.on{transform:translate(-50%,0)}
+  body[data-screen="review"] #toast{bottom:calc(var(--peek) + var(--dock) + 8px)}
+  body.sheet-open[data-screen] #toast{bottom:auto;top:60px}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none !important;animation:none !important} }
+</style>
+</head>
+<body data-dir="v1" data-card="detail" data-list="others" data-home="dashboard" data-autoselect data-screen="signin">
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><symbol id="i-arrow-left" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></symbol><symbol id="i-arrow-right" viewBox="0 0 256 256" fill="currentColor"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></symbol><symbol id="i-buildings" viewBox="0 0 256 256" fill="currentColor"><path d="M240,208H224V96a16,16,0,0,0-16-16H144V32a16,16,0,0,0-24.88-13.32L39.12,72A16,16,0,0,0,32,85.34V208H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM208,96V208H144V96ZM48,85.34,128,32V208H48ZM112,112v16a8,8,0,0,1-16,0V112a8,8,0,1,1,16,0Zm-32,0v16a8,8,0,0,1-16,0V112a8,8,0,1,1,16,0Zm0,56v16a8,8,0,0,1-16,0V168a8,8,0,0,1,16,0Zm32,0v16a8,8,0,0,1-16,0V168a8,8,0,0,1,16,0Z"/></symbol><symbol id="i-caret-down" viewBox="0 0 256 256" fill="currentColor"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></symbol><symbol id="i-caret-left" viewBox="0 0 256 256" fill="currentColor"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></symbol><symbol id="i-caret-right" viewBox="0 0 256 256" fill="currentColor"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></symbol><symbol id="i-caret-up" viewBox="0 0 256 256" fill="currentColor"><path d="M213.66,165.66a8,8,0,0,1-11.32,0L128,91.31,53.66,165.66a8,8,0,0,1-11.32-11.32l80-80a8,8,0,0,1,11.32,0l80,80A8,8,0,0,1,213.66,165.66Z"/></symbol><symbol id="i-check-circle" viewBox="0 0 256 256" fill="currentColor"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></symbol><symbol id="i-check" viewBox="0 0 256 256" fill="currentColor"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></symbol><symbol id="i-circle-notch" viewBox="0 0 256 256" fill="currentColor"><path d="M232,128a104,104,0,0,1-208,0c0-41,23.81-78.36,60.66-95.27a8,8,0,0,1,6.68,14.54C60.15,61.59,40,93.27,40,128a88,88,0,0,0,176,0c0-34.73-20.15-66.41-51.34-80.73a8,8,0,0,1,6.68-14.54C208.19,49.64,232,87,232,128Z"/></symbol><symbol id="i-clock-counter-clockwise" viewBox="0 0 256 256" fill="currentColor"><path d="M136,80v43.47l36.12,21.67a8,8,0,0,1-8.24,13.72l-40-24A8,8,0,0,1,120,128V80a8,8,0,0,1,16,0Zm-8-48A95.44,95.44,0,0,0,60.08,60.15C52.81,67.51,46.35,74.59,40,82V64a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16H49c7.15-8.42,14.27-16.35,22.39-24.57a80,80,0,1,1,1.66,114.75,8,8,0,1,0-11,11.64A96,96,0,1,0,128,32Z"/></symbol><symbol id="i-crosshair-simple" viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm8,191.63V184a8,8,0,0,0-16,0v31.63A88.13,88.13,0,0,1,40.37,136H72a8,8,0,0,0,0-16H40.37A88.13,88.13,0,0,1,120,40.37V72a8,8,0,0,0,16,0V40.37A88.13,88.13,0,0,1,215.63,120H184a8,8,0,0,0,0,16h31.63A88.13,88.13,0,0,1,136,215.63Z"/></symbol><symbol id="i-download-simple" viewBox="0 0 256 256" fill="currentColor"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/></symbol><symbol id="i-file-text" viewBox="0 0 256 256" fill="currentColor"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-32-80a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,168Z"/></symbol><symbol id="i-funnel-simple" viewBox="0 0 256 256" fill="currentColor"><path d="M200,136a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,136Zm32-56H24a8,8,0,0,0,0,16H232a8,8,0,0,0,0-16Zm-80,96H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z"/></symbol><symbol id="i-house" viewBox="0 0 256 256" fill="currentColor"><path d="M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V160h32v56a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V120A15.87,15.87,0,0,0,219.31,108.68ZM208,208H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48V120l80-80,80,80Z"/></symbol><symbol id="i-keyboard" viewBox="0 0 256 256" fill="currentColor"><path d="M224,48H32A16,16,0,0,0,16,64V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V64A16,16,0,0,0,224,48Zm0,144H32V64H224V192Zm-16-64a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16H200A8,8,0,0,1,208,128Zm0-32a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16H200A8,8,0,0,1,208,96ZM72,160a8,8,0,0,1-8,8H56a8,8,0,0,1,0-16h8A8,8,0,0,1,72,160Zm96,0a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,160Zm40,0a8,8,0,0,1-8,8h-8a8,8,0,0,1,0-16h8A8,8,0,0,1,208,160Z"/></symbol><symbol id="i-lightning" viewBox="0 0 256 256" fill="currentColor"><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17ZM109.37,214l10.47-52.38a8,8,0,0,0-5-9.06L62,132.71l84.62-90.66L136.16,94.43a8,8,0,0,0,5,9.06l52.8,19.8Z"/></symbol><symbol id="i-list-checks" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H128a8,8,0,0,1,0-16h88A8,8,0,0,1,224,128ZM128,72h88a8,8,0,0,0,0-16H128a8,8,0,0,0,0,16Zm88,112H128a8,8,0,0,0,0,16h88a8,8,0,0,0,0-16ZM82.34,42.34,56,68.69,45.66,58.34A8,8,0,0,0,34.34,69.66l16,16a8,8,0,0,0,11.32,0l32-32A8,8,0,0,0,82.34,42.34Zm0,64L56,132.69,45.66,122.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32,0l32-32a8,8,0,0,0-11.32-11.32Zm0,64L56,196.69,45.66,186.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32,0l32-32a8,8,0,0,0-11.32-11.32Z"/></symbol><symbol id="i-list" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"/></symbol><symbol id="i-magnifying-glass" viewBox="0 0 256 256" fill="currentColor"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></symbol><symbol id="i-minus" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128Z"/></symbol><symbol id="i-pencil-simple" viewBox="0 0 256 256" fill="currentColor"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"/></symbol><symbol id="i-plugs-connected" viewBox="0 0 256 256" fill="currentColor"><path d="M237.66,18.34a8,8,0,0,0-11.32,0l-52.4,52.41-5.37-5.38a32.05,32.05,0,0,0-45.26,0L100,88.69l-6.34-6.35A8,8,0,0,0,82.34,93.66L88.69,100,65.37,123.31a32,32,0,0,0,0,45.26l5.38,5.37-52.41,52.4a8,8,0,0,0,11.32,11.32l52.4-52.41,5.37,5.38a32,32,0,0,0,45.26,0L156,167.31l6.34,6.35a8,8,0,0,0,11.32-11.32L167.31,156l23.32-23.31a32,32,0,0,0,0-45.26l-5.38-5.37,52.41-52.4A8,8,0,0,0,237.66,18.34Zm-116.29,161a16,16,0,0,1-22.62,0L76.69,157.25a16,16,0,0,1,0-22.62L100,111.31,144.69,156Zm57.94-57.94L156,144.69,111.31,100l23.32-23.31a16,16,0,0,1,22.62,0l22.06,22A16,16,0,0,1,179.31,121.37ZM88.57,35A8,8,0,0,1,103.43,29l8,20A8,8,0,0,1,96.57,55ZM24.57,93A8,8,0,0,1,35,88.57l20,8A8,8,0,0,1,49,111.43l-20-8A8,8,0,0,1,24.57,93ZM231.43,163a8,8,0,0,1-10.4,4.46l-20-8A8,8,0,1,1,207,144.57l20,8A8,8,0,0,1,231.43,163Zm-64,58.06A8,8,0,0,1,152.57,227l-8-20A8,8,0,0,1,159.43,201Z"/></symbol><symbol id="i-plus" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></symbol><symbol id="i-sidebar-simple" viewBox="0 0 256 256" fill="currentColor"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H80V200H40ZM216,200H96V56H216V200Z"/></symbol><symbol id="i-sign-out" viewBox="0 0 256 256" fill="currentColor"><path d="M120,216a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V40a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H56V208h56A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z"/></symbol><symbol id="i-stack" viewBox="0 0 256 256" fill="currentColor"><path d="M230.91,172A8,8,0,0,1,228,182.91l-96,56a8,8,0,0,1-8.06,0l-96-56A8,8,0,0,1,36,169.09l92,53.65,92-53.65A8,8,0,0,1,230.91,172ZM220,121.09l-92,53.65L36,121.09A8,8,0,0,0,28,134.91l96,56a8,8,0,0,0,8.06,0l96-56A8,8,0,1,0,220,121.09ZM24,80a8,8,0,0,1,4-6.91l96-56a8,8,0,0,1,8.06,0l96,56a8,8,0,0,1,0,13.82l-96,56a8,8,0,0,1-8.06,0l-96-56A8,8,0,0,1,24,80Zm23.88,0L128,126.74,208.12,80,128,33.26Z"/></symbol><symbol id="i-user-switch" viewBox="0 0 256 256" fill="currentColor"><path d="M253.66,133.66l-24,24a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L216,132.69V128A88,88,0,0,0,56.49,76.67a8,8,0,0,1-13-9.34A104,104,0,0,1,232,128v4.69l10.34-10.35a8,8,0,0,1,11.32,11.32Zm-41.18,55A104,104,0,0,1,24,128v-4.69L13.66,133.66A8,8,0,0,1,2.34,122.34l24-24a8,8,0,0,1,11.32,0l24,24a8,8,0,0,1-11.32,11.32L40,123.31V128a87.62,87.62,0,0,0,22.24,58.41A79.66,79.66,0,0,1,98.3,157.66a48,48,0,1,1,59.4,0,79.59,79.59,0,0,1,36.08,28.78,89.68,89.68,0,0,0,5.71-7.11,8,8,0,0,1,13,9.34ZM128,152a32,32,0,1,0-32-32A32,32,0,0,0,128,152Zm0,64a88.2,88.2,0,0,0,53.92-18.49,64,64,0,0,0-107.84,0A87.57,87.57,0,0,0,128,216Z"/></symbol><symbol id="i-users-three" viewBox="0 0 256 256" fill="currentColor"><path d="M244.8,150.4a8,8,0,0,1-11.2-1.6A51.6,51.6,0,0,0,192,128a8,8,0,0,1-7.37-4.89,8,8,0,0,1,0-6.22A8,8,0,0,1,192,112a24,24,0,1,0-23.24-30,8,8,0,1,1-15.5-4A40,40,0,1,1,219,117.51a67.94,67.94,0,0,1,27.43,21.68A8,8,0,0,1,244.8,150.4ZM190.92,212a8,8,0,1,1-13.84,8,57,57,0,0,0-98.16,0,8,8,0,1,1-13.84-8,72.06,72.06,0,0,1,33.74-29.92,48,48,0,1,1,58.36,0A72.06,72.06,0,0,1,190.92,212ZM128,176a32,32,0,1,0-32-32A32,32,0,0,0,128,176ZM72,120a8,8,0,0,0-8-8A24,24,0,1,1,87.24,82a8,8,0,1,0,15.5-4A40,40,0,1,0,37,117.51,67.94,67.94,0,0,0,9.6,139.19a8,8,0,1,0,12.8,9.61A51.6,51.6,0,0,1,64,128,8,8,0,0,0,72,120Z"/></symbol><symbol id="i-warning-circle" viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></symbol><symbol id="i-x-circle" viewBox="0 0 256 256" fill="currentColor"><path d="M165.66,101.66,139.31,128l26.35,26.34a8,8,0,0,1-11.32,11.32L128,139.31l-26.34,26.35a8,8,0,0,1-11.32-11.32L116.69,128,90.34,101.66a8,8,0,0,1,11.32-11.32L128,116.69l26.34-26.35a8,8,0,0,1,11.32,11.32ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></symbol><symbol id="i-x" viewBox="0 0 256 256" fill="currentColor"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></symbol><symbol id="logo-chatgpt" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523zm5.899 2.83a5.947 5.947 0 005.827-4.756C22.287 18.339 24 15.84 24 13.296c0-1.665-.713-3.282-1.998-4.448.119-.5.19-.999.19-1.498 0-3.401-2.759-5.947-5.946-5.947-.642 0-1.26.095-1.88.31A5.962 5.962 0 0010.205 0a5.947 5.947 0 00-5.827 4.757C1.713 5.447 0 7.945 0 10.49c0 1.666.713 3.283 1.998 4.448-.119.5-.19 1-.19 1.499 0 3.401 2.759 5.946 5.946 5.946.642 0 1.26-.095 1.88-.309a5.96 5.96 0 004.162 1.713z"></path></symbol><symbol id="logo-claude" viewBox="0 0 24 24"><path d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z" fill="#D97757" fill-rule="nonzero"></path></symbol><symbol id="logo-gemini" viewBox="0 0 24 24"><path d="M20.616 10.835a14.147 14.147 0 01-4.45-3.001 14.111 14.111 0 01-3.678-6.452.503.503 0 00-.975 0 14.134 14.134 0 01-3.679 6.452 14.155 14.155 0 01-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 000 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 014.45 3.001 14.112 14.112 0 013.679 6.453.502.502 0 00.975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 013.001-4.45 14.113 14.113 0 016.453-3.678.503.503 0 000-.975 13.245 13.245 0 01-2.003-.678z" fill="#3186FF"></path><path d="M20.616 10.835a14.147 14.147 0 01-4.45-3.001 14.111 14.111 0 01-3.678-6.452.503.503 0 00-.975 0 14.134 14.134 0 01-3.679 6.452 14.155 14.155 0 01-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 000 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 014.45 3.001 14.112 14.112 0 013.679 6.453.502.502 0 00.975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 013.001-4.45 14.113 14.113 0 016.453-3.678.503.503 0 000-.975 13.245 13.245 0 01-2.003-.678z" fill="url(#logo-gemini-lobe-icons-gemini-0-_R_0_)"></path><path d="M20.616 10.835a14.147 14.147 0 01-4.45-3.001 14.111 14.111 0 01-3.678-6.452.503.503 0 00-.975 0 14.134 14.134 0 01-3.679 6.452 14.155 14.155 0 01-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 000 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 014.45 3.001 14.112 14.112 0 013.679 6.453.502.502 0 00.975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 013.001-4.45 14.113 14.113 0 016.453-3.678.503.503 0 000-.975 13.245 13.245 0 01-2.003-.678z" fill="url(#logo-gemini-lobe-icons-gemini-1-_R_0_)"></path><path d="M20.616 10.835a14.147 14.147 0 01-4.45-3.001 14.111 14.111 0 01-3.678-6.452.503.503 0 00-.975 0 14.134 14.134 0 01-3.679 6.452 14.155 14.155 0 01-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 000 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 014.45 3.001 14.112 14.112 0 013.679 6.453.502.502 0 00.975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 013.001-4.45 14.113 14.113 0 016.453-3.678.503.503 0 000-.975 13.245 13.245 0 01-2.003-.678z" fill="url(#logo-gemini-lobe-icons-gemini-2-_R_0_)"></path><defs><linearGradient gradientUnits="userSpaceOnUse" id="logo-gemini-lobe-icons-gemini-0-_R_0_" x1="7" x2="11" y1="15.5" y2="12"><stop stop-color="#08B962"></stop><stop offset="1" stop-color="#08B962" stop-opacity="0"></stop></linearGradient><linearGradient gradientUnits="userSpaceOnUse" id="logo-gemini-lobe-icons-gemini-1-_R_0_" x1="8" x2="11.5" y1="5.5" y2="11"><stop stop-color="#F94543"></stop><stop offset="1" stop-color="#F94543" stop-opacity="0"></stop></linearGradient><linearGradient gradientUnits="userSpaceOnUse" id="logo-gemini-lobe-icons-gemini-2-_R_0_" x1="3.5" x2="17.5" y1="13.5" y2="12"><stop stop-color="#FABC12"></stop><stop offset=".46" stop-color="#FABC12" stop-opacity="0"></stop></linearGradient></defs></symbol><symbol id="logo-grok" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd"><path d="M9.27 15.29l7.978-5.897c.391-.29.95-.177 1.137.272.98 2.369.542 5.215-1.41 7.169-1.951 1.954-4.667 2.382-7.149 1.406l-2.711 1.257c3.889 2.661 8.611 2.003 11.562-.953 2.341-2.344 3.066-5.539 2.388-8.42l.006.007c-.983-4.232.242-5.924 2.75-9.383.06-.082.12-.164.179-.248l-3.301 3.305v-.01L9.267 15.292M7.623 16.723c-2.792-2.67-2.31-6.801.071-9.184 1.761-1.763 4.647-2.483 7.166-1.425l2.705-1.25a7.808 7.808 0 00-1.829-1A8.975 8.975 0 005.984 5.83c-2.533 2.536-3.33 6.436-1.962 9.764 1.022 2.487-.653 4.246-2.34 6.022-.599.63-1.199 1.259-1.682 1.925l7.62-6.815"></path></symbol><symbol id="logo-languagetool" viewBox="0 0 24 24"><path d="M2.28 20.494 0 18.865c.67-.938 1.36-1.66 2.088-2.171.805-.568 1.667-.869 2.555-.869.824 0 1.539.198 2.178.582.261.16.504.344.734.549.16.14.281.255.53.504.383.384.537.524.728.633.205.127.422.185.735.185s.53-.058.734-.185c.192-.109.351-.25.734-.633.25-.249.37-.364.537-.51a4.69 4.69 0 0 1 .728-.543c.639-.384 1.348-.582 2.171-.582.824 0 1.533.198 2.172.582.255.153.491.332.728.542.166.147.287.262.536.511.383.384.543.524.735.633.204.127.421.185.734.185.281 0 .588-.109.945-.358.44-.306.92-.81 1.418-1.507L24 18.042c-.67.938-1.36 1.666-2.088 2.17-.805.57-1.667.87-2.555.87-.824 0-1.539-.199-2.178-.582a5.072 5.072 0 0 1-.734-.543c-.166-.146-.281-.261-.537-.51v-.007c-.376-.377-.536-.517-.728-.626-.204-.127-.415-.185-.728-.185s-.523.058-.728.185c-.191.109-.35.25-.728.626v.007c-.255.249-.37.364-.536.51-.243.211-.48.39-.735.543-.638.383-1.354.581-2.177.581-.824 0-1.54-.198-2.178-.58a5.593 5.593 0 0 1-.735-.544 11.126 11.126 0 0 1-.53-.51c-.383-.384-.536-.524-.728-.633-.204-.127-.421-.185-.734-.185-.281 0-.588.109-.945.358-.44.313-.92.81-1.418 1.507zM3.417 2.919h2.33c.965 0 1.75.779 1.75 1.75v6.795h4.554v2.452H6.795c-.964 0-1.75-.786-1.75-1.75V5.371H3.417Zm17.818 1.75v1.82h-2.453V5.37h-1.928v8.545H14.4V5.37h-1.928v1.118H10.02v-1.82c0-.971.786-1.75 1.75-1.75h7.708c.971 0 1.757.779 1.757 1.75zm0 0"/></symbol></svg>
+
+<section id="screen-signin" class="screen" aria-label="Sign in"><div id="signin-root"></div></section>
+
+<div class="app">
+  <header class="top">
+    <button id="sidebtn" class="iconbtn" type="button" aria-controls="side" aria-expanded="false" aria-label="Show or hide the sidebar" title="Sidebar">
+      <svg class="ic" aria-hidden="true"><use href="#i-sidebar-simple"/></svg></button>
+    <a class="home" href="#/dashboard" aria-label="Vidimus, dashboard"><span class="wm">Vidimus</span></a>
+    <span class="vr" aria-hidden="true"></span>
+    <div id="crumb"></div>
+    <div class="topright">
+      <div class="prog doc-only"><span id="progress"></span><span class="bar" id="progressbar"><i></i></span></div>
+      <button id="exportbtn" class="btn primary doc-only" type="button"><svg class="ic" aria-hidden="true"><use href="#i-download-simple"/></svg><span>Export</span></button>
+      <div class="acct"><button id="avatarbtn" class="avbtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Account"></button>
+        <div id="usermenu" class="menu" role="menu" hidden></div></div>
+    </div>
+  </header>
+
+  <nav id="side" class="side" aria-label="Main">
+    <div class="side-in">
+      <div class="side-brand" aria-hidden="true"><span>Vidimus</span></div>
+      <ul class="side-nav">
+        <li><a href="#/dashboard" data-nav="dashboard"><svg class="ic" aria-hidden="true"><use href="#i-house"/></svg><span>Dashboard</span></a></li>
+        <li><a href="#/reviews" data-nav="reviews"><svg class="ic" aria-hidden="true"><use href="#i-list-checks"/></svg><span>Reviews</span></a></li>
+        <li><a href="#/documents" data-nav="documents"><svg class="ic" aria-hidden="true"><use href="#i-stack"/></svg><span>Documents</span></a></li>
+        <li><a href="#/agents" data-nav="agents"><svg class="ic" aria-hidden="true"><use href="#i-lightning"/></svg><span>Agents</span></a></li>
+      </ul>
+      <div class="side-sep"></div>
+      <div class="side-ws"><span class="side-label">Workspace</span>
+        <button id="wsbtn" class="wsbtn" type="button" aria-haspopup="menu" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-buildings"/></svg>
+          <span>Oeverlicht Custody</span><svg class="ic" aria-hidden="true"><use href="#i-caret-down"/></svg></button>
+        <div id="wsmenu" class="menu" role="menu" hidden></div></div>
+    </div>
+  </nav>
+
+  <div class="content">
+    <main id="screen-dashboard" class="screen"><div id="dashboard-root" class="page"></div></main>
+    <main id="screen-reviews" class="screen"><div id="reviews-root" class="page"></div></main>
+    <main id="screen-documents" class="screen"><div id="documents-root" class="page"></div></main>
+    <main id="screen-agents" class="screen"><div class="page">
+      <div class="pg-head"><h1>Agents</h1><p>Every connected tool reads the document and flags what looks wrong. Your team decides on each finding.</p></div>
+      <ol class="steps"><li>Connect the tools you use</li><li>They read the document</li><li>Your team approves or rejects</li></ol>
+      <ul class="toolsgrid" data-toolsgrid></ul>
+      <p class="pg-note">Demo states: no real connection; nothing leaves this page.</p>
+    </div></main>
+
+    <main id="screen-review" class="screen">
+      <section class="docpane" aria-label="Document">
+        <div id="scroller"><div id="docrow">
+          <div id="pages"></div>
+          <aside id="lane" aria-label="Findings">
+            <div id="lanehead" class="lanehead"><section id="findhead" class="fcard" aria-label="Search and filter">
+              <div class="fhead"><h2>Findings</h2><div data-searchbox></div></div>
+              <div data-filters data-search="none"></div>
+              <div id="tabs" class="seg" role="tablist" aria-label="Status"></div>
+            </section></div>
+            <ol id="cmts" class="cmts"></ol>
+          </aside>
+        </div></div>
+        <div id="dock" class="dock">
+          <p class="dkeys" aria-label="Keyboard shortcuts"><span><kbd>J</kbd><kbd>K</kbd> move</span><span><kbd>A</kbd> approve</span><span><kbd>X</kbd> reject</span><span class="k4"><kbd>E</kbd> edit</span></p>
+          <div class="dctl" role="group" aria-label="Pages">
+            <button id="prevpage" type="button" aria-label="Previous page" title="Previous page"><svg class="ic" aria-hidden="true"><use href="#i-caret-left"/></svg></button>
+            <span id="pageno" aria-live="polite"></span>
+            <button id="nextpage" type="button" aria-label="Next page" title="Next page"><svg class="ic" aria-hidden="true"><use href="#i-caret-right"/></svg></button>
+          </div>
+          <span class="dsep" aria-hidden="true"></span>
+          <div class="dctl" role="group" aria-label="Zoom">
+            <button id="zoomout" type="button" aria-label="Zoom out" title="Zoom out"><svg class="ic" aria-hidden="true"><use href="#i-minus"/></svg></button>
+            <button id="zoomval" type="button" title="Back to the default zoom"></button>
+            <button id="zoomin" type="button" aria-label="Zoom in" title="Zoom in"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button>
+          </div>
+          <span class="dsep hidesep" aria-hidden="true"></span>
+          <button id="dockhide" type="button" aria-controls="dock" aria-label="Hide this bar" title="Hide this bar"><svg class="ic" aria-hidden="true"><use href="#i-caret-down"/></svg></button>
+        </div>
+        <button id="dockshow" class="dockshow" type="button" aria-controls="dock" aria-label="Show the page and zoom bar" title="Show the bar"><svg class="ic" aria-hidden="true"><use href="#i-caret-up"/></svg></button>
+      </section>
+      <aside id="panel" aria-label="Findings">
+        <button id="sheetbtn" class="sheetbtn" type="button" aria-expanded="false" aria-controls="panel"><span class="handle"></span><span class="sr">Show findings</span></button>
+        <div id="peek"></div>
+        <section id="detail" class="fcard" aria-label="Selected finding"></section>
+        <section class="fcard listcard" aria-label="Other findings">
+          <ol id="list" class="list"></ol>
+        </section>
+      </aside>
+    </main>
+
+    <main id="screen-export" class="screen"><div id="export-root" class="ex"></div></main>
+  </div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script id="payload" type="application/json">{"document": {"title": "Compliance note CN-2026-07", "subtitle": "Oeverlicht Custody · CAFR licence application", "file": "../sample/note.pdf", "pages": 4}, "agents": [{"key": "claude", "name": "Claude", "mono": "CL", "kind": "AI model", "connected": true, "about": "Reads for figures, references and consistency."}, {"key": "chatgpt", "name": "ChatGPT", "mono": "GP", "kind": "AI model", "connected": true, "about": "Reads for terminology and figures."}, {"key": "gemini", "name": "Gemini", "mono": "GE", "kind": "AI model", "connected": true, "about": "Cross-checks numbers, names and dates."}, {"key": "grok", "name": "Grok", "mono": "GR", "kind": "AI model", "connected": false, "about": "A second opinion on references and deadlines."}, {"key": "languagetool", "name": "LanguageTool", "mono": "LT", "kind": "Language check", "connected": true, "about": "Spelling and grammar. Runs on your own machine."}, {"key": "reviewer", "name": "Team review", "mono": "TR", "kind": "People", "connected": true, "about": "Findings your colleagues flag by hand."}], "workspace": "Oeverlicht Custody", "library": [{"title": "Custody agreement, client terms v3", "subtitle": "Oeverlicht Custody · retail clients", "pages": 12, "findings": 31, "approved": 26, "rejected": 5, "status": "done", "updated_days_ago": 9, "team": ["lena", "noah"]}, {"title": "AML and CFT policy 2026", "subtitle": "Oeverlicht Custody · internal policy", "pages": 9, "findings": 14, "status": "waiting", "updated_days_ago": 2, "team": ["sam"]}, {"title": "Incident register, third quarter", "subtitle": "Oeverlicht Custody · report to the DASA", "pages": 3, "findings": 6, "approved": 6, "rejected": 0, "status": "done", "updated_days_ago": 23, "team": ["lena", "sam"]}], "team": [{"key": "sam", "name": "Sam Ortega", "role": "Compliance reviewer", "email": "sam@example.com"}, {"key": "lena", "name": "Lena Vos", "role": "Head of Compliance", "email": "lena@example.com"}, {"key": "noah", "name": "Noah Brandt", "role": "Legal counsel", "email": "noah@example.com"}], "decisions": [{"finding": "f01", "by": "lena", "verdict": "approved", "minutes_ago": 118}, {"finding": "f05", "by": "lena", "verdict": "approved", "minutes_ago": 96}, {"finding": "f05", "by": "noah", "verdict": "approved", "minutes_ago": 61}, {"finding": "f06", "by": "noah", "verdict": "approved", "minutes_ago": 52}, {"finding": "f11", "by": "lena", "verdict": "approved", "minutes_ago": 44}, {"finding": "f11", "by": "noah", "verdict": "rejected", "minutes_ago": 40}, {"finding": "f14", "by": "noah", "verdict": "rejected", "minutes_ago": 31}], "findings": [{"id": "f01", "page": 1, "severity": "high", "type": "figures", "quote": "minimum capital of €150,000", "suggestion": "minimum capital of €125,000", "title": "Class 2 minimum capital differs from Table 1", "note": "Table 1 on page 2 gives €125,000 for class 2. €150,000 is the amount for class 3.", "agents": ["claude", "chatgpt", "reviewer"]}, {"id": "f02", "page": 1, "severity": "low", "type": "language", "quote": "The licence are expected", "suggestion": "The licence is expected", "title": "Subject and verb disagree: ‘licence are’", "note": "‘Licence’ is singular, so the verb is ‘is’.", "agents": ["languagetool", "gemini"]}, {"id": "f03", "page": 1, "severity": "medium", "type": "terminology", "quote": "asset-referenced tokens", "suggestion": "asset-linked tokens", "title": "Term differs from the note’s own definition", "note": "Section 8 defines ‘asset-linked token’. Use the defined term, as the same sentence does for ‘e-money tokens’.", "agents": ["chatgpt", "claude"], "variants": [{"agent": "claude", "text": "tokens whose value is linked to other assets"}]}, {"id": "f04", "page": 1, "severity": "low", "type": "terminology", "quote": "assesses the issuer's prospectus", "suggestion": "assesses the issuer's white paper", "title": "‘Prospectus’ where the note means the white paper", "note": "Under the CAFR an issuer publishes a white paper (section 8), and the next sentence says ‘white paper’ too.", "agents": ["grok"]}, {"id": "f05", "page": 2, "severity": "high", "type": "reference", "quote": "Article 62 CAFR divides", "suggestion": "Article 26 CAFR divides", "title": "Wrong article number for the capital requirements", "note": "Footnote 1 and the definitions both give Article 26 CAFR. The digits look swapped.", "agents": ["claude", "grok"]}, {"id": "f06", "page": 2, "severity": "high", "type": "figures", "quote": "One quarter of that is €435,000", "suggestion": "One quarter of that is €535,000", "title": "Arithmetic: a quarter of €2,140,000 is €535,000", "note": "2,140,000 divided by 4 is 535,000. The conclusion of the sentence still holds; the amount does not.", "agents": ["claude", "gemini"]}, {"id": "f07", "page": 2, "severity": "medium", "type": "figures", "quote": "€1,000,0000", "suggestion": "€1,000,000", "title": "Amount with one digit too many", "note": "‘1,000,0000’ is not a valid amount. €1,000,000 is the likely meaning; check it against the quarterly figures.", "agents": ["chatgpt"]}, {"id": "f08", "page": 2, "severity": "low", "type": "language", "quote": "never stores it's keys", "suggestion": "never stores its keys", "title": "‘It’s’ where the possessive ‘its’ is meant", "note": "‘It’s’ means ‘it is’. The possessive has no apostrophe.", "agents": ["languagetool", "reviewer"], "variants": [{"agent": "reviewer", "text": "never stores the keys"}]}, {"id": "f09", "page": 2, "severity": "medium", "type": "reference", "quote": "(see section 7.2)", "suggestion": "(see Table 2)", "title": "Reference to a section that does not exist", "note": "Section 7 has no subsections. The 24-hour deadline for a reconciliation difference is in Table 2.", "agents": ["claude"]}, {"id": "f10", "page": 3, "severity": "high", "type": "consistency", "quote": "Because 80% of client assets are kept in cold storage", "suggestion": "Because at least 90% of client assets are kept in cold storage", "title": "80% in cold storage, where sections 1 and 4 say 90%", "note": "Section 1 and section 4 both say at least 90% is kept in cold storage.", "agents": ["gemini", "claude"]}, {"id": "f11", "page": 3, "severity": "high", "type": "figures", "quote": "15% money market funds", "suggestion": "5% money market funds", "title": "The parts of the reserve add up to 110%", "note": "60% + 35% + 15% = 110%. One of the three shares is wrong; confirm with Treasury before the text changes.", "agents": ["claude", "chatgpt", "gemini"]}, {"id": "f12", "page": 3, "severity": "high", "type": "consistency", "quote": "financial intelligence unit within 30 days", "suggestion": "financial intelligence unit within 14 days", "title": "Reporting deadline differs from Table 2", "note": "Table 2, just above, gives 14 days for an unusual transaction.", "agents": ["grok", "reviewer"]}, {"id": "f13", "page": 3, "severity": "medium", "type": "reference", "quote": "See Table 3 for the full list", "suggestion": "See Table 2 for the full list", "title": "There is no Table 3", "note": "The note has two tables. The reporting deadlines are in Table 2.", "agents": ["chatgpt"]}, {"id": "f14", "page": 3, "severity": "medium", "type": "terminology", "quote": "The crypto service provider keeps a register", "suggestion": "Oeverlicht keeps a register", "title": "Term differs from ‘crypto-asset service provider’", "note": "Section 8 defines ‘crypto-asset service provider’. Here it means Oeverlicht itself, so the name is clearest.", "agents": ["gemini", "chatgpt"], "variants": [{"agent": "chatgpt", "text": "The crypto-asset service provider keeps a register"}]}, {"id": "f15", "page": 3, "severity": "low", "type": "language", "quote": "notifed", "suggestion": "notified", "title": "Spelling: ‘notified’", "note": "Missing letter: notified.", "agents": ["languagetool"]}, {"id": "f16", "page": 4, "severity": "high", "type": "figures", "quote": "submitted on 31 June 2026", "suggestion": "submitted on 30 June 2026", "title": "The date does not exist: June has 30 days", "note": "There is no 31 June. Check the date on the DASA’s acknowledgement of receipt.", "agents": ["reviewer", "claude"], "variants": [{"agent": "claude", "text": "submitted on 1 July 2026"}]}, {"id": "f17", "page": 4, "severity": "low", "type": "language", "quote": "governance and the the custody", "suggestion": "governance and the custody", "title": "Repeated word: ‘the the’", "note": "‘The’ appears twice in a row.", "agents": ["languagetool"]}, {"id": "f18", "page": 4, "severity": "medium", "type": "consistency", "quote": "decision period of 20 working days", "suggestion": "decision period of 25 working days", "title": "Decision period: 20 working days here, 25 above", "note": "The paragraph above the list gives 25 working days.", "agents": ["chatgpt", "grok"]}, {"id": "f19", "page": 4, "severity": "medium", "type": "consistency", "quote": "Oeverlight Custody B.V. declares", "suggestion": "Oeverlicht Custody B.V. declares", "title": "Company name misspelt", "note": "Everywhere else it is Oeverlicht, with ‘ch’. In a declaration the exact name matters.", "agents": ["gemini", "reviewer"]}], "vendor": "../../desk/vendor/"}</script>
+<script>/* Vidimus lab desk: the logic both design directions share.
+   lab/build.py inlines this file, the icon sprite and the sample data into
+   lab/vN/template.html.
+
+   Three screens: sign in (demo accounts), review, export.
+   Review shows one document, rendered with PDF.js. Every finding carries the
+   text it is about; the desk finds that text in the PDF and draws the highlight
+   there, so a finding cannot land on the wrong sentence. Numbered markers sit
+   in a gutter beside the page, never on the text. Every finding has a key
+   (VD-01 …) the team can refer to, and every decision records who made it.
+
+   Nothing here talks to a server: sign-in, connected tools and decisions are
+   sample states kept in this browser.
+
+   The template decides the layout. It provides the elements used below (by id)
+   and says on <body> where the selected card goes: data-card="inline" (inside
+   the list, under its row) or data-card="detail" (in #detail). A filter host
+   ([data-filters]) is drawn as a dropdown bar, or as facet lists with
+   data-style="facets". */
+(() => {
+'use strict';
+
+const D = JSON.parse(document.getElementById('payload').textContent);
+const DIR = document.body.dataset.dir || 'lab';
+const INLINE = document.body.dataset.card !== 'detail';
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MOBILE = matchMedia('(max-width: 760px)');
+
+const SEV = {high: 'High', medium: 'Medium', low: 'Low'};
+const TYPES = {figures: 'Figures', reference: 'Reference', terminology: 'Terminology',
+               consistency: 'Consistency', language: 'Language'};
+const STATUS = {open: 'Open', approved: 'Approved', rejected: 'Rejected', split: 'Split'};
+const GROUPS = {sev: 'Severity', type: 'Type', agent: 'Found by'};
+const AG = Object.fromEntries(D.agents.map(a => [a.key, a]));
+const TEAM = Object.fromEntries(D.team.map((u, i) => [u.key, Object.assign({i}, u)]));
+const pad = n => String(n).padStart(2, '0');
+const F = D.findings.map((f, i) => Object.assign({n: i + 1, key: 'VD-' + pad(i + 1), rects: null}, f));
+const byId = Object.fromEntries(F.map(f => [f.id, f]));
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+const initials = name => name.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+function ago(t){
+  const m = Math.round((Date.now() - t) / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m} min ago`;
+  const h = Math.round(m / 60);
+  return h < 24 ? `${h} h ago` : `${Math.round(h / 24)} d ago`;
+}
+
+/* ---------- icons (Phosphor) and tool logos, both from the inlined sprite ---------- */
+const ic = (n, cls = '') => `<svg class="ic${cls ? ' ' + cls : ''}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const hasLogo = k => !!document.getElementById('logo-' + k);
+const logo = (k, cls = '') => `<span class="lg lg-${k}${cls ? ' ' + cls : ''}" title="${esc(AG[k].name)}">${
+  hasLogo(k) ? `<svg aria-hidden="true"><use href="#logo-${k}"/></svg>` : ic('users-three')}</span>`;
+const logos = keys => `<span class="lgstack">${keys.map(k => logo(k)).join('')}</span>`;
+
+/* ---------- saved state (this browser only) ---------- */
+const KEY = 'vidimus-lab-' + DIR;
+function lsGet(k, d){ try { const v = localStorage.getItem(KEY + ':' + k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } }
+function lsSet(k, v){ try { localStorage.setItem(KEY + ':' + k, JSON.stringify(v)); } catch(e){} }
+
+let me = lsGet('user', null);                      // who is signed in
+{ // ?as=lena opens the desk signed in as that demo account (for embeds and checks)
+  const as = new URLSearchParams(location.search).get('as');
+  if (as && TEAM[as]){ me = as; lsSet('user', me); }
+}
+let votes = lsGet('votes', null);                   // id -> {person: {v, at}}
+if (!votes){
+  votes = {};
+  for (const d of D.decisions || [])
+    (votes[d.finding] = votes[d.finding] || {})[d.by] = {v: d.verdict, at: Date.now() - d.minutes_ago * 60000};
+  lsSet('votes', votes);
+}
+let edits = lsGet('edits', {});                     // id -> {text, by, at}
+const conn = Object.assign(Object.fromEntries(D.agents.map(a => [a.key, !!a.connected])), lsGet('tools', {}));
+const connecting = new Set();
+/* Zoom is relative to the page fitting its column. A phone opens at a reading
+   zoom instead (the page about 1.05x its size in points, body text near 11px)
+   and keeps its own setting; null means « use the default for this screen ». */
+const zkey = () => MOBILE.matches ? 'zoom-phone' : 'zoom';
+let zoom = lsGet(zkey(), null);
+const filt = {sev: new Set(), type: new Set(), agent: new Set()};
+let query = '', openDrop = null;
+let tab = 'all', sel = null, editing = null, listTop = false;
+const ex = {scope: 'all', format: 'csv'};
+
+const textOf = f => (edits[f.id] && edits[f.id].text) || f.suggestion;
+const votesOf = f => votes[f.id] || {};
+function statusOf(f){
+  const v = Object.values(votesOf(f)).map(x => x.v);
+  const ok = v.includes('approved'), no = v.includes('rejected');
+  return ok && no ? 'split' : ok ? 'approved' : no ? 'rejected' : 'open';
+}
+/* a split decision still needs one: it sits under Open */
+const tabOf = f => { const s = statusOf(f); return s === 'split' ? 'open' : s; };
+const myVote = f => (votesOf(f)[me] || {}).v;
+const by = (f, verdict) => Object.entries(votesOf(f)).filter(([, x]) => x.v === verdict).map(([k]) => k);
+
+function vote(id, verdict){
+  if (!me) return;
+  const f = byId[id], cur = votes[id] = votes[id] || {};
+  if (cur[me] && cur[me].v === verdict) delete cur[me];
+  else cur[me] = {v: verdict, at: Date.now()};
+  lsSet('votes', votes);
+  const name = TEAM[me].name.split(' ')[0];
+  toast(cur[me] ? `${f.key} ${verdict} by ${name}` : `${name}’s decision on ${f.key} withdrawn`);
+  render();
+}
+
+/* ---------- which findings show ---------- */
+const agentsOf = f => f.agents.filter(a => conn[a]);
+const live = f => agentsOf(f).length > 0;
+const hay = f => `${f.key} ${f.title} ${f.quote} ${f.note} ${TYPES[f.type]} ${textOf(f)}`.toLowerCase();
+function pass(f, skip){
+  if (!live(f)) return false;
+  if (query && !hay(f).includes(query)) return false;
+  if (skip !== 'sev' && filt.sev.size && !filt.sev.has(f.severity)) return false;
+  if (skip !== 'type' && filt.type.size && !filt.type.has(f.type)) return false;
+  if (skip !== 'agent' && filt.agent.size && !agentsOf(f).some(a => filt.agent.has(a))) return false;
+  if (skip !== 'tab' && tab !== 'all' && tabOf(f) !== tab) return false;
+  return true;
+}
+const shown = () => F.filter(f => pass(f));
+const filtering = () => filt.sev.size + filt.type.size + filt.agent.size > 0 || !!query;
+
+function names(list){
+  return list.length < 2 ? list.join('') : list.slice(0, -1).join(', ') + ' and ' + list[list.length - 1];
+}
+function avatar(k, cls = ''){
+  const u = TEAM[k];
+  return `<span class="av av-${u.i}${cls ? ' ' + cls : ''}" title="${esc(u.name)}">${initials(u.name)}</span>`;
+}
+const LOGO = `<svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="1" width="22" height="22" rx="6" fill="currentColor"/>
+  <path d="M7 8.5l5 8 5-8" fill="none" stroke="var(--logo-ink,#fff)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+/* ---------- word diff: struck old words, marked new ones ---------- */
+function toks(s){ return String(s || '').split(/(\s+)/).filter(x => x !== ''); }
+function wdiff(a, b){
+  const A = toks(a), B = toks(b), n = A.length, m = B.length;
+  const L = Array.from({length: n + 1}, () => new Uint16Array(m + 1));
+  for (let i = n - 1; i >= 0; i--)
+    for (let j = m - 1; j >= 0; j--)
+      L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const out = []; let i = 0, j = 0;
+  while (i < n && j < m){
+    if (A[i] === B[j]){ out.push(['=', A[i]]); i++; j++; }
+    else if (L[i + 1][j] >= L[i][j + 1]) out.push(['-', A[i++]]);
+    else out.push(['+', B[j++]]);
+  }
+  while (i < n) out.push(['-', A[i++]]);
+  while (j < m) out.push(['+', B[j++]]);
+  return out;
+}
+/* The suggestion reads as the new wording only, with what changed marked in
+   green; the old words are already in « Current text » above it (Andy, 21 Nov). */
+function diffHTML(a, b){
+  if (a === b) return '<span class="same">No change</span>';
+  return wdiff(a, b).map(([op, t]) => {
+    if (op === '=') return esc(t);
+    if (op === '-') return '';
+    return /^\s+$/.test(t) ? t : `<ins>${esc(t)}</ins>`;
+  }).join('').replace(/<\/ins>(\s+)<ins>/g, '$1').replace(/ {2,}/g, ' ');
+}
+
+/* =====================================================================
+   Screens: sign in, then whatever the template offers (dashboard, reviews,
+   documents, agents, review, export). A screen exists when the template has
+   a #screen-<name> for it.
+   ===================================================================== */
+const HOME = document.body.dataset.home || 'review';
+const OTHERS = document.body.dataset.list === 'others';      // the selected finding is not repeated in the list
+const AUTO = 'autoselect' in document.body.dataset;          // on a phone, the sheet's peek always holds a finding
+const autoSel = () => AUTO && MOBILE.matches;                 // on a desk the findings fold and open like comments
+const NAV_OF = {review: 'documents', export: 'documents'};
+const firstOpen = () => (shown().find(f => tabOf(f) === 'open') || shown()[0] || {}).id || null;
+function route(){
+  let s = (location.hash.match(/^#\/(\w+)/) || [])[1] || (me ? HOME : 'signin');
+  if (!me) s = 'signin';
+  if (s !== 'signin' && !$(`#screen-${s}`)) s = HOME;
+  document.body.dataset.screen = s;
+  closeMenus(); openDrop = null; setNav(false);
+  $$('[data-nav]').forEach(a => a.dataset.nav === (NAV_OF[s] || s) ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
+  renderCrumb(s);
+  if (s === 'signin') renderSignin();
+  if (s === 'export') renderExport();
+  if (s === 'dashboard') renderDashboard();
+  if (s === 'reviews') renderReviews();
+  if (s === 'documents') renderDocuments();
+  if (s === 'agents') renderTools();
+  if (s === 'review'){
+    if (autoSel() && !sel) sel = firstOpen();
+    render(); if (!doc) mount(); else { layout(); if (sel) focusSel(); }
+  }
+  const main = $(`#screen-${s}`); if (main) main.scrollTop = 0;
+}
+addEventListener('hashchange', route);
+function go(s){ if (location.hash !== '#/' + s) location.hash = '#/' + s; else route(); }
+
+function renderSignin(){
+  const host = $('#signin-root'); if (!host) return;
+  host.innerHTML = `<div class="si-card">
+      <div class="si-brand">${LOGO}<span>Vidimus</span></div>
+      <h1 class="si-title">Sign in to review</h1>
+      <p class="si-sub">${esc(D.document.title)} is waiting for your team. Choose an account to continue.</p>
+      <ul class="si-users">${D.team.map(u => `<li><button type="button" class="si-user" data-signin="${u.key}">
+          ${avatar(u.key)}<span class="si-who"><b>${esc(u.name)}</b><span>${esc(u.role)}</span></span>
+          ${ic('caret-right', 'si-go')}</button></li>`).join('')}</ul>
+      <p class="si-note">Demo accounts. No password, and nothing leaves this page.</p>
+    </div>`;
+  $$('[data-signin]', host).forEach(b => b.onclick = () => {
+    me = b.dataset.signin; lsSet('user', me);
+    toast(`Signed in as ${TEAM[me].name}`);
+    go(HOME);
+  });
+}
+
+/* ---------- where am I: the header's breadcrumb ---------- */
+const SCREEN_NAME = {dashboard: 'Dashboard', reviews: 'Reviews', documents: 'Documents', agents: 'Agents'};
+function renderCrumb(s){
+  const host = $('#crumb'); if (!host) return;
+  host.innerHTML = SCREEN_NAME[s] ? `<b>${SCREEN_NAME[s]}</b>`
+    : `<a href="#/documents">Documents</a><span class="cr-sep" aria-hidden="true">/</span><b>${esc(D.document.title)}</b><span class="cr-sub">${esc(D.document.subtitle)}</span>`;
+}
+
+/* ---------- the history: every decision and edit, newest first ---------- */
+function activity(){
+  const ev = [];
+  for (const f of F){
+    for (const [k, x] of Object.entries(votesOf(f))) ev.push({at: x.at, who: k, what: x.v, f});
+    if (edits[f.id] && TEAM[edits[f.id].by]) ev.push({at: edits[f.id].at, who: edits[f.id].by, what: 'edited', f});
+  }
+  return ev.sort((a, b) => b.at - a.at);
+}
+const VERB = {approved: 'approved', rejected: 'rejected', edited: 'edited the suggestion of'};
+function activityHTML(limit){
+  const ev = activity().slice(0, limit || 1e9);
+  if (!ev.length) return '<p class="dnone">No decisions yet.</p>';
+  return `<ul class="alist">${ev.map(e => `<li>${avatar(e.who, 'sm' + (e.what === 'edited' ? '' : ' v-' + e.what))}
+    <span class="atext"><b>${esc(TEAM[e.who].name)}</b> ${VERB[e.what]} <a href="#/review" data-goto="${e.f.id}">${e.f.key}</a>
+      <span class="atitle">${esc(e.f.title)}</span></span><time>${ago(e.at)}</time></li>`).join('')}</ul>`;
+}
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-goto]');
+  if (!g) return;
+  e.preventDefault();
+  sel = g.dataset.goto; editing = null;
+  if (!pass(byId[sel])){ filt.sev.clear(); filt.type.clear(); filt.agent.clear(); query = ''; tab = 'all'; }
+  go('review');
+});
+function greeting(){ const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; }
+const DOC_STATUS = {review: 'In review', waiting: 'Waiting for review', done: 'Done'};
+function libDocs(){
+  const all = F.filter(live), decided = all.filter(f => tabOf(f) !== 'open').length;
+  const touched = activity()[0];
+  return [{title: D.document.title, subtitle: D.document.subtitle, pages: D.document.pages, findings: all.length,
+           decided, status: 'review', updated: touched ? ago(touched.at) : 'today', team: D.team.map(u => u.key), live: true}]
+    .concat((D.library || []).map(d => Object.assign({}, d, {updated: `${d.updated_days_ago} d ago`})));
+}
+
+function renderDashboard(){
+  const host = $('#dashboard-root'); if (!host || !me) return;
+  const all = F.filter(live), n = s => all.filter(f => tabOf(f) === s).length;
+  const decided = all.length - n('open'), on = D.agents.filter(a => conn[a.key]);
+  const openSev = s => all.filter(f => tabOf(f) === 'open' && f.severity === s).length;
+  host.innerHTML = `
+    <div class="pg-head"><h1>${greeting()}, ${esc(TEAM[me].name.split(' ')[0])}</h1>
+      <p>${plural(n('open'), 'finding is', 'findings are')} waiting for a decision in ${esc(D.workspace || 'your workspace')}.</p></div>
+    <div class="dash">
+      <section class="dcard dcont">
+        <span class="dlabel">Continue reviewing</span>
+        <h2>${esc(D.document.title)}</h2><p class="dsub">${esc(D.document.subtitle)}</p>
+        <div class="dprog"><span class="bar"><i style="--p:${all.length ? decided / all.length : 0}"></i></span><span><b>${decided}</b> of ${all.length} decided</span></div>
+        <div class="dsev">${['high', 'medium', 'low'].map(s => `<span><i class="dot s-${s}"></i>${SEV[s]}<b>${openSev(s)}</b><small>open</small></span>`).join('')}</div>
+        <a class="btn primary" href="#/review">Continue review ${ic('arrow-right')}</a>
+      </section>
+      <section class="dcard dstats">
+        ${[['Open', n('open'), ''], ['Approved', n('approved'), 'approved'], ['Rejected', n('rejected'), ''],
+           ['Agents connected', `${on.length}<small> of ${D.agents.length}</small>`, '']].map(([l, v, k]) =>
+          `<div class="dstat${k ? ' st-' + k : ''}"><span>${l}</span><b>${v}</b></div>`).join('')}
+      </section>
+      <section class="dcard dact"><div class="dhead"><h3>Recent activity</h3><a class="linkbtn" href="#/reviews">All reviews</a></div>${activityHTML(5)}</section>
+      <section class="dcard ddocs"><div class="dhead"><h3>Documents</h3><a class="linkbtn" href="#/documents">All documents</a></div>
+        <ul class="dlist2">${libDocs().slice(0, 3).map(d => `<li><span class="dt"><b>${esc(d.title)}</b><span>${DOC_STATUS[d.status]}</span></span>
+          <span class="dn">${d.status === 'review' ? `${d.decided}/${d.findings}` : d.findings}</span></li>`).join('')}</ul></section>
+    </div>`;
+}
+
+let rvTab = 'all';
+function renderReviews(){
+  const host = $('#reviews-root'); if (!host || !me) return;
+  const all = F.filter(live), rows = all.filter(f => rvTab === 'all' || tabOf(f) === rvTab);
+  const n = s => s === 'all' ? all.length : all.filter(f => tabOf(f) === s).length;
+  host.innerHTML = `
+    <div class="pg-head"><h1>Reviews</h1><p>Every finding and every decision, with who made it and when.</p></div>
+    <div class="rv">
+      <section class="dcard rvlist">
+        <div class="dhead"><h3>${esc(D.document.title)}</h3><a class="linkbtn" href="#/review">Open document</a></div>
+        <div class="seg rvtabs" role="tablist" aria-label="Status">${[['all', 'All'], ['open', 'Open'], ['approved', 'Approved'], ['rejected', 'Rejected']].map(([k, l]) =>
+          `<button type="button" role="tab" aria-selected="${rvTab === k}" data-rvtab="${k}">${l}<span class="n">${n(k)}</span></button>`).join('')}</div>
+        <ul class="rvrows">${rows.map(f => { const s = statusOf(f), v = Object.entries(votesOf(f));
+          return `<li><a href="#/review" data-goto="${f.id}" class="rvrow">
+            <span class="mk-mini s-${f.severity} st-${s}">${f.n}</span>
+            <span class="rvmain"><b>${esc(f.title)}</b><span class="rmeta"><span class="rkey">${f.key}</span><span class="sevw s-${f.severity}">${SEV[f.severity]}</span><span>${TYPES[f.type]}</span><span>Page ${f.page}</span>
+              ${s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : '<span class="stat st-open">Open</span>'}</span></span>
+            <span class="rvwho">${v.length ? v.map(([k, x]) => avatar(k, 'xs v-' + x.v)).join('') : ''}</span></a></li>`; }).join('') || '<li class="empty">Nothing here.</li>'}</ul>
+      </section>
+      <section class="dcard rvact"><div class="dhead"><h3>History</h3></div>${activityHTML()}</section>
+      <section class="dcard rvold"><div class="dhead"><h3>Earlier documents</h3></div>
+        <ul class="dlist2">${(D.library || []).filter(d => d.status === 'done').map(d => `<li><span class="dt"><b>${esc(d.title)}</b>
+          <span>${d.findings} findings: ${d.approved} approved, ${d.rejected} rejected, ${d.updated_days_ago} d ago</span></span>
+          <span class="avs">${(d.team || []).map(k => avatar(k, 'xs')).join('')}</span></li>`).join('')}</ul>
+        <p class="pg-note">Sample entries: only ${esc(D.document.title)} is loaded in this demo.</p></section>
+    </div>`;
+  $$('[data-rvtab]', host).forEach(b => b.onclick = () => { rvTab = b.dataset.rvtab; renderReviews(); $(`[data-rvtab="${rvTab}"]`, host).focus(); });
+}
+
+function renderDocuments(){
+  const host = $('#documents-root'); if (!host || !me) return;
+  host.innerHTML = `
+    <div class="pg-head"><h1>Documents</h1><p>Everything your team has had read and reviewed in ${esc(D.workspace || 'this workspace')}.</p></div>
+    <section class="dcard doctable">
+      <div class="dt-head" aria-hidden="true"><span>Document</span><span>Pages</span><span>Findings</span><span>Status</span><span>Updated</span><span>Team</span></div>
+      <ul>${libDocs().map((d, i) => `<li class="dt-row${d.live ? ' live' : ''}">
+        <span class="dt-doc">${ic('file-text')}<span><b>${esc(d.title)}</b><small>${esc(d.subtitle)}</small></span></span>
+        <span class="dt-n" data-l="Pages">${d.pages}</span>
+        <span class="dt-n" data-l="Findings">${d.status === 'review' ? `${d.decided}/${d.findings} decided` : d.findings}</span>
+        <span data-l="Status"><span class="stat st-${d.status === 'done' ? 'approved' : d.status === 'review' ? 'split' : 'open'}">${DOC_STATUS[d.status]}</span></span>
+        <span class="dt-n" data-l="Updated">${esc(d.updated)}</span>
+        <span class="avs">${(d.team || []).map(k => avatar(k, 'xs')).join('')}</span>
+        ${d.live ? `<a class="btn small primary" href="#/review">Open</a>` : `<button type="button" class="btn small" data-sample="${i}">Open</button>`}
+      </li>`).join('')}</ul>
+    </section>
+    <p class="pg-note">Only ${esc(D.document.title)} is loaded in this demo; the other rows are sample entries.</p>`;
+  $$('[data-sample]', host).forEach(b => b.onclick = () => toast(`Sample entry: only ${D.document.title} is loaded`));
+}
+
+/* ---------- the sidebar: folded by default, opened from the header ----------
+   On a desk it pushes the review aside and the choice is remembered; on a
+   phone it is a drawer over the page that closes on every move. */
+function setNav(open){
+  document.body.classList.toggle('nav-open', !!open);
+  if (MOBILE.matches) $('#sidebtn')?.setAttribute('aria-expanded', !!open);
+}
+function setSide(open){
+  document.body.classList.toggle('side-open', !!open);
+  lsSet('side', !!open);
+  $('#sidebtn')?.setAttribute('aria-expanded', !!open);
+}
+if ($('#sidebtn')){
+  if (lsGet('side', false)) document.body.classList.add('side-open');
+  $('#sidebtn').setAttribute('aria-expanded', !MOBILE.matches && document.body.classList.contains('side-open'));
+  $('#sidebtn').onclick = e => {
+    e.stopPropagation();
+    if (MOBILE.matches) setNav(!document.body.classList.contains('nav-open'));
+    else setSide(!document.body.classList.contains('side-open'));
+  };
+}
+
+/* ---------- the bar under the pages: it hides, and a small arrow brings it back ---------- */
+function setDock(on){
+  document.body.classList.toggle('dock-off', !on);
+  lsSet('dock', !!on);
+  $('#dockhide')?.setAttribute('aria-expanded', !!on);
+  $('#dockshow')?.setAttribute('aria-expanded', !!on);
+}
+if ($('#dock')){
+  setDock(lsGet('dock', true) !== false);
+  $('#dockhide').onclick = () => { setDock(false); $('#dockshow').focus(); };
+  $('#dockshow').onclick = () => { setDock(true); $('#dockhide').focus(); };
+}
+$('#wsbtn') && ($('#wsbtn').onclick = e => {
+  e.stopPropagation();
+  const m = $('#wsmenu');
+  if (!m.hidden){ closeMenus(); return; }
+  m.innerHTML = `<div class="um-label">Workspaces</div>
+    <button type="button" class="um-item" role="menuitemradio" aria-checked="true">${ic('buildings')}<span>${esc(D.workspace || 'Workspace')}</span>${ic('check', 'um-check')}</button>
+    <p class="ws-note">This demo has one workspace.</p>`;
+  m.hidden = false; e.currentTarget.setAttribute('aria-expanded', 'true'); $('button', m)?.focus();
+});
+
+/* ---------- top bar: progress, tools, account ---------- */
+function renderTop(){
+  const all = F.filter(live), decided = all.filter(f => tabOf(f) !== 'open').length;
+  const p = $('#progress');
+  if (p) p.innerHTML = `<b>${decided}</b> of ${all.length} decided`;
+  const bar = $('#progressbar');
+  if (bar) bar.style.setProperty('--p', all.length ? decided / all.length : 0);
+  const tm = $('#toolsmonos');
+  if (tm){
+    const on = D.agents.filter(a => conn[a.key]).map(a => a.key);
+    tm.innerHTML = logos(on.slice(0, 4)) + (on.length > 4 ? `<span class="more">+${on.length - 4}</span>` : '');
+  }
+  const ab = $('#avatarbtn');
+  if (ab && me) ab.innerHTML = avatar(me);
+}
+
+/* ---------- account menu: who you are, review as someone else, sign out ---------- */
+function renderUserMenu(){
+  const host = $('#usermenu'); if (!host || !me) return;
+  const u = TEAM[me];
+  host.innerHTML = `<div class="um-me">${avatar(me, 'big')}<span><b>${esc(u.name)}</b><span>${esc(u.email)}</span><span>${esc(u.role)}</span></span></div>
+    <div class="um-label">Review as</div>
+    ${D.team.map(t => `<button type="button" class="um-item" role="menuitemradio" aria-checked="${t.key === me}" data-as="${t.key}">
+        ${avatar(t.key, 'sm')}<span>${esc(t.name)}</span>${t.key === me ? ic('check', 'um-check') : ''}</button>`).join('')}
+    <div class="um-sep"></div>
+    <button type="button" class="um-item" role="menuitem" data-signout>${ic('sign-out')}<span>Sign out</span></button>`;
+  $$('[data-as]', host).forEach(b => b.onclick = () => {
+    me = b.dataset.as; lsSet('user', me); closeMenus();
+    toast(`Now reviewing as ${TEAM[me].name}`); render();
+  });
+  $('[data-signout]', host).onclick = () => { me = null; lsSet('user', null); closeMenus(); go('signin'); };
+}
+function closeMenus(){
+  for (const [m, b] of [[$('#usermenu'), $('#avatarbtn')], [$('#wsmenu'), $('#wsbtn')]])
+    if (m && !m.hidden){ m.hidden = true; b && b.setAttribute('aria-expanded', 'false'); }
+}
+$('#avatarbtn') && ($('#avatarbtn').onclick = e => {
+  e.stopPropagation();
+  const m = $('#usermenu');
+  if (m.hidden){ renderUserMenu(); m.hidden = false; e.currentTarget.setAttribute('aria-expanded', 'true'); $('button', m)?.focus(); }
+  else closeMenus();
+});
+
+/* ---------- connect your tools: a full pop-up, sample states only ---------- */
+function renderTools(){
+  for (const host of $$('#toolsgrid,[data-toolsgrid]')) toolsInto(host);
+}
+function toolsInto(host){
+  host.innerHTML = D.agents.map(a => {
+    const on = conn[a.key], busy = connecting.has(a.key);
+    return `<li class="tcard${on ? ' on' : ''}${busy ? ' busy' : ''}">
+      <span class="tlogo">${logo(a.key)}</span>
+      <span class="tbody"><b>${esc(a.name)}</b><span class="tkind">${esc(a.kind)}</span></span>
+      <span class="tabout">${esc(a.about || '')}</span>
+      <span class="tstate">${busy ? `${ic('circle-notch', 'spin')}<span>Connecting…</span>`
+        : on ? `<span class="ok">${ic('check-circle')}Connected</span><button type="button" class="linkbtn" data-tool="${a.key}">Disconnect</button>`
+             : `<button type="button" class="btn small" data-tool="${a.key}">${ic('plugs-connected')}<span>Connect</span></button>`}</span>
+    </li>`;
+  }).join('');
+  $$('[data-tool]', host).forEach(b => b.onclick = () => {
+    const k = b.dataset.tool;
+    if (conn[k]){
+      conn[k] = false; lsSet('tools', conn); filt.agent.delete(k);
+      if (sel && !live(byId[sel])) sel = null;
+      renderTools(); render(); toast(`${AG[k].name} disconnected`);
+      $(`[data-tool="${k}"]`, host)?.focus();
+      return;
+    }
+    connecting.add(k); renderTools();
+    setTimeout(() => {
+      connecting.delete(k); conn[k] = true; lsSet('tools', conn);
+      renderTools(); render(); toast(`${AG[k].name} connected`);
+      $(`[data-tool="${k}"]`, host)?.focus();
+    }, REDUCED ? 200 : 1100);
+  });
+}
+function openTools(){
+  const m = $('#toolsmodal'); if (!m) return;
+  m.hidden = false; document.body.classList.add('modal-open');
+  renderTools();
+  ($('[data-tool]', m) || $('.modal-close', m))?.focus();
+}
+function closeTools(){
+  const m = $('#toolsmodal'); if (!m || m.hidden) return;
+  m.hidden = true; document.body.classList.remove('modal-open');
+  $('#toolsbtn')?.focus();
+}
+$('#toolsbtn') && ($('#toolsbtn').onclick = openTools);
+$$('[data-close-tools]').forEach(b => b.onclick = closeTools);
+$('#toolsmodal') && $('#toolsmodal').addEventListener('pointerdown', e => { if (e.target.id === 'toolsmodal') closeTools(); });
+$('#exportbtn') && ($('#exportbtn').onclick = () => go('export'));
+
+/* =====================================================================
+   Review: filters, list, card
+   ===================================================================== */
+const groupItems = g => g === 'sev' ? Object.entries(SEV) : g === 'type' ? Object.entries(TYPES)
+  : D.agents.filter(a => conn[a.key]).map(a => [a.key, a.name]);
+const lead = (g, k) => g === 'sev' ? `<i class="dot s-${k}"></i>` : g === 'agent' ? logo(k) : '';
+const count = (g, k) => F.filter(f => pass(f, g) && (g === 'sev' ? f.severity === k : g === 'type' ? f.type === k
+  : agentsOf(f).includes(k))).length;
+function itemHTML(g, k, label, cls){
+  const on = filt[g].has(k), n = count(g, k);
+  return `<button type="button" class="${cls}" role="menuitemcheckbox" aria-checked="${on}" data-group="${g}" data-key="${k}"${n === 0 && !on ? ' data-zero' : ''}>
+    <span class="cbox">${ic('check')}</span>${lead(g, k)}<span class="cl">${esc(label)}</span><span class="n">${n}</span></button>`;
+}
+function btnLabel(g){
+  const on = [...filt[g]];
+  if (!on.length) return `<span>${GROUPS[g]}</span>`;
+  const name = k => g === 'agent' ? AG[k].name : (g === 'sev' ? SEV : TYPES)[k];
+  const val = on.length === 1 ? name(on[0]) : `${on.length} selected`;
+  return `<span>${GROUPS[g]}</span><span class="fval">${esc(val)}</span>`;
+}
+function renderFilters(){
+  $$('[data-filters]').forEach((host, hi) => {
+    const facets = host.dataset.style === 'facets';
+    if (!host.dataset.built){
+      host.dataset.built = '1';
+      host.innerHTML = facets
+        ? `<label class="search">${ic('magnifying-glass')}<input type="search" placeholder="Search findings" aria-label="Search findings" data-q></label>
+           ${Object.keys(GROUPS).map(g => `<div class="fgroup" role="group" aria-label="${GROUPS[g]}"><div class="flabel">${GROUPS[g]}</div><div class="fitems" data-items="${g}"></div></div>`).join('')}
+           <button type="button" class="linkbtn fclear" data-clear hidden>Clear filters</button>`
+        : `<div class="fbar">${host.dataset.search === 'none' ? '' : `<label class="search">${ic('magnifying-glass')}<input type="search" placeholder="Search" aria-label="Search findings" data-q></label>`}
+           ${Object.keys(GROUPS).map(g => `<div class="fdrop"><button type="button" class="fbtn" aria-haspopup="true" aria-expanded="false" data-dropbtn="${hi}:${g}"></button>
+             <div class="fmenu" role="menu" aria-label="${GROUPS[g]}" data-menu="${hi}:${g}" hidden></div></div>`).join('')}
+           <button type="button" class="fbtn fx" data-clear hidden title="Clear filters">${ic('x')}<span>Clear</span></button></div>`;
+      const q = $('[data-q]', host); if (q) q.addEventListener('input', onQuery);
+    }
+    if (facets){
+      for (const g of Object.keys(GROUPS))
+        $(`[data-items="${g}"]`, host).innerHTML = groupItems(g).map(([k, l]) => itemHTML(g, k, l, 'facet')).join('');
+    } else {
+      for (const g of Object.keys(GROUPS)){
+        const id = `${hi}:${g}`, b = $(`[data-dropbtn="${id}"]`, host), m = $(`[data-menu="${id}"]`, host);
+        b.innerHTML = btnLabel(g) + ic('caret-down', 'caret');
+        b.classList.toggle('on', filt[g].size > 0);
+        b.setAttribute('aria-expanded', openDrop === id);
+        m.hidden = openDrop !== id;
+        if (openDrop === id) m.innerHTML = groupItems(g).map(([k, l]) => itemHTML(g, k, l, 'mitem')).join('');
+      }
+    }
+    $$('[data-clear]', host).forEach(c => c.hidden = !filtering());
+  });
+  const n = filt.sev.size + filt.type.size + filt.agent.size;
+  $$('[data-fcount]').forEach(el => el.textContent = n ? `${n} on` : '');
+}
+/* Search: typed anywhere, kept in step everywhere. A [data-searchbox] is a
+   magnifier that opens into the field (also with /) and folds away again. */
+let searchOpen = false;
+function onQuery(e){
+  query = e.target.value.trim().toLowerCase();
+  $$('[data-q]').forEach(q => { if (q !== e.target) q.value = e.target.value; });
+  if (sel && !pass(byId[sel])) sel = null;
+  listTop = true; render();
+}
+function renderSearchBox(){
+  for (const h of $$('[data-searchbox]')){
+    if (!h.dataset.built){
+      h.dataset.built = '1';
+      h.innerHTML = `<button type="button" class="sbtn" data-sopen aria-label="Search findings" title="Search (/)">${ic('magnifying-glass')}</button>
+        <label class="search sfield">${ic('magnifying-glass')}<input type="search" placeholder="Search findings" aria-label="Search findings" data-q>
+        <button type="button" class="sclose" data-sclose aria-label="Close search">${ic('x')}</button></label>`;
+      const q = $('[data-q]', h);
+      q.addEventListener('input', onQuery);
+      q.addEventListener('keydown', e => { if (e.key === 'Escape'){ e.stopPropagation(); closeSearch(); } });
+      $('[data-sopen]', h).onclick = () => { searchOpen = true; renderSearchBox(); q.focus(); };
+      $('[data-sclose]', h).onclick = closeSearch;
+    }
+    h.classList.toggle('open', searchOpen || !!query);
+  }
+}
+function closeSearch(){
+  searchOpen = false;
+  if (query){ query = ''; $$('[data-q]').forEach(q => q.value = ''); listTop = true; }
+  render(); $('[data-sopen]')?.focus();
+}
+
+/* On narrow screens folded filter areas close; on a desk they stay open. */
+for (const d of $$('details[data-fold]')){
+  const mq = d.dataset.fold ? matchMedia(d.dataset.fold) : MOBILE;
+  const sync = () => { d.open = !mq.matches; };
+  sync(); mq.addEventListener('change', sync);
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-group][data-key]');
+  if (t){
+    const g = filt[t.dataset.group], k = t.dataset.key;
+    g.has(k) ? g.delete(k) : g.add(k);
+    if (sel && !pass(byId[sel])) sel = null;
+    listTop = true; render();
+    return;
+  }
+  const db = e.target.closest('[data-dropbtn]');
+  if (db){ openDrop = openDrop === db.dataset.dropbtn ? null : db.dataset.dropbtn; renderFilters();
+           if (openDrop) $(`[data-menu="${openDrop}"] button`)?.focus(); return; }
+  if (e.target.closest('[data-clear]')){
+    filt.sev.clear(); filt.type.clear(); filt.agent.clear(); query = '';
+    $$('[data-q]').forEach(q => q.value = ''); openDrop = null; listTop = true; render();
+    return;
+  }
+  if (openDrop && !e.target.closest('.fmenu')){ openDrop = null; renderFilters(); }
+});
+document.addEventListener('pointerdown', e => {
+  for (const [m, b] of [['#usermenu', '#avatarbtn'], ['#wsmenu', '#wsbtn']]){
+    const el = $(m);
+    if (el && !el.hidden && !el.contains(e.target) && !e.target.closest(b)) closeMenus();
+  }
+  if (document.body.classList.contains('nav-open') && !e.target.closest('#side,#sidebtn')) setNav(false);
+});
+
+function renderTabs(){
+  const host = $('#tabs'); if (!host) return;
+  const base = F.filter(f => pass(f, 'tab'));
+  const n = {all: base.length};
+  for (const s of ['open', 'approved', 'rejected']) n[s] = base.filter(f => tabOf(f) === s).length;
+  host.innerHTML = [['all', 'All'], ['open', 'Open'], ['approved', 'Approved'], ['rejected', 'Rejected']].map(([k, l]) =>
+    `<button type="button" role="tab" aria-selected="${tab === k}" data-tab="${k}">${l}<span class="n">${n[k]}</span></button>`).join('');
+  $$('[data-tab]', host).forEach(b => b.onclick = () => {
+    tab = b.dataset.tab; if (sel && !pass(byId[sel])) sel = null; listTop = true; render();
+  });
+}
+
+const STATUS_ICON = {approved: 'check-circle', rejected: 'x-circle', split: 'warning-circle'};
+function votersHTML(f){
+  const v = Object.entries(votesOf(f)).sort((a, b) => a[1].at - b[1].at);
+  return v.length ? `<span class="rvoters">${v.map(([k, x]) => avatar(k, 'xs v-' + x.v)).join('')}</span>` : '';
+}
+function rowHTML(f, lane){   // lane: who decided sits under the tools, so the meta line never wraps
+  const s = statusOf(f);
+  return `<button type="button" class="rowbtn" aria-expanded="${sel === f.id}">
+      <span class="mk-mini s-${f.severity} st-${s}">${f.n}</span>
+      <span class="rmain">
+        <span class="rtitle">${esc(f.title)}</span>
+        <span class="rmeta"><span class="rkey">${f.key}</span><span class="sevw s-${f.severity}">${SEV[f.severity]}</span><span>${TYPES[f.type]}</span><span>Page ${f.page}</span>${
+          s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : ''}${lane ? '' : votersHTML(f)}</span>
+      </span>
+      <span class="rside">${logos(agentsOf(f))}${lane && sel !== f.id ? votersHTML(f) : ''}</span>
+    </button>`;
+}
+
+function decisionsHTML(f){
+  const list = Object.entries(votesOf(f)).sort((a, b) => a[1].at - b[1].at);
+  if (!list.length) return '<p class="dnone">No decision yet. Approve or reject to record yours.</p>';
+  return `<ul class="dlist">${list.map(([k, x]) => `<li>${avatar(k, 'sm v-' + x.v)}
+      <span><b>${esc(TEAM[k].name)}</b>${k === me ? ' <span class="you">(you)</span>' : ''}</span>
+      <span class="verdict v-${x.v}">${ic(x.v === 'approved' ? 'check' : 'x')}${x.v === 'approved' ? 'Approved' : 'Rejected'}</span><time>${ago(x.at)}</time></li>`).join('')}</ul>`;
+}
+function cardHTML(f){
+  const ags = agentsOf(f), mine = myVote(f), text = textOf(f), ed = edits[f.id];
+  const variants = (f.variants || []).filter(v => conn[v.agent] && v.text !== text);
+  const suggestion = editing === f.id
+    ? `<textarea class="cinput" id="ta-${f.id}" rows="2" spellcheck="true" aria-label="Suggestion for ${f.key}">${esc(text)}</textarea>
+       <div class="cedit"><button type="button" class="btn small primary" data-save>${ic('check')}<span>Save</span></button>
+         <button type="button" class="btn small ghost" data-cancel>Cancel</button><span class="hint">Enter to save, Esc to cancel</span></div>`
+    : `<div class="csugg">${diffHTML(f.quote, text)}</div>
+       ${ed ? `<p class="cedited">${ic('pencil-simple')}Edited by ${esc(TEAM[ed.by] ? TEAM[ed.by].name : ed.by)}, ${ago(ed.at)}</p>` : ''}`;
+  return `
+    <div class="cagents"><span>Found by ${esc(names(ags.map(k => AG[k].name)))}</span></div>
+    <div class="cfield"><div class="clabel">Current text</div><div class="cquote">${esc(f.quote)}</div></div>
+    <div class="cfield"><div class="clabel">Suggestion</div>${suggestion}</div>
+    ${variants.length && editing !== f.id ? `<div class="cfield"><div class="clabel">Alternative</div>${variants.map((v, i) =>
+      `<button type="button" class="cvar" data-v="${i}">${logo(v.agent)}<span class="vt">${esc(v.text)}</span><span class="use">Use</span></button>`).join('')}</div>` : ''}
+    <p class="cnote">${esc(f.note)}</p>
+    ${f.rects === false ? `<p class="cmiss">${ic('warning-circle')}This text was not found in the PDF. Check the page itself.</p>` : ''}
+    <div class="cacts">
+      <button type="button" class="btn approve" aria-pressed="${mine === 'approved'}" title="Approve (A)">${ic('check')}<span>${mine === 'approved' ? 'Approved' : 'Approve'}</span></button>
+      <button type="button" class="btn reject" aria-pressed="${mine === 'rejected'}" title="Reject (X)">${ic('x')}<span>${mine === 'rejected' ? 'Rejected' : 'Reject'}</span></button>
+      <button type="button" class="btn edit" aria-pressed="${editing === f.id}" title="Edit the suggestion (E)">${ic('pencil-simple')}<span>Edit</span></button>
+      <button type="button" class="btn ghost show" data-show>${ic('crosshair-simple')}<span>Show in document</span></button>
+    </div>
+    <div class="cdec"><div class="clabel">Decisions</div>${decisionsHTML(f)}</div>`;
+}
+function startEdit(id){ editing = id; render(); const ta = $(`#ta-${id}`); if (ta){ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); } }
+function saveEdit(f, value){
+  const v = value.trim();
+  if (v && v !== textOf(f)){ edits[f.id] = {text: v, by: me, at: Date.now()}; lsSet('edits', edits); toast(`${f.key} suggestion edited`); }
+  editing = null; render();
+}
+function wireCard(el, f){
+  const ta = $('textarea', el);
+  if (ta){
+    ta.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); saveEdit(f, ta.value); }
+      if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); editing = null; render(); }
+    });
+    $('[data-save]', el).onclick = () => saveEdit(f, ta.value);
+    $('[data-cancel]', el).onclick = () => { editing = null; render(); };
+  }
+  const variants = (f.variants || []).filter(v => conn[v.agent] && v.text !== textOf(f));
+  $$('.cvar', el).forEach(b => b.onclick = () => {
+    const v = variants[+b.dataset.v];
+    edits[f.id] = {text: v.text, by: me, at: Date.now()}; lsSet('edits', edits);
+    toast(`Using ${AG[v.agent].name}’s wording for ${f.key}`); render();
+  });
+  $('.approve', el).onclick = () => vote(f.id, 'approved');
+  $('.reject', el).onclick = () => vote(f.id, 'rejected');
+  $('.edit', el).onclick = () => editing === f.id ? (editing = null, render()) : startEdit(f.id);
+  $$('[data-show]', el).forEach(b => b.onclick = () => showInDoc(f));
+}
+
+function renderList(){
+  const host = $('#list'); if (!host) return;
+  if (!MOBILE.matches){ host.innerHTML = ''; listTop = false; return; }
+  if (listTop){ host.scrollTop = 0; listTop = false; }
+  const fs = shown().filter(f => !(OTHERS && f.id === sel));
+  if (!fs.length){
+    host.innerHTML = `<li class="empty">${ic('funnel-simple')}<b>${F.some(live) ? 'No findings match' : 'No tools are connected'}</b>
+      <span>${F.some(live) ? 'Try another filter or clear them.' : 'Connect a tool to see what it finds.'}</span>
+      ${filtering() ? '<button type="button" class="btn small" data-clear>Clear filters</button>' : ''}</li>`;
+    return;
+  }
+  host.innerHTML = fs.map(f => `<li class="row${sel === f.id ? ' sel' : ''} st-${statusOf(f)}" data-id="${f.id}">${rowHTML(f)}${
+      INLINE && sel === f.id ? `<div class="card" data-id="${f.id}">${cardHTML(f)}</div>` : ''}</li>`).join('');
+  for (const li of $$('.row', host)){
+    const f = byId[li.dataset.id];
+    $('.rowbtn', li).onclick = () => select(sel === f.id && INLINE ? null : f.id, 'list');
+    li.onmouseenter = () => hover(f.id, true);
+    li.onmouseleave = () => hover(f.id, false);
+    const card = $('.card', li);
+    if (card) wireCard(card, f);
+  }
+}
+function renderDetail(){
+  const host = $('#detail'); if (!host || INLINE) return;
+  if (!MOBILE.matches){ host.innerHTML = ''; return; }
+  const f = sel && byId[sel];
+  if (!f){
+    const next = shown().find(x => tabOf(x) === 'open');
+    host.innerHTML = `<div class="dempty">${ic('file-text')}<b>Pick a finding</b>
+      <span>Choose one in the list, or click a marker beside the page.</span>
+      ${next ? `<button type="button" class="btn small primary" data-first>Start with ${next.key}</button>` : ''}
+      <span class="keys"><kbd>J</kbd><kbd>K</kbd> move <kbd>A</kbd> approve <kbd>X</kbd> reject <kbd>E</kbd> edit</span></div>`;
+    const b = $('[data-first]', host); if (b) b.onclick = () => select(next.id, 'detail');
+    return;
+  }
+  host.innerHTML = `<div class="row sel st-${statusOf(f)}" data-id="${f.id}">${rowHTML(f)}<div class="card" data-id="${f.id}">${cardHTML(f)}</div></div>`;
+  const rb = $('.rowbtn', host);
+  rb.title = 'Show in the document'; rb.onclick = () => showInDoc(f);
+  rb.onmouseenter = () => hover(f.id, true); rb.onmouseleave = () => hover(f.id, false);
+  wireCard($('.card', host), f);
+}
+
+/* ---------- phone: the findings sheet over the document ---------- */
+function renderPeek(){
+  const host = $('#peek'); if (!host) return;
+  const f = sel && byId[sel];
+  if (!f){
+    const fs = shown(), open = fs.filter(x => tabOf(x) === 'open');
+    host.innerHTML = `<span class="ptext"><b>${plural(fs.length, 'finding', 'findings')}</b>, ${open.length} open</span>
+      <span class="phint">Tap a marker beside the page, or start at the top.</span>
+      ${open.length ? `<span class="pacts"><button type="button" class="btn small primary" data-first>Start with ${open[0].key}</button>
+        <button type="button" class="btn small" data-open>See all</button></span>` : ''}`;
+    $('[data-first]', host) && ($('[data-first]', host).onclick = e => { e.stopPropagation(); select(open[0].id, 'peek'); });
+    $('[data-open]', host) && ($('[data-open]', host).onclick = e => { e.stopPropagation(); setSheet(true); });
+    return;
+  }
+  const mine = myVote(f);
+  host.innerHTML = `<span class="mk-mini s-${f.severity} st-${statusOf(f)}">${f.n}</span>
+    <span class="ptext"><span class="rkey">${f.key}</span> <b>${esc(f.title)}</b></span>
+    <span class="pacts"><button type="button" class="btn approve small" aria-pressed="${mine === 'approved'}">${ic('check')}<span>Approve</span></button>
+    <button type="button" class="btn reject small" aria-pressed="${mine === 'rejected'}">${ic('x')}<span>Reject</span></button>
+    <button type="button" class="btn small" data-open>Details</button></span>`;
+  $('.approve', host).onclick = e => { e.stopPropagation(); vote(f.id, 'approved'); };
+  $('.reject', host).onclick = e => { e.stopPropagation(); vote(f.id, 'rejected'); };
+  $('[data-open]', host).onclick = e => { e.stopPropagation(); setSheet(true); };
+}
+function setSheet(open){
+  document.body.classList.toggle('sheet-open', open);
+  const b = $('#sheetbtn'); if (b) b.setAttribute('aria-expanded', open);
+  if (!open || !INLINE){ const p = $('#panel'); if (p) p.scrollTop = 0; }   // folded, or the pinned card first
+  else if (open && sel){
+    const li = $(`#list .row[data-id="${sel}"]`);
+    if (li) requestAnimationFrame(() => li.scrollIntoView({block: 'start'}));
+  }
+}
+$('#sheetbtn') && ($('#sheetbtn').onclick = () => setSheet(!document.body.classList.contains('sheet-open')));
+$('#peek') && ($('#peek').onclick = e => { if (!e.target.closest('button')) setSheet(true); });
+
+/* ---------- selection ---------- */
+function select(id, from){
+  if (editing && editing !== id) editing = null;
+  sel = id;
+  render();
+  const f = id && byId[id];
+  if (!f) return;
+  if (!MOBILE.matches){ revealSel(); return; }
+  const open = document.body.classList.contains('sheet-open');
+  if (from !== 'doc' && !open) scrollDocTo(f);
+  // with the phone sheet folded the list is out of sight: leave it (and the peek) where they are
+  if (open){ const p = $('#panel'); if (p) p.scrollTop = 0; }
+}
+function showInDoc(f){
+  if (MOBILE.matches) setSheet(false);
+  requestAnimationFrame(() => scrollDocTo(f));
+}
+function hover(id, on){
+  $$(`[data-fid="${id}"]`).forEach(el => el.classList.toggle('hover', on));
+  const li = $(`#list .row[data-id="${id}"]`); if (li) li.classList.toggle('hover', on);
+  const c = $(`#cmts .cmt[data-id="${id}"]`); if (c) c.classList.toggle('hover', on);
+}
+
+/* =====================================================================
+   Export: every finding, its decision and who made it
+   ===================================================================== */
+function exportRows(){
+  return F.filter(live).filter(f => ex.scope === 'all' || statusOf(f) === 'approved');
+}
+const nameList = keys => keys.map(k => TEAM[k].name).join(', ');
+function csv(rows){
+  const q = v => /[",\n]/.test(v) ? `"${String(v).replace(/"/g, '""')}"` : String(v);
+  const head = ['Key', 'Page', 'Severity', 'Type', 'Finding', 'Current text', 'Final wording', 'Status',
+                'Approved by', 'Rejected by', 'Found by', 'Note'];
+  const lines = rows.map(f => [f.key, f.page, SEV[f.severity], TYPES[f.type], f.title, f.quote, textOf(f),
+    STATUS[statusOf(f)], nameList(by(f, 'approved')), nameList(by(f, 'rejected')),
+    agentsOf(f).map(k => AG[k].name).join(', '), f.note].map(q).join(','));
+  return [head.join(','), ...lines].join('\n') + '\n';
+}
+function report(rows){
+  const count = s => rows.filter(f => statusOf(f) === s).length;
+  const out = [`# ${D.document.title}: review export`, '', D.document.subtitle,
+    `Exported by ${TEAM[me].name}, ${new Date().toLocaleString('en-GB', {dateStyle: 'long', timeStyle: 'short'})}.`, '',
+    `${plural(rows.length, 'finding', 'findings')}: ${count('approved')} approved, ${count('rejected')} rejected, ${count('split')} split, ${count('open')} open.`, ''];
+  for (let p = 1; p <= D.document.pages; p++){
+    const g = rows.filter(f => f.page === p); if (!g.length) continue;
+    out.push(`## Page ${p}`, '');
+    for (const f of g){
+      out.push(`### ${f.key}: ${f.title}`,
+        `- Severity: ${SEV[f.severity]}. Type: ${TYPES[f.type]}. Found by: ${agentsOf(f).map(k => AG[k].name).join(', ')}`,
+        `- Current: ${f.quote}`, `- Final wording: ${textOf(f)}`,
+        `- Status: ${STATUS[statusOf(f)]}${by(f, 'approved').length ? `, approved by ${nameList(by(f, 'approved'))}` : ''}${by(f, 'rejected').length ? `, rejected by ${nameList(by(f, 'rejected'))}` : ''}`,
+        `- Note: ${f.note}`, '');
+    }
+  }
+  return out.join('\n');
+}
+function download(name, text, type){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], {type}));
+  a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function renderExport(){
+  const host = $('#export-root'); if (!host || !me) return;
+  const all = F.filter(live), rows = exportRows();
+  const n = s => all.filter(f => statusOf(f) === s).length;
+  const stats = [['Findings', all.length, '', `across ${new Set(all.map(f => f.page)).size} pages`],
+                 ['Approved', n('approved'), 'approved', 'ready to apply'], ['Rejected', n('rejected'), 'rejected', 'left as written'],
+                 ['Open', n('open') + n('split'), 'open', n('split') ? `${n('split')} split, needs a decision` : 'no decision yet']];
+  const fmt = ex.format === 'csv' ? 'CSV' : 'report';
+  host.innerHTML = `
+    <div class="ex-head">
+      <a class="ex-back" href="#/review">${ic('arrow-left')}Back to review</a>
+      <h1>Export</h1>
+      <p>${esc(D.document.title)}, ${esc(D.document.subtitle)}</p>
+    </div>
+    <div class="ex-stats">${stats.map(([l, v, k, sub]) => `<div class="ex-stat${k ? ' st-' + k : ''}"><span>${l}</span><b>${v}</b><small>${sub}</small></div>`).join('')}</div>
+    <div class="ex-panel">
+      <div class="ex-bar">
+        <div class="ex-opt"><span class="ex-label" id="exl-scope">Include</span>
+          <div class="seg" role="radiogroup" aria-labelledby="exl-scope">
+            <button type="button" role="radio" aria-checked="${ex.scope === 'all'}" data-scope="all">All findings</button>
+            <button type="button" role="radio" aria-checked="${ex.scope === 'approved'}" data-scope="approved">Approved only</button></div></div>
+        <div class="ex-opt"><span class="ex-label" id="exl-fmt">Format</span>
+          <div class="seg" role="radiogroup" aria-labelledby="exl-fmt">
+            <button type="button" role="radio" aria-checked="${ex.format === 'csv'}" data-format="csv">CSV</button>
+            <button type="button" role="radio" aria-checked="${ex.format === 'md'}" data-format="md">Report</button></div></div>
+        <button type="button" class="btn primary" id="exdl"${rows.length ? '' : ' disabled'}>${ic('download-simple')}<span>Download ${fmt}</span></button>
+      </div>
+      <p class="ex-count">${plural(rows.length, 'finding', 'findings')} in this export, each with its decision and who made it.</p>
+      <div class="ex-tablewrap"><table class="ex-table">
+        <thead><tr><th>Key</th><th>Finding</th><th>Final wording</th><th>Status</th><th>Decided by</th></tr></thead>
+        <tbody>${rows.map(f => {
+          const s = statusOf(f), voters = Object.entries(votesOf(f));
+          return `<tr>
+            <td class="ex-key"><b>${f.key}</b><span>Page ${f.page}</span></td>
+            <td class="ex-find"><span class="ex-tags"><span class="sevw s-${f.severity}">${SEV[f.severity]}</span><span class="ex-type">${TYPES[f.type]}</span></span><b>${esc(f.title)}</b><span class="ex-q">${esc(f.quote)}</span></td>
+            <td class="ex-final">${esc(textOf(f))}</td>
+            <td><span class="stat st-${s}">${s !== 'open' ? ic(STATUS_ICON[s]) : ''}${STATUS[s]}</span></td>
+            <td class="ex-by">${voters.length ? voters.map(([k, x]) => `<span class="ex-p">${avatar(k, 'xs v-' + x.v)}${esc(TEAM[k].name)}<i>${x.v}</i></span>`).join('') : '<span class="ex-none">Nobody yet</span>'}</td>
+          </tr>`; }).join('') || '<tr><td colspan="5" class="ex-none">Nothing approved yet.</td></tr>'}</tbody>
+      </table></div>
+    </div>`;
+  $$('[data-scope]', host).forEach(b => b.onclick = () => { ex.scope = b.dataset.scope; renderExport(); $(`[data-scope="${ex.scope}"]`, host).focus(); });
+  $$('[data-format]', host).forEach(b => b.onclick = () => { ex.format = b.dataset.format; renderExport(); $(`[data-format="${ex.format}"]`, host).focus(); });
+  $('#exdl', host).onclick = () => {
+    const base = (D.document.title.match(/CN-[\d-]+/) || ['vidimus'])[0];
+    if (ex.format === 'csv') download(`${base}-findings.csv`, csv(rows), 'text/csv');
+    else download(`${base}-review.md`, report(rows), 'text/markdown');
+    toast(`Downloaded ${plural(rows.length, 'finding', 'findings')}`);
+  };
+}
+
+function toast(m){
+  const t = $('#toast'); if (!t) return;
+  t.textContent = m; placeToast(t); t.classList.add('on');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => { t.classList.remove('on'); $('#dock')?.classList.remove('toasting'); }, 2500);
+}
+/* On the review a toast never covers the page or the bar's shortcuts: it sits in the bar's
+   empty middle, and where that middle is too narrow the shortcuts fade out while it shows. */
+function placeToast(t){
+  const dock = $('#dock');
+  t.style.left = t.style.bottom = t.style.maxWidth = '';
+  dock?.classList.remove('toasting');
+  if (MOBILE.matches || document.body.dataset.screen !== 'review' || !dock) return;
+  if (document.body.classList.contains('dock-off')){
+    const p = pages[0] ? pages[0].el.getBoundingClientRect() : $('.docpane').getBoundingClientRect();
+    t.style.left = Math.round(Math.max(p.left, 8) + 16) + 'px'; t.style.bottom = '12px';
+    return;
+  }
+  const d = dock.getBoundingClientRect(), keys = $('.dkeys', dock), w = t.offsetWidth;
+  const kr = keys && getComputedStyle(keys).visibility !== 'hidden'
+    ? Math.min(keys.getBoundingClientRect().right, Math.max(d.left, ...$$('span', keys).filter(x => x.offsetWidth).map(x => x.getBoundingClientRect().right)))
+    : d.left;
+  const cl = $('.dctl', dock).getBoundingClientRect().left;
+  let left;
+  if (w <= cl - kr - 40) left = kr + 20 + (cl - kr - 40 - w) / 2;
+  else { dock.classList.add('toasting'); left = d.left + 12; t.style.maxWidth = Math.max(160, cl - left - 16) + 'px'; }
+  t.style.left = Math.round(left) + 'px';
+  t.style.bottom = Math.round(innerHeight - d.bottom + (d.height - t.offsetHeight) / 2) + 'px';
+}
+
+/* ---------- keyboard: j/k walk the list, a approves, x rejects, e edits ---------- */
+addEventListener('keydown', e => {
+  if (e.key === 'Escape'){
+    if ($('#toolsmodal') && !$('#toolsmodal').hidden) return closeTools();
+    if (openDrop){ openDrop = null; renderFilters(); return; }
+    if ($('#usermenu') && !$('#usermenu').hidden){ closeMenus(); $('#avatarbtn')?.focus(); return; }
+    if ($('#wsmenu') && !$('#wsmenu').hidden){ closeMenus(); $('#wsbtn')?.focus(); return; }
+    if (document.body.classList.contains('nav-open')){ setNav(false); $('#sidebtn')?.focus(); return; }
+    if (document.body.classList.contains('sheet-open')) return setSheet(false);
+    if (editing){ editing = null; render(); return; }
+    if (sel && !autoSel()){ sel = null; render(); }
+    return;
+  }
+  if (document.body.dataset.screen !== 'review' || document.body.classList.contains('modal-open')) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (/^(TEXTAREA|INPUT|SELECT)$/.test(e.target.tagName)) return;
+  const k = e.key.toLowerCase();
+  if (k === '/'){
+    e.preventDefault();
+    if ($('[data-searchbox]') && !searchOpen){ searchOpen = true; renderSearchBox(); }
+    const q = $$('[data-q]').find(x => x.offsetParent); if (q) q.focus();
+    return;
+  }
+  const fs = shown(); if (!fs.length) return;
+  const i = fs.findIndex(f => f.id === sel);
+  if (k === 'j'){ e.preventDefault(); select(fs[i < 0 ? 0 : Math.min(i + 1, fs.length - 1)].id, 'key'); }
+  else if (k === 'k'){ e.preventDefault(); select(fs[i < 0 ? 0 : Math.max(i - 1, 0)].id, 'key'); }
+  else if (sel && k === 'a'){ e.preventDefault(); vote(sel, 'approved'); }
+  else if (sel && k === 'x'){ e.preventDefault(); vote(sel, 'rejected'); }
+  else if (sel && k === 'e'){ e.preventDefault(); startEdit(sel); }
+});
+
+/* =====================================================================
+   The document: PDF.js pages, highlights and gutter markers
+   ===================================================================== */
+const scroller = $('#scroller'), host = $('#pages');
+const MAXW = 848;   // the page's widest; both directions show it at this scale
+let pdfjs = null, doc = null, mounting = null;
+const pages = [];          // {n, pg, el, sheet, canvas, hls, gut, w, h (pt), task, painted}
+
+async function lib(){
+  if (!pdfjs){
+    pdfjs = await import(D.vendor + 'pdf.min.mjs');
+    pdfjs.GlobalWorkerOptions.workerSrc = D.vendor + 'pdf.worker.min.mjs';
+  }
+  return pdfjs;
+}
+const cssNum = name => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0;
+const PHONE_READ = 1.05;   // a phone shows the page at about 1.05 CSS px per point
+function fitWidth(){
+  // the gutter on the left holds the markers, so they never sit on the text; the lane of findings sits on the right
+  const lane = MOBILE.matches ? 0 : cssNum('--lane') + cssNum('--lane-gap') + 14;
+  const avail = scroller.clientWidth - lane - cssNum('--gutter') - cssNum('--gutter-r') - cssNum('--pad-x') * 2;
+  return Math.max(220, Math.min(avail, MAXW));
+}
+function zoomNow(){
+  if (zoom != null) return zoom;
+  return MOBILE.matches && pages.length ? Math.max(1, pages[0].w * PHONE_READ / fitWidth()) : 1;
+}
+function sheetWidth(){ return Math.round(fitWidth() * zoomNow()); }
+/* When the page is wider than its column (a phone at reading zoom), start at
+   the text column, just right of the marker rail, instead of the page margin. */
+function sheetLeft(P){
+  return P.sheet.getBoundingClientRect().left - scroller.getBoundingClientRect().left + scroller.scrollLeft;
+}
+function alignText(){
+  if (!pages.length || scroller.scrollWidth <= scroller.clientWidth + 2) return;
+  const P = pages[0], minx = Math.min(...pages.map(q => q.minx || 0));
+  scroller.scrollLeft = Math.max(0, sheetLeft(P) + minx / P.w * P.sheet.clientWidth - cssNum('--gutter') - 10);
+}
+
+function mount(){
+  if (mounting) return mounting;
+  mounting = (async () => {
+    const p = await lib();
+    doc = await p.getDocument(D.document.file).promise;
+    for (let n = 1; n <= doc.numPages; n++){
+      const pg = await doc.getPage(n);
+      const vp = pg.getViewport({scale: 1});
+      const el = document.createElement('section');
+      el.className = 'pg'; el.dataset.n = n; el.setAttribute('aria-label', `Page ${n}`);
+      el.innerHTML = `<div class="gut"></div><div class="sheet"><canvas></canvas><div class="hls"></div></div>`;
+      host.appendChild(el);
+      pages.push({n, pg, el, sheet: $('.sheet', el), canvas: $('canvas', el), hls: $('.hls', el),
+                  gut: $('.gut', el), w: vp.width, h: vp.height, task: null, painted: 0});
+    }
+    layout();
+    cur = 0; currentPage();
+    await Promise.all(pages.map(index));
+    for (const f of F) if (f.rects === null) f.rects = false;
+    drawMarks();
+    render();
+    alignText();
+    if (sel) focusSel();
+    thumbs();
+    document.body.classList.add('ready');
+  })().catch(err => {
+    console.error(err);
+    host.innerHTML = '<p class="loaderr">The PDF could not be loaded. Open the desk through a local web server (see the README).</p>';
+  });
+  return mounting;
+}
+
+/* the bar sits under the page only, and its tab (when hidden) in the middle of the page */
+function placeDock(){
+  const dock = $('#dock'), tab = $('#dockshow'), pane = $('.docpane'), P = pages[0];
+  if (!dock || !pane || !P || MOBILE.matches){ if (dock){ dock.style.left = dock.style.width = ''; } if (tab) tab.style.left = ''; return; }
+  const d = pane.getBoundingClientRect(), r = P.el.getBoundingClientRect();
+  const left = Math.max(d.left, r.left), right = Math.min(d.right, r.right);
+  dock.style.left = Math.round(left - d.left) + 'px';
+  dock.style.width = Math.round(right - left) + 'px';
+  if (tab) tab.style.left = Math.round((left + right) / 2 - d.left) + 'px';
+}
+scroller.addEventListener('scroll', () => requestAnimationFrame(placeDock), {passive: true});
+function layout(){
+  if (!scroller.clientWidth) return;
+  const w = sheetWidth();
+  for (const P of pages){
+    P.sheet.style.width = w + 'px';
+    P.sheet.style.height = Math.round(w * P.h / P.w) + 'px';
+  }
+  pages.forEach(paint);
+  placeMarkers();
+  placeLane();
+  placeDock();
+  if (sel) revealSel(true);
+  const zv = $('#zoomval'); if (zv) zv.textContent = Math.round(zoomNow() * 100) + '%';
+}
+function paint(P){
+  const w = P.sheet.clientWidth || sheetWidth();
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  if (P.painted === w * dpr) return;
+  P.painted = w * dpr;
+  if (P.task) P.task.cancel();
+  const vp = P.pg.getViewport({scale: (w / P.w) * dpr});
+  P.canvas.width = Math.round(vp.width); P.canvas.height = Math.round(vp.height);
+  P.task = P.pg.render({canvasContext: P.canvas.getContext('2d'), viewport: vp});
+  P.task.promise.catch(() => {}).finally(() => { P.task = null; });
+}
+
+/* ---- finding a quote in a page's text ----
+   Whitespace is dropped on both sides (the PDF breaks lines wherever it likes)
+   and every kept character remembers its text item and its place in it. */
+function fold(ch){
+  return ch.normalize('NFKC').replace(/[’‘ʼ]/g, "'").replace(/[“”„]/g, '"').toLowerCase();
+}
+const foldText = s => [...s].map(fold).join('').replace(/\s+/g, '');
+const mctx = document.createElement('canvas').getContext('2d');
+function measure(str, it){
+  mctx.font = `${it.h}px ${it.family}`;
+  return mctx.measureText(str).width;
+}
+async function index(P){
+  const tc = await P.pg.getTextContent();
+  const vp = P.pg.getViewport({scale: 1});
+  const items = tc.items.filter(it => it.str !== undefined).map(it => {
+    const tr = pdfjs.Util.transform(vp.transform, it.transform);
+    const h = Math.hypot(tr[2], tr[3]) || 10;
+    return {str: it.str, x: tr[4], base: tr[5], h, w: it.width,
+            family: (tc.styles[it.fontName] || {}).fontFamily || 'sans-serif'};
+  });
+  const xs = items.filter(it => it.str.trim()).map(it => it.x);
+  P.minx = xs.length ? Math.min(...xs) : 0;
+  let s = ''; const map = [];
+  items.forEach((it, i) => {
+    [...it.str].forEach((ch, off) => {
+      if (/\s/.test(ch)) return;
+      for (const c of fold(ch)){ s += c; map.push([i, off]); }
+    });
+  });
+  for (const f of F){
+    if (f.page !== P.n) continue;
+    const needle = foldText(f.quote);
+    const at = s.indexOf(needle);
+    if (needle.length < 3 || at < 0){ f.rects = false; continue; }
+    const [ia, oa] = map[at], [ib, ob] = map[at + needle.length - 1];
+    const lines = [];
+    for (let i = ia; i <= ib; i++){
+      const it = items[i]; if (!it.w) continue;
+      const a = i === ia ? oa : 0, b = i === ib ? ob + 1 : it.str.length;
+      const full = measure(it.str, it) || 1;
+      const x0 = it.x + it.w * measure(it.str.slice(0, a), it) / full;
+      const x1 = it.x + it.w * measure(it.str.slice(0, b), it) / full;
+      const top = it.base - it.h * 0.86, bot = it.base + it.h * 0.24;
+      const ln = lines.find(l => Math.abs(l.base - it.base) < it.h * 0.5);
+      if (ln){ ln.x0 = Math.min(ln.x0, x0); ln.x1 = Math.max(ln.x1, x1); ln.top = Math.min(ln.top, top); ln.bot = Math.max(ln.bot, bot); }
+      else lines.push({base: it.base, x0, x1, top, bot});
+    }
+    // as fractions of the page, so the marks follow every zoom and resize
+    f.rects = lines.map(l => ({x: (l.x0 - 1.5) / P.w, y: (l.top - 1) / P.h,
+                               w: (l.x1 - l.x0 + 3) / P.w, h: (l.bot - l.top + 2) / P.h}));
+  }
+}
+
+function drawMarks(){
+  for (const P of pages){ P.hls.innerHTML = ''; P.gut.innerHTML = ''; }
+  for (const f of F){
+    if (!f.rects) continue;
+    const P = pages[f.page - 1];
+    f.rects.forEach((r, i) => {
+      const d = document.createElement('div');
+      d.className = `hl s-${f.severity}`; d.dataset.fid = f.id;
+      if (i === 0){ d.classList.add('first'); d.dataset.n = f.n; }
+      Object.assign(d.style, {left: r.x * 100 + '%', top: r.y * 100 + '%', width: r.w * 100 + '%', height: r.h * 100 + '%'});
+      d.onclick = () => select(f.id, 'doc');
+      d.onmouseenter = () => hover(f.id, true); d.onmouseleave = () => hover(f.id, false);
+      P.hls.appendChild(d);
+    });
+    const m = document.createElement('button');
+    m.type = 'button'; m.className = `mk s-${f.severity}`; m.dataset.fid = f.id;
+    m.textContent = f.n; m.title = `${f.key}: ${f.title}`;
+    m.setAttribute('aria-label', `${f.key}: ${f.title}`);
+    m.onclick = () => select(f.id, 'doc');
+    m.onmouseenter = () => hover(f.id, true); m.onmouseleave = () => hover(f.id, false);
+    P.gut.appendChild(m);
+  }
+  paintMarks();
+}
+/* classes only: visibility follows the filters, colour follows the decision */
+function paintMarks(){
+  for (const f of F){
+    const vis = pass(f), s = statusOf(f);
+    $$(`[data-fid="${f.id}"]`).forEach(el => {
+      el.classList.toggle('off', !vis);
+      el.classList.toggle('sel', sel === f.id);
+      el.classList.remove('st-open', 'st-approved', 'st-rejected', 'st-split');
+      el.classList.add('st-' + s);
+    });
+  }
+  placeMarkers();
+  thumbMarks();
+}
+/* Markers stack downwards when two findings share a line, so none overlaps. */
+function placeMarkers(){
+  for (const P of pages){
+    const H = P.sheet.clientHeight; if (!H) continue;
+    const ms = $$('.mk:not(.off)', P.gut).map(m => {
+      const r = byId[m.dataset.fid].rects[0];
+      return {m, y: (r.y + r.h / 2) * H};
+    }).sort((a, b) => a.y - b.y);
+    let next = -Infinity;
+    for (const o of ms){
+      const size = o.m.offsetHeight || 22;
+      const top = Math.max(o.y - size / 2, next);
+      o.m.style.top = top + 'px';
+      next = top + size + 3;
+    }
+  }
+}
+
+/* ---------- the desk: findings float beside the page, as comments do in Google Docs ----------
+   Each card sits level with its text and scrolls with the document (it lives in the same
+   scroller). Folded, it shows its row; selected, it opens in place and the cards around it
+   move aside: the open one keeps its height, the ones above go up, the ones below go down. */
+const LANE_GAP = 12;   // on the lane's 4 px grid
+const lanePos = {};        // id -> {x, y}: a re-render starts each card where it was, so moves animate
+let laneSel = null;        // the open card's top and height in the lane
+const laneRO = new ResizeObserver(() => requestAnimationFrame(placeLane));
+function renderLane(){
+  const host = $('#cmts'); if (!host) return;
+  laneRO.disconnect();
+  if (MOBILE.matches || !pages.length || F.some(f => f.rects === null)){ host.innerHTML = ''; return; }
+  const fs = shown();
+  host.innerHTML = fs.length ? fs.map(f => {
+    const p = lanePos[f.id];
+    return `<li class="cmt s-${f.severity} st-${statusOf(f)}${sel === f.id ? ' sel' : ''}${p ? '' : ' fresh'}" data-id="${f.id}" data-n="${f.n}"${
+      p ? ` style="transform:translate(${p.x}px,${p.y}px)"` : ''}>${rowHTML(f, true)}${
+      sel === f.id ? `<div class="card" data-id="${f.id}">${cardHTML(f)}</div>` : ''}</li>`;
+  }).join('') : `<li class="cmt fresh"><div class="empty">${ic('funnel-simple')}<b>${F.some(live) ? 'No findings match' : 'No tools are connected'}</b>
+      <span>${F.some(live) ? 'Try another filter or clear them.' : 'Connect a tool to see what it finds.'}</span>
+      ${filtering() ? '<button type="button" class="btn small" data-clear>Clear filters</button>' : ''}</div></li>`;
+  for (const li of $$('.cmt[data-id]', host)){
+    const f = byId[li.dataset.id], b = $('.rowbtn', li);
+    b.title = sel === f.id ? 'Fold' : 'Open';
+    b.onclick = () => select(sel === f.id ? null : f.id, 'lane');
+    li.onmouseenter = () => hover(f.id, true);
+    li.onmouseleave = () => hover(f.id, false);
+    const card = $('.card', li); if (card) wireCard(card, f);
+  }
+  placeLane();
+  const open = $('.cmt.sel', host); if (open) laneRO.observe(open);
+  const fh = $('#findhead'); if (fh) laneRO.observe(fh);
+}
+function anchorOf(f, L){
+  const P = pages[f.page - 1]; if (!P || !P.sheet.clientHeight) return null;
+  const H = P.sheet.clientHeight, r = f.rects && f.rects[0];
+  // the card's marker sits level with the middle of its first line
+  return P.sheet.getBoundingClientRect().top - L + (r ? (r.y + r.h / 2) * H - 24 : 8);
+}
+function laneMin(lane){
+  const h = $('#lanehead', lane);
+  return h && h.contains($('#findhead')) ? h.offsetHeight + 2 : 4;
+}
+function placeLane(){
+  const lane = $('#lane'), host = $('#cmts');
+  laneSel = null;
+  if (!lane || !host || MOBILE.matches || !lane.offsetParent) return;
+  const L = lane.getBoundingClientRect().top, min = laneMin(lane);
+  const items = $$('.cmt', host).map((el, i) => {
+    const f = byId[el.dataset.id], a = f ? anchorOf(f, L) : null;
+    return {el, f, i, y: Math.max(min, a == null ? min : a), h: el.offsetHeight};
+  }).sort((a, b) => a.y - b.y || a.i - b.i);
+  const n = items.length, top = [], s = items.findIndex(o => o.f && o.f.id === sel);
+  const down = from => { for (let i = from; i < n; i++) top[i] = Math.max(items[i].y, i ? top[i - 1] + items[i - 1].h + LANE_GAP : min); };
+  if (s < 0) down(0);
+  else {
+    top[s] = items[s].y;
+    down(s + 1);
+    for (let i = s - 1; i >= 0; i--) top[i] = Math.min(items[i].y, top[i + 1] - LANE_GAP - items[i].h);
+    if (top[0] < min){                       // no room above: the whole stack moves down
+      top[0] = min;
+      for (let i = 1; i < n; i++) top[i] = Math.max(top[i], top[i - 1] + items[i - 1].h + LANE_GAP);
+    }
+  }
+  let bottom = 0;
+  items.forEach((o, i) => {
+    const open = !!(o.f && o.f.id === sel), x = 0, y = Math.round(top[i]);   // every card stays aligned with the findings card
+    o.el.style.transform = `translate(${x}px,${y}px)`;
+    if (o.f) lanePos[o.f.id] = {x, y};
+    if (open) laneSel = {top: y, h: o.h};
+    bottom = Math.max(bottom, y + o.h);
+  });
+  lane.style.minHeight = Math.ceil(bottom + 24) + 'px';
+  requestAnimationFrame(() => $$('.cmt.fresh', host).forEach(el => el.classList.remove('fresh')));
+}
+/* bring the open card fully into view, below the pinned findings card */
+function revealSel(keep){
+  const lane = $('#lane'); if (!lane || !laneSel || !lane.offsetParent) return;
+  const cover = laneMin(lane);
+  const sr = scroller.getBoundingClientRect(), st = scroller.scrollTop, ch = scroller.clientHeight;
+  const top = lane.getBoundingClientRect().top - sr.top + st + laneSel.top, bot = top + laneSel.h;
+  if (keep && (bot < st || top > st + ch)) return;     // a relayout leaves an off-screen card where it is
+  let to = null;
+  if (top < st + cover) to = top - cover;
+  else if (bot > st + ch - 12) to = Math.min(bot - ch + 12, top - cover);
+  if (to != null) scroller.scrollTo({top: Math.max(0, to), behavior: REDUCED || keep ? 'auto' : 'smooth'});
+}
+function focusSel(){ if (!sel) return; if (MOBILE.matches) scrollDocTo(byId[sel]); else revealSel(); }
+/* the findings card: pinned in the lane on a desk, at the top of the sheet on a phone */
+function placeFindhead(){
+  const fh = $('#findhead'); if (!fh) return;
+  if (MOBILE.matches){ const d = $('#detail'); if (d && fh.nextElementSibling !== d) d.before(fh); }
+  else { const h = $('#lanehead'); if (h && fh.parentNode !== h) h.append(fh); }
+}
+placeFindhead();
+MOBILE.addEventListener('change', () => { placeFindhead(); render(); });
+document.fonts && document.fonts.ready.then(() => placeLane());
+
+function scrollDocTo(f){
+  const P = pages[f.page - 1]; if (!P) return;
+  const r = f.rects && f.rects[0];
+  const top = P.sheet.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop
+            + (r ? r.y * P.sheet.clientHeight - scroller.clientHeight * 0.3 : -16);
+  const opts = {top: Math.max(0, top), behavior: REDUCED ? 'auto' : 'smooth'};
+  if (r && scroller.scrollWidth > scroller.clientWidth + 2){
+    // keep the lines' starts in view (aligned to the text column) and move
+    // sideways only as far as it takes to show the whole highlight
+    const W = P.sheet.clientWidth, sl = sheetLeft(P), g = cssNum('--gutter') + 10;
+    const minx = Math.min(...pages.map(q => q.minx || 0));
+    let left = sl + minx / P.w * W - g;                                  // text column aligned
+    const need = sl + (r.x + r.w) * W + 12 - scroller.clientWidth;      // the highlight's end in view
+    if (left < need) left = Math.min(need, sl + r.x * W - g);           // but never past its start
+    opts.left = Math.max(0, left);
+  }
+  scroller.scrollTo(opts);
+}
+function goPage(n){
+  const P = pages[n - 1]; if (!P) return;
+  scroller.scrollTo({top: P.el.offsetTop - 12, behavior: REDUCED ? 'auto' : 'smooth'});
+}
+let cur = 1;
+function currentPage(){
+  const y = scroller.scrollTop + scroller.clientHeight * 0.35;
+  let n = 1;
+  for (const P of pages) if (P.el.offsetTop <= y) n = P.n;
+  const pn = $('#pageno');
+  if (n !== cur || (pn && !pn.textContent)){
+    cur = n;
+    if (pn) pn.textContent = `${n} / ${pages.length}`;
+    $$('#thumbs .thumb').forEach(t => t.setAttribute('aria-current', +t.dataset.n === n ? 'true' : 'false'));
+  }
+}
+scroller.addEventListener('scroll', () => requestAnimationFrame(currentPage), {passive: true});
+$('#prevpage') && ($('#prevpage').onclick = () => goPage(Math.max(1, cur - 1)));
+$('#nextpage') && ($('#nextpage').onclick = () => goPage(Math.min(pages.length, cur + 1)));
+function setZoom(z){
+  zoom = z == null ? null : Math.max(0.6, Math.min(2.6, Math.round(z * 10) / 10));
+  lsSet(zkey(), zoom); layout(); alignText();
+}
+$('#zoomin') && ($('#zoomin').onclick = () => setZoom(zoomNow() + 0.1));
+$('#zoomout') && ($('#zoomout').onclick = () => setZoom(zoomNow() - 0.1));
+$('#zoomval') && ($('#zoomval').onclick = () => setZoom(null));
+MOBILE.addEventListener('change', () => { zoom = lsGet(zkey(), null); layout(); });
+let rt = 0;
+new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(layout, 120); }).observe(scroller);
+
+/* ---- page thumbnails, for the layouts that have a #thumbs rail ---- */
+function thumbs(){
+  const t = $('#thumbs'); if (!t || !doc) return;
+  t.innerHTML = pages.map(P => `<button type="button" class="thumb" data-n="${P.n}" aria-label="Page ${P.n}">
+      <span class="tsheet"><canvas></canvas><span class="tdots"></span></span><span class="tn"></span></button>`).join('');
+  for (const P of pages){
+    const b = $(`.thumb[data-n="${P.n}"]`, t), cv = $('canvas', b);
+    b.onclick = () => goPage(P.n);
+    const vp = P.pg.getViewport({scale: 240 / P.w});
+    cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
+    P.pg.render({canvasContext: cv.getContext('2d'), viewport: vp});
+  }
+  thumbMarks(); cur = 0; currentPage();
+}
+function thumbMarks(){
+  for (const b of $$('#thumbs .thumb')){
+    const n = +b.dataset.n;
+    const fs = F.filter(f => f.page === n && f.rects && pass(f));
+    $('.tdots', b).innerHTML = fs.map(f =>
+      `<i class="tdot s-${f.severity} st-${statusOf(f)}${sel === f.id ? ' sel' : ''}" style="top:${(f.rects[0].y * 100).toFixed(2)}%"></i>`).join('');
+    $('.tn', b).innerHTML = `${n}${fs.length ? `<span class="tc">${fs.length}</span>` : ''}`;
+  }
+}
+
+/* ---------- everything that follows from the state ---------- */
+function render(){
+  // with a pinned card there is always a finding in it: when filters or search hide
+  // the current one, the first one that matches takes its place
+  if (autoSel() && document.body.dataset.screen === 'review' && (!sel || !pass(byId[sel]))) sel = firstOpen();
+  renderTop(); renderSearchBox(); renderFilters(); renderTabs(); renderList(); renderDetail(); renderPeek(); renderLane();
+  if (document.body.dataset.screen === 'agents') renderTools();
+  if ($('#toolsmodal') && !$('#toolsmodal').hidden) renderTools();
+  paintMarks();
+}
+
+document.title = `${D.document.title} · Vidimus`;
+$('#docname') && ($('#docname').textContent = D.document.title);
+$('#docsub') && ($('#docsub').textContent = D.document.subtitle);
+route();
+})();
+</script>
+</body>
+</html>

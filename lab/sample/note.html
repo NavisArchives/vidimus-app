@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>Compliance note CN-2026-07 (fictitious sample)</title>
+<!-- An invented document, made to demonstrate the review desk. The firm, the
+     regulator, the framework, every figure and every article number are made
+     up. Mistakes were put in on purpose; lab/sample/findings.json lists them.
+     Printed to note.pdf by make_pdf.py. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=block">
+<style>
+@page { size: A4; margin: 0 }
+* { box-sizing: border-box }
+html, body { margin: 0; padding: 0 }
+body {
+  font-family: 'Source Serif 4', Georgia, serif; font-size: 10.4pt; line-height: 1.52;
+  color: #1B1F24; font-variant-ligatures: none; font-kerning: normal;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.page {
+  width: 210mm; height: 297mm; position: relative; overflow: hidden;
+  padding: 22mm 24mm 26mm 26mm; break-after: page; page-break-after: always;
+}
+.page:last-child { break-after: auto; page-break-after: auto }
+.sans { font-family: 'IBM Plex Sans', Helvetica, Arial, sans-serif }
+
+/* running head and foot */
+.runhead {
+  position: absolute; top: 11mm; left: 26mm; right: 24mm; display: flex;
+  justify-content: space-between; font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 7.4pt; color: #5B6470; letter-spacing: .02em;
+  border-bottom: .6pt solid #D5D9DE; padding-bottom: 2.2mm;
+}
+.foot {
+  position: absolute; bottom: 12mm; left: 26mm; right: 24mm; display: flex;
+  justify-content: space-between; font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 7.2pt; color: #6A7380;
+}
+
+/* first page letterhead */
+.letterhead { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 2mm }
+.mark { display: flex; align-items: center; gap: 3.2mm }
+.mark svg { width: 9mm; height: 9mm }
+.mark b { display: block; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; font-size: 12.5pt;
+  letter-spacing: .01em; color: #12324A }
+.mark span { display: block; font-family: 'IBM Plex Sans', sans-serif; font-size: 7.6pt; color: #5B6470;
+  letter-spacing: .04em }
+.docid { text-align: right; font-family: 'IBM Plex Sans', sans-serif; font-size: 7.6pt; color: #5B6470; line-height: 1.6 }
+.docid b { color: #12324A; font-weight: 600 }
+.stamp { display: inline-block; margin-top: 1.4mm; border: .7pt solid #B4472F; color: #B4472F;
+  padding: .4mm 2mm; font-weight: 600; letter-spacing: .08em; font-size: 6.8pt }
+
+h1 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; font-size: 19pt; line-height: 1.18;
+  letter-spacing: -.01em; color: #12324A; margin: 13mm 0 3mm; max-width: 150mm }
+.lede { font-family: 'IBM Plex Sans', sans-serif; font-size: 9pt; color: #4A5360; margin: 0 0 7mm }
+.facts { display: grid; grid-template-columns: 27mm 1fr 27mm 1fr; gap: 1.6mm 4mm;
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 8.3pt; padding: 3.6mm 0;
+  border-top: .8pt solid #12324A; border-bottom: .6pt solid #D5D9DE; margin-bottom: 8mm }
+.facts dt { color: #5B6470 } .facts dd { margin: 0; color: #1B1F24 }
+
+h2 { font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; font-size: 11.6pt; color: #12324A;
+  margin: 7mm 0 2.4mm; display: flex; gap: 3mm; align-items: baseline }
+h2 .no { color: #3E7CA6; font-weight: 500; min-width: 6mm }
+p { margin: 0 0 3mm; orphans: 3; widows: 3 }
+sup { font-family: 'IBM Plex Sans', sans-serif; font-size: 6.4pt; color: #3E7CA6; line-height: 0 }
+
+table { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Sans', sans-serif; font-size: 8.4pt;
+  margin: 2mm 0 5mm }
+caption { caption-side: top; text-align: left; font-weight: 600; font-size: 8.4pt; color: #12324A;
+  padding-bottom: 2mm }
+th { text-align: left; font-weight: 500; color: #5B6470; border-bottom: .8pt solid #12324A;
+  padding: 1.6mm 2mm 1.6mm 0 }
+td { border-bottom: .5pt solid #DDE1E5; padding: 2mm 2mm 2mm 0; vertical-align: top }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0 }
+tr:nth-child(even) td { background: #F5F7F9 }
+
+.callout { border-left: 2.2pt solid #3E7CA6; background: #F2F6F9; padding: 3.2mm 4mm; margin: 4mm 0 5mm;
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 8.8pt; color: #26313C }
+.callout b { color: #12324A; font-weight: 600 }
+
+.notes { position: absolute; left: 26mm; right: 24mm; bottom: 20mm; border-top: .6pt solid #D5D9DE;
+  padding-top: 2.4mm; font-family: 'IBM Plex Sans', sans-serif; font-size: 7.2pt; color: #4A5360; line-height: 1.5 }
+.notes p { margin: 0 0 .8mm }
+.notes sup { font-size: 6pt }
+
+dl.terms { display: grid; grid-template-columns: 45mm 1fr; gap: 2.6mm 5mm; font-size: 9.4pt; margin: 3mm 0 6mm }
+dl.terms dt { font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; font-size: 8.6pt; color: #12324A }
+dl.terms dd { margin: 0 }
+.sign { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 8.4pt; margin-top: 8mm }
+.sign div { border-top: .6pt solid #9AA4AF; padding-top: 2mm; color: #4A5360 }
+.sign b { display: block; color: #1B1F24; font-weight: 500 }
+ol.steps { margin: 0 0 4mm; padding-left: 5mm }
+ol.steps li { margin-bottom: 1.6mm }
+</style>
+</head>
+<body>
+
+<!-- ========================= page 1 ========================= -->
+<section class="page">
+  <div class="letterhead">
+    <div class="mark">
+      <svg viewBox="0 0 36 36" aria-hidden="true"><rect x="1" y="1" width="34" height="34" rx="3" fill="#12324A"/>
+        <path d="M7 22c4-5 8-5 11 0s7 5 11 0" fill="none" stroke="#8FC1E3" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M7 15c4-5 8-5 11 0s7 5 11 0" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/></svg>
+      <div><b>Oeverlicht</b><span>CUSTODY B.V.</span></div>
+    </div>
+    <div class="docid">
+      <b>Compliance note CN-2026-07</b><br>
+      Version 1.3 · 14 October 2026<br>
+      <span class="stamp">CONFIDENTIAL · FICTITIOUS</span>
+    </div>
+  </div>
+
+  <h1>Licence application as a crypto-asset service provider</h1>
+  <p class="lede">Explanatory note for the Digital Assets Supervisory Authority (DASA) on the application under the Crypto-Asset Framework Regulation (CAFR).</p>
+
+  <dl class="facts">
+    <dt>Applicant</dt><dd>Oeverlicht Custody B.V.</dd>
+    <dt>Service class</dt><dd>Class 2</dd>
+    <dt>Services</dt><dd>Custody, exchange, order execution</dd>
+    <dt>Prepared by</dt><dd>Compliance department</dd>
+  </dl>
+
+  <h2><span class="no">1</span>Summary</h2>
+  <p>Oeverlicht Custody B.V. (Oeverlicht) applies for a licence as a crypto-asset service provider within the meaning of Article 3 CAFR. The application covers three services: custody and administration of crypto-assets on behalf of clients, exchange of crypto-assets for funds, and execution of orders on behalf of clients. This places Oeverlicht in class 2, for which the CAFR requires minimum capital of €150,000 (see Table 1).</p>
+  <p>On 30 September 2026 Oeverlicht held crypto-assets worth €48.6 million for 3,912 clients. At least 90% of these are kept in cold storage (see section 4).</p>
+  <p>This note explains how Oeverlicht meets the capital requirements, the rules on custody and segregation, the travel rule and the duty to report incidents. The licence are expected to be granted in the first quarter of 2027.</p>
+
+  <h2><span class="no">2</span>Scope of the application</h2>
+  <p>Oeverlicht does not issue tokens itself. It does hold asset-referenced tokens and e-money tokens on behalf of clients. Their custody follows the same rules as that of other crypto-assets, except for the reserve requirements in Article 36 CAFR, which apply to issuers only.</p>
+  <p>Before Oeverlicht takes any token into custody, the Compliance department assesses the issuer's prospectus. Tokens without a white paper are not taken into custody.</p>
+
+  <div class="foot"><span>Oeverlicht Custody B.V. · CN-2026-07 · Fictitious document, made for a demonstration</span><span>Page 1 of 4</span></div>
+</section>
+
+<!-- ========================= page 2 ========================= -->
+<section class="page">
+  <div class="runhead"><span>Oeverlicht · Compliance note CN-2026-07</span><span>CAFR licence application</span></div>
+
+  <h2><span class="no">3</span>Capital requirements</h2>
+  <p>Article 62 CAFR divides crypto-asset service providers into three classes, according to the services they provide.<sup>1</sup> Table 1 sets out the minimum capital for each class. A provider holds at least the higher of two amounts: the minimum capital for its class, or one quarter of the previous year's fixed overheads.</p>
+
+  <table>
+    <caption>Table 1 · Minimum capital by service class</caption>
+    <thead><tr><th style="width:18mm">Class</th><th>Services</th><th class="num" style="width:36mm">Minimum capital</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Advice, reception and transmission of orders</td><td class="num">€50,000</td></tr>
+      <tr><td>2</td><td>Class 1, plus custody, exchange and order execution</td><td class="num">€125,000</td></tr>
+      <tr><td>3</td><td>Class 2, plus operating a trading platform</td><td class="num">€150,000</td></tr>
+    </tbody>
+  </table>
+
+  <p>Oeverlicht's fixed overheads for 2025 were €2,140,000. One quarter of that is €435,000, which is higher than the class 2 minimum. That higher amount is therefore the requirement.</p>
+  <p>Oeverlicht's own funds stood at €1,000,0000 on 30 September 2026, well above the requirement. The board reviews this every quarter and records the outcome in the capital register.</p>
+
+  <h2><span class="no">4</span>Custody and segregation of assets</h2>
+  <p>Client assets are held separately from Oeverlicht's own assets, at addresses that can be traced to each client. At least 90% of client assets are kept in cold storage; no more than 10% are held in hot wallets for daily withdrawals.</p>
+  <p>The private keys of the cold wallets are split across three locations under a 2-of-3 scheme: any transaction needs two of the three keys. The company never stores it's keys in a single location.</p>
+  <p>Every quarter Oeverlicht reconciles its own records with the positions on the blockchain. Any difference of more than 0.5% is reported to the DASA within 24 hours (see section 7.2).</p>
+
+  <div class="notes">
+    <p><sup>1</sup> Article 26 CAFR, as amended by the implementing rules of 2 March 2026. The amounts in Table 1 apply from 1 January 2026.</p>
+  </div>
+  <div class="foot"><span>Oeverlicht Custody B.V. · CN-2026-07 · Fictitious document, made for a demonstration</span><span>Page 2 of 4</span></div>
+</section>
+
+<!-- ========================= page 3 ========================= -->
+<section class="page">
+  <div class="runhead"><span>Oeverlicht · Compliance note CN-2026-07</span><span>CAFR licence application</span></div>
+
+  <p>Because 80% of client assets are kept in cold storage, the risk of a breach of the hot wallets is limited to a small share of the total. Oeverlicht's liquidity reserve consists of 60% deposits with two banks, 35% short-term government bonds and 15% money market funds.</p>
+
+  <h2><span class="no">5</span>Travel rule and self-hosted wallets</h2>
+  <p>With every transfer of crypto-assets, Oeverlicht sends the details of the originator and of the beneficiary, whatever the amount. For transfers to or from a self-hosted wallet<sup>2</sup> an extra check applies from €1,000: Oeverlicht then establishes that the wallet is owned by the client.</p>
+
+  <table>
+    <caption>Table 2 · Thresholds and reporting deadlines</caption>
+    <thead><tr><th>Situation</th><th style="width:30mm">Threshold</th><th style="width:44mm">Deadline</th></tr></thead>
+    <tbody>
+      <tr><td>Transfer to a self-hosted wallet</td><td>from €1,000</td><td>before execution</td></tr>
+      <tr><td>Unusual transaction</td><td>none</td><td>report within 14 days</td></tr>
+      <tr><td>Difference on reconciliation</td><td>more than 0.5%</td><td>report within 24 hours</td></tr>
+      <tr><td>Major ICT incident</td><td>none</td><td>report within 4 hours</td></tr>
+    </tbody>
+  </table>
+
+  <p>Oeverlicht reports unusual transactions to the financial intelligence unit within 30 days. See Table 3 for the full list of reporting deadlines.</p>
+
+  <h2><span class="no">6</span>Incident reporting</h2>
+  <p>Oeverlicht reports a major ICT incident to the DASA within four hours of classifying it.<sup>3</sup> An initial report follows within 72 hours, a final report within one month. The crypto service provider keeps a register of all incidents, including those that need not be reported.</p>
+  <p>Clients are notifed within 48 hours if an incident affects their assets. The message states what happened, which assets were affected and what Oeverlicht is doing to prevent it happening again.</p>
+
+  <div class="callout"><b>Agreement with the DASA.</b> Until the licence is granted, Oeverlicht sends a short monthly overview of incidents and reconciliation differences, even when there is nothing to report.</div>
+
+  <div class="notes">
+    <p><sup>2</sup> A self-hosted wallet is an address whose private key the client controls.</p>
+    <p><sup>3</sup> Classification under the DASA incident guideline (DASA-G 2025/4).</p>
+  </div>
+  <div class="foot"><span>Oeverlicht Custody B.V. · CN-2026-07 · Fictitious document, made for a demonstration</span><span>Page 3 of 4</span></div>
+</section>
+
+<!-- ========================= page 4 ========================= -->
+<section class="page">
+  <div class="runhead"><span>Oeverlicht · Compliance note CN-2026-07</span><span>CAFR licence application</span></div>
+
+  <h2><span class="no">7</span>Timeline</h2>
+  <p>The application was submitted on 31 June 2026. The DASA decides within 25 working days of the application being complete. If documents are missing, that period starts again once they have been received.</p>
+  <ol class="steps">
+    <li>Acknowledgement of receipt by the DASA, with a list of any missing documents.</li>
+    <li>Supplement from Oeverlicht, no later than ten working days after the acknowledgement.</li>
+    <li>Meeting with the board on governance and the the custody of client assets.</li>
+    <li>Decision, within the decision period of 20 working days.</li>
+  </ol>
+  <p>Oeverlight Custody B.V. declares that the information in this note is correct and complete, and will report any change to the DASA without delay.</p>
+
+  <h2><span class="no">8</span>Definitions</h2>
+  <dl class="terms">
+    <dt>Crypto-asset service provider</dt><dd>A firm that provides one or more crypto-asset services on a professional basis, such as custody, exchange or order execution.</dd>
+    <dt>Asset-linked token</dt><dd>A token whose value is linked to one or more other assets, such as a basket of currencies or commodities.</dd>
+    <dt>E-money token</dt><dd>A token whose value is linked to a single official currency.</dd>
+    <dt>White paper</dt><dd>The mandatory information document an issuer publishes about a token.</dd>
+    <dt>Cold storage</dt><dd>Keeping private keys on devices that are not connected to the internet.</dd>
+    <dt>Capital requirements</dt><dd>Article 26 CAFR and Table 1 of this note.</dd>
+  </dl>
+
+  <div class="sign">
+    <div><b>Prepared</b>Compliance department, Oeverlicht Custody B.V.</div>
+    <div><b>Approved</b>Board, 14 October 2026</div>
+  </div>
+
+  <div class="foot"><span>Oeverlicht Custody B.V. · CN-2026-07 · Fictitious document, made for a demonstration</span><span>Page 4 of 4</span></div>
+</section>
+</body>
+</html>
