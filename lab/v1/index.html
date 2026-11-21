@@ -222,11 +222,11 @@ body.dock-off .dock{display:none}
 body.dock-off .docpane{gap:0;padding-bottom:0}
 body.dock-off #pages{padding-bottom:44px}
 body.dock-off .dockshow{display:grid;place-items:center;position:absolute;bottom:0;z-index:6;transform:translateX(-50%);width:56px;height:28px;border:0;border-radius:10px 10px 0 0;
-  background:var(--surface);box-shadow:var(--float);color:var(--ink-2);transition:opacity .2s var(--ease),transform .2s var(--ease)}
+  background:var(--ink);box-shadow:0 -2px 12px -4px rgba(24,24,27,.35);color:#fff;transition:opacity .2s var(--ease),transform .2s var(--ease)}
 @starting-style{body.dock-off .dockshow{opacity:0;transform:translate(-50%,6px)}}
-.dockshow:hover{color:var(--ink)}
+.dockshow:hover{background:#000;color:#fff}
 body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
-.dockshow .ic{width:14px;height:14px}
+.dockshow .ic{width:15px;height:15px}
 #scroller{flex:1;min-height:0;overflow:auto;position:relative;overscroll-behavior:contain;border-radius:var(--r-card)}
 #pages{padding:4px var(--pad-x) 24px}
 .pg{display:grid;grid-template-columns:var(--gutter) auto;width:max-content;margin:0 auto 20px;padding-right:var(--gutter-r)}
