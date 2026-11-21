@@ -606,16 +606,17 @@ function votersHTML(f){
   const v = Object.entries(votesOf(f)).sort((a, b) => a[1].at - b[1].at);
   return v.length ? `<span class="rvoters">${v.map(([k, x]) => avatar(k, 'xs v-' + x.v)).join('')}</span>` : '';
 }
-function rowHTML(f, lane){   // lane: a floating card leaves out the type and groups who decided with the tools, top right
+function rowHTML(f, lane){   // lane: a floating card; folded, its status and who decided share one pill, and its tools show only when open
   const s = statusOf(f);
+  const chip = s !== 'open' ? `<span class="stat st-${s}${lane ? ' vchip' : ''}">${ic(STATUS_ICON[s])}${STATUS[s]}${lane ? votersHTML(f) : ''}</span>` : '';
   return `<button type="button" class="rowbtn" aria-expanded="${sel === f.id}">
       <span class="mk-mini s-${f.severity} st-${s}">${f.n}</span>
       <span class="rmain">
         <span class="rtitle">${esc(f.title)}</span>
         <span class="rmeta"><span class="rkey">${f.key}</span><span class="sevw s-${f.severity}">${SEV[f.severity]}</span>${lane ? '' : `<span>${TYPES[f.type]}</span>`}<span>Page ${f.page}</span>${
-          s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : ''}${lane ? '' : votersHTML(f)}</span>
+          chip}${lane ? '' : votersHTML(f)}</span>
       </span>
-      <span class="rside">${logos(agentsOf(f))}${lane && sel !== f.id ? votersHTML(f) : ''}</span>
+      <span class="rside">${!lane || sel === f.id ? logos(agentsOf(f)) : ''}</span>
     </button>`;
 }
 

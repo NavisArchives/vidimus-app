@@ -284,8 +284,11 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 .cmt > .rowbtn{grid-template-columns:minmax(0,1fr) auto}
 .cmt > .rowbtn > .mk-mini{display:none}
 /* the tools that found it and the people who decided, together at the top right */
-.cmt .rside{gap:6px}
-.cmt .rside .rvoters{margin:0}
+/* folded: the status and who decided share one pill at the right of the meta line; the tools show only when open */
+.cmt .vchip{margin-left:auto;height:26px;gap:6px;padding:0 4px 0 8px}
+.cmt .vchip .rvoters{margin:0;gap:3px}
+.cmt .vchip .av{width:20px;height:20px;font-size:8px;box-shadow:0 0 0 1.5px var(--surface)}
+.cmt .vchip.st-rejected{background:var(--high-soft);color:var(--high)}
 .cmt[data-n]::after{content:attr(data-n);position:absolute;top:-7px;right:-7px;z-index:3;min-width:20px;height:20px;padding:0 5px;border-radius:6px;
   display:grid;place-items:center;background:var(--cc);color:#fff;font:600 11px/1 var(--sans);font-variant-numeric:tabular-nums;
   box-shadow:0 0 0 2px var(--bg);pointer-events:none}
