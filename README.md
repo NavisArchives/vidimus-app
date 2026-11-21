@@ -68,13 +68,33 @@ Settings, all optional:
 
 The sample in `out/` was checked against LanguageTool's public API (`LT_SERVER=https://api.languagetool.org/v2/check`, `LT_DELAY=3.2`), since the text is invented.
 
+## Lab: a one-document desk (design refresh, in progress)
+
+`lab/` holds two design directions for the next desk, built on a new invented sample: a four-page compliance note on a made-up crypto framework, from a made-up firm (Oeverlicht Custody B.V.) to a made-up regulator, with 19 mistakes put in on purpose (figures, legal references, terminology, consistency, language).
+
+- **One document, mistakes marked in place.** The desk renders the PDF with PDF.js, finds each finding's quoted text in it and tints that text. Numbered markers sit in a gutter beside the page, never on the text. Every finding has a key (`VD-01` …) the team can refer to.
+- **Filters** by severity, type and the tool that found it, with counts, plus a text search.
+- **Team decisions.** Approve, reject or edit a suggestion; each decision records who made it and when, so one finding can be approved by one person and rejected by another.
+- **Export** of every finding (or only the approved ones) with its decision and who made it, as CSV or as a Markdown report.
+- **Screens:** sign in (demo accounts), review, export. Interface in English.
+- `v1/` « Paper » is light, with the card opening inside the list; `v2/` « Night » is dark, with filters and a page map on the left and the selected finding pinned on the right. Both share `lab/desk.js`.
+
+**Sample states only.** The sign-in, the « Connect your tools » panel (Claude, ChatGPT, Gemini, Grok, LanguageTool and team review) and every decision are kept in the browser's local storage. Nothing is called, no key is asked for or stored, and nothing leaves the page. The logos name the tools and remain their owners' trademarks; sources and licences are in `lab/assets/NOTICE.md`.
+
+```bash
+python3 lab/sample/make_pdf.py      # note.html -> lab/sample/note.pdf (needs Chrome and network for the fonts)
+python3 lab/build.py                # checks every quote against the PDF, then builds lab/v1 and lab/v2
+python3 -m http.server 8777 --bind 127.0.0.1
+# http://localhost:8777/lab/  (v1: /lab/v1/, v2: /lab/v2/)
+```
+
 ## Tests
 
 ```bash
 python3 -m unittest discover -s tests
 ```
 
-Unit tests cover block extraction, the QA report parser, the PDF match and LanguageTool's auto-fix. The pipeline scripts also assert their own invariants on every run (one finding per block, a suggestion that differs from the current text, the quoted text still in its block).
+Unit tests cover block extraction, the QA report parser, the PDF match and LanguageTool's auto-fix, and for the lab: every planted quote found once on its page, the build refusing a finding it cannot place, every icon present in the sprite, and the built pages up to date. The pipeline scripts also assert their own invariants on every run (one finding per block, a suggestion that differs from the current text, the quoted text still in its block).
 
 ## License
 

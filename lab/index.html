@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vidimus lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#F1F1F2;--surface:#fff;--ink:#18181B;--ink-2:#3F3F46;--muted:#66666E;--line:#E4E4E7}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;background:var(--bg);color:var(--ink);font:15px/1.55 'Geist',ui-sans-serif,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;display:grid;place-items:center;padding:32px 16px}
+main{width:100%;max-width:760px}
+h1{font-size:26px;font-weight:600;letter-spacing:-.025em;margin:0 0 6px}
+p{margin:0 0 22px;color:var(--muted);max-width:60ch}
+ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+a{display:block;height:100%;padding:18px 20px;border-radius:14px;background:var(--surface);color:inherit;text-decoration:none;
+  box-shadow:0 0 0 1px rgba(24,24,27,.06),0 10px 28px -14px rgba(24,24,27,.18);transition:transform .12s cubic-bezier(.23,1,.32,1),box-shadow .15s}
+a:hover{box-shadow:0 0 0 1px rgba(24,24,27,.14),0 10px 28px -14px rgba(24,24,27,.24)}
+a:active{transform:scale(.99)}
+b{display:block;font-weight:600;font-size:16px;margin-bottom:4px}
+span{display:block;color:var(--ink-2);font-size:14px}
+small{display:block;margin-top:18px;color:var(--muted);font-size:13px}
+@media (max-width:640px){ul{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Vidimus lab</h1>
+  <p>Two directions for the review desk, on the same invented compliance note and the same 19 findings. Both have sign in, review and export.</p>
+  <ul>
+    <li><a href="v1/"><b>v1, Paper</b><span>Light. The findings list opens each card in place, with a filter bar and search above it.</span></a></li>
+    <li><a href="v2/"><b>v2, Night</b><span>Dark with lit pages. Filters and a page map on the left, the selected finding pinned on the right.</span></a></li>
+  </ul>
+  <small>Sample data only. Sign-in, connected tools and decisions are kept in this browser and sent nowhere.</small>
+</main>
+</body>
+</html>
