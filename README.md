@@ -77,7 +77,7 @@ The sample in `out/` was checked against LanguageTool's public API (`LT_SERVER=h
 - **Team decisions.** Approve, reject or edit a suggestion; each decision records who made it and when, so one finding can be approved by one person and rejected by another.
 - **Export** of every finding (or only the approved ones) with its decision and who made it, as CSV or as a Markdown report.
 - **Screens:** sign in (demo accounts), review, export. Interface in English.
-- `v1/` « Paper » is light, with the card opening inside the list; `v2/` « Night » is dark, with filters and a page map on the left and the selected finding pinned on the right. Both share `lab/desk.js`.
+- Both directions are white. `v1/` « Paper » opens each card inside the list; `v2/` « Ledger » has filters and a page map in a left rail and the selected finding pinned on the right. Both share `lab/desk.js`.
 
 **Sample states only.** The sign-in, the « Connect your tools » panel (Claude, ChatGPT, Gemini, Grok, LanguageTool and team review) and every decision are kept in the browser's local storage. Nothing is called, no key is asked for or stored, and nothing leaves the page. The logos name the tools and remain their owners' trademarks; sources and licences are in `lab/assets/NOTICE.md`.
 
