@@ -1007,10 +1007,10 @@ function mount(){
 /* the bar sits under the page only, and its tab (when hidden) in the middle of the page */
 function placeDock(){
   const dock = $('#dock'), tab = $('#dockshow'), pane = $('.docpane'), P = pages[0];
-  if (!dock || !pane || !P || MOBILE.matches){ if (dock){ dock.style.marginLeft = dock.style.width = ''; } if (tab) tab.style.left = ''; return; }
+  if (!dock || !pane || !P || MOBILE.matches){ if (dock){ dock.style.left = dock.style.width = ''; } if (tab) tab.style.left = ''; return; }
   const d = pane.getBoundingClientRect(), r = P.el.getBoundingClientRect();
   const left = Math.max(d.left, r.left), right = Math.min(d.right, r.right);
-  dock.style.marginLeft = Math.round(left - d.left) + 'px';
+  dock.style.left = Math.round(left - d.left) + 'px';
   dock.style.width = Math.round(right - left) + 'px';
   if (tab) tab.style.left = Math.round((left + right) / 2 - d.left) + 'px';
 }

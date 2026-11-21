@@ -198,9 +198,10 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 
 /* ---------- review: the pages with their bar, three cards ---------- */
 #screen-review{grid-template-columns:minmax(0,1fr);padding:2px 12px 0 4px}
-.docpane{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px;padding-bottom:16px}
+.docpane{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column}
 /* the bar spans the page's column only (the desk sets its left and width from the page) */
-.dock{align-self:flex-start;max-width:100%}
+/* it floats over the page like a pop-up: the page always runs to the bottom, showing or hiding it changes nothing else */
+.dock{position:absolute;bottom:16px;left:0;z-index:6;max-width:100%}
 /* the bar under the pages: shortcuts, pages, zoom. It hides, and a small arrow brings it back. Never on the page. */
 .dock{flex:none;display:flex;align-items:center;gap:2px;height:var(--dock);padding:0 6px 0 16px;background:var(--surface);
   border-radius:var(--r-lg);box-shadow:var(--float);font-size:12.5px;color:var(--muted);white-space:nowrap;container-type:inline-size;
@@ -221,8 +222,6 @@ body:not([data-screen="review"]):not([data-screen="export"]) .doc-only{display:n
 #zoomval{min-width:48px;font-size:12.5px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
 .dockshow{display:none}
 body.dock-off .dock{display:none}
-body.dock-off .docpane{gap:0;padding-bottom:0}
-body.dock-off #pages{padding-bottom:44px}
 body.dock-off .dockshow{display:grid;place-items:center;position:absolute;bottom:0;z-index:6;transform:translateX(-50%);width:56px;height:28px;border:0;border-radius:10px 10px 0 0;
   background:var(--ink);box-shadow:0 -2px 12px -4px rgba(24,24,27,.35);color:#fff;transition:opacity .2s var(--ease),transform .2s var(--ease)}
 @starting-style{body.dock-off .dockshow{opacity:0;transform:translate(-50%,6px)}}
@@ -230,7 +229,7 @@ body.dock-off .dockshow{display:grid;place-items:center;position:absolute;bottom
 body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 .dockshow .ic{width:15px;height:15px}
 #scroller{flex:1;min-height:0;overflow:auto;position:relative;overscroll-behavior:contain;border-radius:var(--r-card)}
-#pages{padding:4px var(--pad-x) 24px}
+#pages{padding:4px var(--pad-x) calc(var(--dock) + 40px)}
 .pg{display:grid;grid-template-columns:var(--gutter) auto;width:max-content;margin:0 auto 20px;padding-right:var(--gutter-r)}
 /* the marker rail stays at the left edge when the page is wider than its column */
 .gut{position:sticky;left:0;z-index:3;background:var(--bg)}
@@ -279,13 +278,15 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 /* the open card breathes: more room around and between its parts */
 .cmt.sel > .rowbtn{padding:var(--g6) var(--g4) var(--g2) var(--g6)}
 /* the body spans the card with the same 24 px on both sides, so the card is balanced */
-.cmt .card{padding:var(--g2) var(--g6) var(--g6)}
+.cmt .card{padding:0 var(--g6) var(--g6)}
 .cmt .cagents{margin:var(--g1) 0 var(--g6)}
 .cmt .cfield{margin-bottom:var(--g4)}
 .cmt .clabel{margin:0 0 var(--g2)}
 .cmt .cnote{margin:var(--g2) 0 var(--g6)}
 .cmt .cdec{margin-top:var(--g6);padding-top:var(--g4)}
 .cmt .rmeta{row-gap:var(--g2)}
+/* an open card shows its decision once, under Decisions */
+.cmt.sel .rmeta :is(.stat,.rvoters),#detail .rmeta :is(.stat,.rvoters){display:none}
 #panel{display:none}
 #panel > .fcard{flex:none}
 .fhead{display:flex;align-items:center;gap:10px;min-height:34px}
@@ -1756,10 +1757,10 @@ function mount(){
 /* the bar sits under the page only, and its tab (when hidden) in the middle of the page */
 function placeDock(){
   const dock = $('#dock'), tab = $('#dockshow'), pane = $('.docpane'), P = pages[0];
-  if (!dock || !pane || !P || MOBILE.matches){ if (dock){ dock.style.marginLeft = dock.style.width = ''; } if (tab) tab.style.left = ''; return; }
+  if (!dock || !pane || !P || MOBILE.matches){ if (dock){ dock.style.left = dock.style.width = ''; } if (tab) tab.style.left = ''; return; }
   const d = pane.getBoundingClientRect(), r = P.el.getBoundingClientRect();
   const left = Math.max(d.left, r.left), right = Math.min(d.right, r.right);
-  dock.style.marginLeft = Math.round(left - d.left) + 'px';
+  dock.style.left = Math.round(left - d.left) + 'px';
   dock.style.width = Math.round(right - left) + 'px';
   if (tab) tab.style.left = Math.round((left + right) / 2 - d.left) + 'px';
 }
