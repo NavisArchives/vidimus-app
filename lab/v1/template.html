@@ -24,10 +24,10 @@
   --bg:#F1F1F2; --surface:#FFFFFF; --surface-2:#FAFAFA; --hover:#F4F4F5;
   --ink:#18181B; --ink-2:#3F3F46; --muted:#66666E;
   --line:#E4E4E7; --line-2:#D4D4D8;
-  --accent:#047857; --accent-2:#065F46; --accent-soft:#ECFDF5; --accent-hl:#B4EBD2;
-  --high:#D02E2E; --high-soft:#FEF2F2; --high-hl:#FFC9C9;
-  --medium:#B45309; --medium-soft:#FFF7E6; --medium-hl:#FFE08A;
-  --low:#5B6B82; --low-soft:#F1F5F9; --low-hl:#D9E2EE;
+  --accent:#047857; --accent-2:#065F46; --accent-soft:#ECFDF5; --accent-hl:rgba(0,190,110,.3);
+  --high:#D02E2E; --high-soft:#FEF2F2; --high-hl:rgba(255,64,64,.28);
+  --medium:#B45309; --medium-soft:#FFF7E6; --medium-hl:rgba(255,190,0,.47);
+  --low:#5B6B82; --low-soft:#F1F5F9; --low-hl:rgba(60,110,180,.2);
   --r-card:16px; --r-lg:14px; --r:9px; --r-sm:7px;
   --ring:0 0 0 1px rgba(24,24,27,.06);
   --float:0 0 0 1px rgba(24,24,27,.06),0 1px 2px rgba(24,24,27,.04),0 10px 28px -14px rgba(24,24,27,.18);
@@ -237,8 +237,8 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 .hls{position:absolute;inset:0}
 .loaderr{max-width:480px;margin:80px auto;color:var(--ink-2);text-align:center}
 
-/* highlights tint the paper (multiply), so the letters stay black */
-.hl{position:absolute;border-radius:3px;mix-blend-mode:multiply;cursor:pointer;transition:filter .15s}
+/* highlights are translucent tints, not blends: the letters show through whatever the browser does while repainting */
+.hl{position:absolute;border-radius:3px;cursor:pointer;transition:filter .15s}
 .hl.s-high{background:var(--high-hl)} .hl.s-medium{background:var(--medium-hl)} .hl.s-low{background:var(--low-hl)}
 .hl.hover{filter:saturate(1.5) brightness(.93)}
 .hl.sel{outline:2px solid var(--ink);outline-offset:1px}
