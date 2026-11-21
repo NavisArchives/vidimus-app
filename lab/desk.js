@@ -606,16 +606,16 @@ function votersHTML(f){
   const v = Object.entries(votesOf(f)).sort((a, b) => a[1].at - b[1].at);
   return v.length ? `<span class="rvoters">${v.map(([k, x]) => avatar(k, 'xs v-' + x.v)).join('')}</span>` : '';
 }
-function rowHTML(f, lane){   // lane: who decided sits under the tools, so the meta line never wraps
+function rowHTML(f, lane){   // lane: a floating card leaves out the type, so who decided fits on the meta line
   const s = statusOf(f);
   return `<button type="button" class="rowbtn" aria-expanded="${sel === f.id}">
       <span class="mk-mini s-${f.severity} st-${s}">${f.n}</span>
       <span class="rmain">
         <span class="rtitle">${esc(f.title)}</span>
-        <span class="rmeta"><span class="rkey">${f.key}</span><span class="sevw s-${f.severity}">${SEV[f.severity]}</span><span>${TYPES[f.type]}</span><span>Page ${f.page}</span>${
-          s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : ''}${lane ? '' : votersHTML(f)}</span>
+        <span class="rmeta"><span class="rkey">${f.key}</span><span class="sevw s-${f.severity}">${SEV[f.severity]}</span>${lane ? '' : `<span>${TYPES[f.type]}</span>`}<span>Page ${f.page}</span>${
+          s !== 'open' ? `<span class="stat st-${s}">${ic(STATUS_ICON[s])}${STATUS[s]}</span>` : ''}${votersHTML(f)}</span>
       </span>
-      <span class="rside">${logos(agentsOf(f))}${lane && sel !== f.id ? votersHTML(f) : ''}</span>
+      <span class="rside">${logos(agentsOf(f))}</span>
     </button>`;
 }
 
