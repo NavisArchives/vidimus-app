@@ -76,10 +76,11 @@ if (!votes){
 let edits = lsGet('edits', {});                     // id -> {text, by, at}
 const conn = Object.assign(Object.fromEntries(D.agents.map(a => [a.key, !!a.connected])), lsGet('tools', {}));
 const connecting = new Set();
-/* Zoom is relative to the page fitting its column. A phone opens at a reading
-   zoom instead (the page about 1.05x its size in points, body text near 11px)
-   and keeps its own setting; null means « use the default for this screen ». */
-const zkey = () => MOBILE.matches ? 'zoom-phone' : 'zoom';
+/* Zoom is relative to the page fitting its column. Every screen opens at fit
+   width, a phone too, the way phone PDF readers do: no line is ever cut at the
+   edges. + and pinch zoom in from there. A phone keeps its own setting; null
+   means « fit width ». */
+const zkey = () => MOBILE.matches ? 'zoom-phone-fit' : 'zoom';   // new key: an old stored reading zoom does not come back
 let zoom = lsGet(zkey(), null);
 const filt = {sev: new Set(), type: new Set(), agent: new Set()};
 let query = '', openDrop = null;
@@ -954,7 +955,6 @@ async function lib(){
   return pdfjs;
 }
 const cssNum = name => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0;
-const PHONE_READ = 1.05;   // a phone shows the page at about 1.05 CSS px per point
 function fitWidth(){
   // the gutter on the left holds the markers, so they never sit on the text; the lane of findings sits on the right
   const lane = MOBILE.matches ? 0 : cssNum('--lane') + cssNum('--lane-gap') + 14;
@@ -963,10 +963,10 @@ function fitWidth(){
 }
 function zoomNow(){
   if (zoom != null) return zoom;
-  return MOBILE.matches && pages.length ? Math.max(1, pages[0].w * PHONE_READ / fitWidth()) : 1;
+  return 1;
 }
 function sheetWidth(){ return Math.round(fitWidth() * zoomNow()); }
-/* When the page is wider than its column (a phone at reading zoom), start at
+/* When the page is wider than its column (zoomed in), start at
    the text column, just right of the marker rail, instead of the page margin. */
 function sheetLeft(P){
   return P.sheet.getBoundingClientRect().left - scroller.getBoundingClientRect().left + scroller.scrollLeft;
