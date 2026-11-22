@@ -2009,7 +2009,10 @@ function placeLane(){
   const down = from => { for (let i = from; i < n; i++) top[i] = Math.max(items[i].y, i ? top[i - 1] + items[i - 1].h + LANE_GAP : min); };
   if (s < 0) down(0);
   else {
-    top[s] = items[s].y;
+    // the open card comes up close under the findings card (Andy): when its text is on screen below that spot,
+    // the card rises to it rather than waiting level with its highlight; off screen, revealSel brings it there
+    const sr = scroller.getBoundingClientRect(), spot = sr.top + min - L, ay = items[s].y;
+    top[s] = ay > spot && L + ay < sr.bottom - 40 ? Math.max(min, spot) : ay;
     down(s + 1);
     for (let i = s - 1; i >= 0; i--) top[i] = Math.min(items[i].y, top[i + 1] - LANE_GAP - items[i].h);
     if (top[0] < min){                       // no room above: the whole stack moves down
