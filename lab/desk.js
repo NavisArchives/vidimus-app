@@ -608,13 +608,14 @@ function votersHTML(f){
 }
 function rowHTML(f, lane){   // lane: a floating card; folded, its status and who decided share one pill; its tools show in Found by when open
   const s = statusOf(f);
-  const chip = s !== 'open' ? `<span class="stat st-${s}${lane ? ' vchip' : ''}">${ic(STATUS_ICON[s])}${STATUS[s]}${lane ? votersHTML(f) : ''}</span>` : '';
+  // a decided finding: its status and who decided are one pill, everywhere, so they can never drift apart
+  const chip = s !== 'open' ? `<span class="stat st-${s} vchip">${ic(STATUS_ICON[s])}${STATUS[s]}${votersHTML(f)}</span>` : '';
   return `<button type="button" class="rowbtn" aria-expanded="${sel === f.id}">
       <span class="mk-mini s-${f.severity} st-${s}">${f.n}</span>
       <span class="rmain">
         <span class="rtitle">${esc(f.title)}</span>
         <span class="rmeta"><span class="rkey">${f.key}</span><span class="sevw s-${f.severity}">${SEV[f.severity]}</span>${lane ? '' : `<span>${TYPES[f.type]}</span>`}<span>Page ${f.page}</span>${
-          chip}${lane ? '' : votersHTML(f)}</span>
+          chip}${s === 'open' ? votersHTML(f) : ''}</span>
       </span>
       <span class="rside">${lane ? '' : logos(agentsOf(f))}</span>
     </button>`;
