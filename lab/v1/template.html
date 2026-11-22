@@ -467,7 +467,7 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 .dsev span{display:inline-flex;align-items:center;gap:7px}
 .dsev b{font-weight:600;color:var(--ink);margin-left:2px}
 .dsev small{color:var(--muted);font-size:12.5px}
-.dstats{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;align-content:center}   /* the figures sit in the middle of a stretched card */
+.dstats{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;align-content:space-between}   /* first line level with its neighbour's, the 2x2 spread to the foot */
 .dstat{display:flex;flex-direction:column;gap:2px}
 .dstat span{font-size:12.5px;color:var(--muted);font-weight:500}
 .dstat b{font-size:28px;font-weight:600;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
@@ -489,6 +489,9 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 .dlist2 .dt b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dlist2 .dt span{font-size:12.5px;color:var(--muted)}
 .dlist2 .dn{font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.ddocs{display:flex;flex-direction:column}
+.ddocs .dlist2{flex:1;display:flex;flex-direction:column}
+.ddocs .dlist2 li{flex:1}   /* the rows share the card's height: no bare band under the last (V1) */
 .rv{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
 .rvlist{grid-row:span 2}
 .rvtabs{margin-bottom:8px}
@@ -596,7 +599,7 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 }
 /* phone: a drawer for the sidebar, the document first, controls in a row above the findings sheet */
 @media (max-width:760px){
-  :root{--gutter-r:0px;--pad-x:6px;--top:54px;--lane:0px;--lane-gap:0px}
+  :root{--gutter-r:0px;--pad-x:6px;--top:54px;--lane:0px;--lane-gap:0px;--peek:132px}   /* the folded bar at its tallest (no finding chosen), for the room under the pages and the toast */
   #docrow{display:block;padding-right:0}
   #lane{display:none}
   .top{gap:6px;padding:0 10px 0 6px;background:var(--surface);box-shadow:0 1px 0 var(--line)}   /* white on a phone, like the status bar above it */
@@ -624,7 +627,7 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
   /* the findings, a full page on a phone (Andy, 22 Nov: « make the finding a full page … I don't want it to be a slide
      up »). Folded, the panel is the bar at the foot of the document; open, it is a page under the top bar, and the
      « Document » button in its header goes back. Between the two it cross-fades; nothing slides. */
-  #panel{display:flex;flex-direction:column;position:fixed;left:0;right:0;top:auto;bottom:0;height:var(--peek);z-index:30;gap:0;padding:0;border-radius:0;background:var(--surface);
+  #panel{display:flex;flex-direction:column;position:fixed;left:0;right:0;top:auto;bottom:0;height:auto;z-index:30;gap:0;padding:0 0 env(safe-area-inset-bottom);border-radius:0;background:var(--surface);
     box-shadow:0 -1px 0 var(--line),0 -10px 28px -16px rgba(24,24,27,.22);overflow:hidden}
   body.sheet-open #panel{top:var(--top);height:auto;box-shadow:none;overflow-y:auto;animation:fadein .2s var(--ease)}
   body.doc-back #scroller{animation:fadein .2s var(--ease)}
@@ -633,12 +636,15 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
   #panel .fcard{box-shadow:none;border-radius:0;max-height:none;overflow:visible;background:var(--surface)}
   #findhead{position:sticky;top:0;z-index:2;padding:8px 14px 12px;background:var(--surface);border-bottom:1px solid var(--line)}   /* stays while the list scrolls */
   #detail{flex:none;background:var(--surface-2) !important;border-bottom:1px solid var(--line)}
-  .backdoc{display:inline-flex;align-items:center;gap:4px;flex:none;height:34px;margin-left:-8px;padding:0 8px 0 4px;border:0;border-radius:var(--r-sm);background:none;
-    color:var(--ink);font:500 15px/1 var(--sans);cursor:pointer}
-  .backdoc .ic{width:18px;height:18px}
-  .backdoc:active{background:var(--hover)}
+  /* the way back: a small control on its own row, « Findings » the title under it (V3) */
+  #findhead .fhead{flex-wrap:wrap;row-gap:2px}
+  #findhead .fhead h2{font-size:20px}
+  .backdoc{display:inline-flex;align-items:center;gap:4px;flex:0 0 100%;justify-content:flex-start;height:28px;margin-left:-6px;padding:0 6px;border:0;border-radius:var(--r-sm);background:none;
+    color:var(--ink-2);font:500 13.5px/1 var(--sans);cursor:pointer}
+  .backdoc .ic{width:16px;height:16px}
+  .backdoc:active{color:var(--ink)}
   #peek{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px 12px;align-items:start;align-content:start;flex:none;
-    padding:16px 16px 16px;min-height:var(--peek);cursor:pointer}
+    padding:14px 16px 14px;cursor:pointer}   /* the bar hugs its content (V4) */
   #peek .ptext{font-size:14px;line-height:1.4;color:var(--ink-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   #peek .ptext:first-child{grid-column:1 / -1}
   #peek .ptext b{font-weight:500;color:var(--ink)}
