@@ -612,14 +612,13 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
   body[data-screen="review"] #screen-review{display:block;position:relative;padding:0}
   .docpane,body.dock-off .docpane{height:100%;gap:0;padding-bottom:0}
   #scroller{border-radius:0}
-  #pages{padding:6px var(--pad-x) calc(var(--peek) + var(--dock) + 16px)}
+  #pages{padding:6px var(--pad-x) calc(var(--peek) + 16px)}
   .pg{margin-bottom:12px}
-  /* the bar is a row above the findings sheet; hidden, a small arrow waits at its right end */
-  .dock{position:fixed;left:0;right:0;bottom:var(--peek);z-index:25;height:var(--dock);justify-content:center;gap:12px;padding:0 8px;
-    border-radius:0;box-shadow:0 -1px 0 var(--line)}
-  .dkeys,.dock .dsep{display:none}
-  #dockhide{position:absolute;right:8px;top:6px}
-  body.dock-off .dockshow{position:fixed;left:auto;right:12px;bottom:calc(var(--peek) + 8px);z-index:25;transform:none;border-radius:999px}
+  /* no page and zoom bar on a phone: the pages scroll natively and pinch zooms */
+  .dock,.dockshow,body.dock-off .dockshow{display:none}
+  /* with the findings sheet open, the document behind it blurs, as under an iOS sheet */
+  #scroller{transition:filter .25s var(--ease)}
+  body.sheet-open #scroller{filter:blur(6px) saturate(.9)}
   .mk{right:3px}
   #panel{display:flex;flex-direction:column;position:fixed;left:0;right:0;bottom:0;height:min(88dvh,780px);z-index:30;gap:0;padding:0;border-radius:20px 20px 0 0;background:var(--surface);
     box-shadow:0 -12px 36px -12px rgba(24,24,27,.28),0 -1px 0 var(--line);overflow-y:auto;
@@ -675,7 +674,7 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
   /* a small pill above the controls row, not a band across the page */
   body[data-screen] #toast{left:50%;right:auto;max-width:calc(100vw - 32px);bottom:16px;transform:translate(-50%,6px)}
   body[data-screen] #toast.on{transform:translate(-50%,0)}
-  body[data-screen="review"] #toast{bottom:calc(var(--peek) + var(--dock) + 8px)}
+  body[data-screen="review"] #toast{bottom:calc(var(--peek) + 8px)}
   body.sheet-open[data-screen] #toast{bottom:auto;top:60px}
 }
 @media (prefers-reduced-motion:reduce){ *{transition:none !important;animation:none !important} }

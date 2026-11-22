@@ -762,6 +762,10 @@ function setSheet(open){
 }
 $('#sheetbtn') && ($('#sheetbtn').onclick = () => setSheet(!document.body.classList.contains('sheet-open')));
 $('#peek') && ($('#peek').onclick = e => { if (!e.target.closest('button')) setSheet(true); });
+// a phone: a tap on the blurred document above the open sheet closes the sheet, nothing else
+$('#scroller')?.addEventListener('click', e => {
+  if (MOBILE.matches && document.body.classList.contains('sheet-open')){ e.stopPropagation(); e.preventDefault(); setSheet(false); }
+}, true);
 
 /* ---------- selection ---------- */
 function select(id, from){
