@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
+<meta name="theme-color" content="#FFFFFF" media="(max-width: 760px)">
 <title>Vidimus</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -595,7 +596,7 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
   :root{--gutter-r:0px;--pad-x:6px;--top:54px;--lane:0px;--lane-gap:0px}
   #docrow{display:block;padding-right:0}
   #lane{display:none}
-  .top{gap:6px;padding:0 10px 0 6px}
+  .top{gap:6px;padding:0 10px 0 6px;background:var(--surface);box-shadow:0 1px 0 var(--line)}   /* white on a phone, like the status bar above it */
   .home,.home + .vr{display:none}
   #crumb > a,#crumb > .cr-sep{display:none}
   .topright{gap:6px}
