@@ -16,7 +16,7 @@ A review desk for regulatory documents. AI models and language tools read the do
 - **Dashboard** (progress, open findings by severity, recent decisions), **Reviews** (every finding and the full history of who approved, rejected or edited what) and **Documents**.
 - **Export** of every finding, or only the approved ones, with its decision and who made it, as CSV or as a Markdown report.
 - **Keyboard:** `j`/`k` next and previous, `a` approve, `x` reject, `e` edit, `/` search, `Esc` folds the open card. A bar under the page shows them with the page and zoom controls; it hides behind a small arrow.
-- **Phone:** the page at its full width, as phone PDF readers show it (pinch to zoom in), each badge in the page's margin level with its line, the findings in a sheet that slides up over the blurred page, approve or reject from its peek.
+- **Phone:** the page at its full width, as phone PDF readers show it (pinch to zoom in), each badge in the page's margin level with its line. The findings open as a full page under the top bar, with a "Document" button back to the page (nothing slides up); approve or reject from the bar at the page's foot.
 
 | | |
 |---|---|
