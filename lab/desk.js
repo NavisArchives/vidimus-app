@@ -1108,7 +1108,13 @@ function drawMarks(){
     f.rects.forEach((r, i) => {
       const d = document.createElement('div');
       d.className = `hl s-${f.severity}`; d.dataset.fid = f.id;
-      if (i === 0){ d.classList.add('first'); d.dataset.n = f.n; }
+      if (i === 0){
+        d.classList.add('first'); d.dataset.n = f.n;
+        // on a phone the badge sits in the page's right margin, level with its line: at fit width a line is
+        // about 10px tall, and a badge on the highlight would cover letters. --mx is that spot, from the highlight's left
+        const edge = 1 - (P.minx ? P.minx / P.w : 0.12) / 2;
+        d.style.setProperty('--mx', `${((edge - r.x) / r.w * 100).toFixed(2)}%`);
+      }
       Object.assign(d.style, {left: r.x * 100 + '%', top: r.y * 100 + '%', width: r.w * 100 + '%', height: r.h * 100 + '%'});
       d.onclick = () => select(f.id, 'doc');
       d.onmouseenter = () => hover(f.id, true); d.onmouseleave = () => hover(f.id, false);
