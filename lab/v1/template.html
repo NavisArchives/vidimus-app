@@ -248,7 +248,7 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
   box-shadow:0 0 0 1.5px #fff;pointer-events:none}
 .hl.hover{filter:saturate(1.5) brightness(.93)}
 /* phone, at fit width: the badge moves into the right margin, level with its line, so it never covers a letter */
-@media (max-width:760px){ .hl.first::after{top:50%;left:var(--mx);transform:translate(-50%,-50%);min-width:14px;height:14px;font-size:9px;border-radius:4px} }
+@media (max-width:760px){ .hl.first::after{top:50%;left:calc(var(--mx) + var(--mxk, 0) * 17px);transform:translate(-50%,-50%);min-width:14px;height:14px;font-size:9px;border-radius:4px} .hl.sel{outline-width:1.5px;outline-offset:1px} }
 .hl.sel{outline:2px solid var(--ink);outline-offset:2px}
 .hl.st-approved{--hlc:var(--accent);background:var(--accent-hl)}
 .hl.st-rejected{--hlc:#A1A1AA;background:transparent}

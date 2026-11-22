@@ -1128,6 +1128,16 @@ function drawMarks(){
     m.onmouseenter = () => hover(f.id, true); m.onmouseleave = () => hover(f.id, false);
     P.gut.appendChild(m);
   }
+  // badges of findings that start on the same or the next line sit side by side in the margin, centred on it
+  for (const P of pages){
+    const firsts = [...P.hls.querySelectorAll('.hl.first')].map(d => ({d, y: parseFloat(d.style.top), h: parseFloat(d.style.height), x: parseFloat(d.style.left)}));
+    const lines = [];
+    for (const o of firsts.sort((a, b) => a.y - b.y || a.x - b.x)){
+      const L = lines.find(l => Math.abs(l[l.length - 1].y - o.y) < o.h * 1.9);   // same or next line: a badge is taller than a line
+      L ? L.push(o) : lines.push([o]);
+    }
+    for (const L of lines) L.forEach((o, k) => o.d.style.setProperty('--mxk', k - (L.length - 1) / 2));
+  }
   paintMarks();
 }
 /* classes only: visibility follows the filters, colour follows the decision */
