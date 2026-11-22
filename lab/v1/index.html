@@ -446,7 +446,7 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 .empty .ic{width:26px;height:26px;color:var(--line-2);margin-bottom:4px}
 .empty b{color:var(--ink);font-weight:500}
 .empty .btn{margin-top:8px}
-.sheetbtn,#peek{display:none}
+.sheetbtn,#peek,.backdoc{display:none}
 
 /* ---------- dashboard, reviews, documents, agents ---------- */
 .page{max-width:1120px;margin:0 auto;padding:12px 28px 48px}
@@ -457,7 +457,7 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 .dhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
 .dhead h3{margin:0;font-size:15px;font-weight:600}
 .dlabel{font-size:12.5px;font-weight:500;color:var(--muted)}
-.dash{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+.dash{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:stretch}   /* a row's cards share its height */
 .dcont h2{font-size:20px;font-weight:600;letter-spacing:-.02em;margin:6px 0 2px}
 .dsub{margin:0 0 16px;color:var(--muted)}
 .dprog{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted);margin-bottom:14px}
@@ -467,7 +467,7 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 .dsev span{display:inline-flex;align-items:center;gap:7px}
 .dsev b{font-weight:600;color:var(--ink);margin-left:2px}
 .dsev small{color:var(--muted);font-size:12.5px}
-.dstats{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
+.dstats{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;align-content:center}   /* the figures sit in the middle of a stretched card */
 .dstat{display:flex;flex-direction:column;gap:2px}
 .dstat span{font-size:12.5px;color:var(--muted);font-weight:500}
 .dstat b{font-size:28px;font-weight:600;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
@@ -620,23 +620,25 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
   .pg{margin-bottom:12px}
   /* no page and zoom bar on a phone: the pages scroll natively and pinch zooms */
   .dock,.dockshow,body.dock-off .dockshow{display:none}
-  /* with the findings sheet open, the document behind it blurs, as under an iOS sheet */
-  #scroller{transition:filter .25s var(--ease)}
-  body.sheet-open #scroller{filter:blur(6px) saturate(.9)}
   .mk{right:3px}
-  #panel{display:flex;flex-direction:column;position:fixed;left:0;right:0;bottom:0;height:min(88dvh,780px);z-index:30;gap:0;padding:0;border-radius:20px 20px 0 0;background:var(--surface);
-    box-shadow:0 -12px 36px -12px rgba(24,24,27,.28),0 -1px 0 var(--line);overflow-y:auto;
-    transform:translateY(calc(100% - var(--peek)));transition:transform .32s cubic-bezier(.32,.72,0,1)}
-  body.sheet-open #panel{transform:none}
-  body:not(.sheet-open) #panel{overflow:hidden}
-  body:not(.sheet-open) #panel > :not(.sheetbtn):not(#peek){visibility:hidden}
+  /* the findings, a full page on a phone (Andy, 22 Nov: « make the finding a full page … I don't want it to be a slide
+     up »). Folded, the panel is the bar at the foot of the document; open, it is a page under the top bar, and the
+     « Document » button in its header goes back. Between the two it cross-fades; nothing slides. */
+  #panel{display:flex;flex-direction:column;position:fixed;left:0;right:0;top:auto;bottom:0;height:var(--peek);z-index:30;gap:0;padding:0;border-radius:0;background:var(--surface);
+    box-shadow:0 -1px 0 var(--line),0 -10px 28px -16px rgba(24,24,27,.22);overflow:hidden}
+  body.sheet-open #panel{top:var(--top);height:auto;box-shadow:none;overflow-y:auto;animation:fadein .2s var(--ease)}
+  body.doc-back #scroller{animation:fadein .2s var(--ease)}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  body:not(.sheet-open) #panel > :not(#peek){display:none}
   #panel .fcard{box-shadow:none;border-radius:0;max-height:none;overflow:visible;background:var(--surface)}
-  #findhead{position:static;padding:4px 14px 12px;border-bottom:1px solid var(--line)}
+  #findhead{position:sticky;top:0;z-index:2;padding:8px 14px 12px;background:var(--surface);border-bottom:1px solid var(--line)}   /* stays while the list scrolls */
   #detail{flex:none;background:var(--surface-2) !important;border-bottom:1px solid var(--line)}
-  .sheetbtn{display:flex;justify-content:center;align-items:center;flex:none;height:26px;border:0;background:none;width:100%}
-  .sheetbtn .handle{width:40px;height:4px;border-radius:2px;background:var(--line-2)}
+  .backdoc{display:inline-flex;align-items:center;gap:4px;flex:none;height:34px;margin-left:-8px;padding:0 8px 0 4px;border:0;border-radius:var(--r-sm);background:none;
+    color:var(--ink);font:500 15px/1 var(--sans);cursor:pointer}
+  .backdoc .ic{width:18px;height:18px}
+  .backdoc:active{background:var(--hover)}
   #peek{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px 12px;align-items:start;align-content:start;flex:none;
-    padding:2px 16px 16px;min-height:calc(var(--peek) - 26px);cursor:pointer}
+    padding:16px 16px 16px;min-height:var(--peek);cursor:pointer}
   #peek .ptext{font-size:14px;line-height:1.4;color:var(--ink-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   #peek .ptext:first-child{grid-column:1 / -1}
   #peek .ptext b{font-weight:500;color:var(--ink)}
@@ -738,7 +740,7 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
           <div id="pages"></div>
           <aside id="lane" aria-label="Findings">
             <div id="lanehead" class="lanehead"><section id="findhead" class="fcard" aria-label="Search and filter">
-              <div class="fhead"><h2>Findings</h2><div data-searchbox></div></div>
+              <div class="fhead"><button id="backdoc" class="backdoc" type="button"><svg class="ic" aria-hidden="true"><use href="#i-arrow-left"/></svg>Document</button><h2>Findings</h2><div data-searchbox></div></div>
               <div data-filters data-search="none"></div>
               <div id="tabs" class="fdrop"></div>
             </section></div>
@@ -1542,7 +1544,12 @@ function renderPeek(){
   $('[data-open]', host).onclick = e => { e.stopPropagation(); setSheet(true); };
 }
 function setSheet(open){
+  const was = document.body.classList.contains('sheet-open');
   document.body.classList.toggle('sheet-open', open);
+  if (was && !open){   // back to the document: it fades in, as the findings page did
+    document.body.classList.add('doc-back'); clearTimeout(setSheet.t);
+    setSheet.t = setTimeout(() => document.body.classList.remove('doc-back'), 240);
+  }
   const b = $('#sheetbtn'); if (b) b.setAttribute('aria-expanded', open);
   if (!open || !INLINE){ const p = $('#panel'); if (p) p.scrollTop = 0; }   // folded, or the pinned card first
   else if (open && sel){
@@ -1552,10 +1559,8 @@ function setSheet(open){
 }
 $('#sheetbtn') && ($('#sheetbtn').onclick = () => setSheet(!document.body.classList.contains('sheet-open')));
 $('#peek') && ($('#peek').onclick = e => { if (!e.target.closest('button')) setSheet(true); });
-// a phone: a tap on the blurred document above the open sheet closes the sheet, nothing else
-$('#scroller')?.addEventListener('click', e => {
-  if (MOBILE.matches && document.body.classList.contains('sheet-open')){ e.stopPropagation(); e.preventDefault(); setSheet(false); }
-}, true);
+// a phone: the findings page's « Document » button goes back to the document
+$('#backdoc') && ($('#backdoc').onclick = () => setSheet(false));
 
 /* ---------- selection ---------- */
 function select(id, from){

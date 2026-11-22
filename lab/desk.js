@@ -761,7 +761,12 @@ function renderPeek(){
   $('[data-open]', host).onclick = e => { e.stopPropagation(); setSheet(true); };
 }
 function setSheet(open){
+  const was = document.body.classList.contains('sheet-open');
   document.body.classList.toggle('sheet-open', open);
+  if (was && !open){   // back to the document: it fades in, as the findings page did
+    document.body.classList.add('doc-back'); clearTimeout(setSheet.t);
+    setSheet.t = setTimeout(() => document.body.classList.remove('doc-back'), 240);
+  }
   const b = $('#sheetbtn'); if (b) b.setAttribute('aria-expanded', open);
   if (!open || !INLINE){ const p = $('#panel'); if (p) p.scrollTop = 0; }   // folded, or the pinned card first
   else if (open && sel){
@@ -771,10 +776,8 @@ function setSheet(open){
 }
 $('#sheetbtn') && ($('#sheetbtn').onclick = () => setSheet(!document.body.classList.contains('sheet-open')));
 $('#peek') && ($('#peek').onclick = e => { if (!e.target.closest('button')) setSheet(true); });
-// a phone: a tap on the blurred document above the open sheet closes the sheet, nothing else
-$('#scroller')?.addEventListener('click', e => {
-  if (MOBILE.matches && document.body.classList.contains('sheet-open')){ e.stopPropagation(); e.preventDefault(); setSheet(false); }
-}, true);
+// a phone: the findings page's « Document » button goes back to the document
+$('#backdoc') && ($('#backdoc').onclick = () => setSheet(false));
 
 /* ---------- selection ---------- */
 function select(id, from){
