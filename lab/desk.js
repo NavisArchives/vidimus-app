@@ -283,7 +283,7 @@ function renderDashboard(){
       </section>
       <section class="dcard dact"><div class="dhead"><h3>Recent activity</h3><a class="linkbtn" href="#/reviews">All reviews</a></div>${activityHTML(5)}</section>
       <section class="dcard ddocs"><div class="dhead"><h3>Documents</h3><a class="linkbtn" href="#/documents">All documents</a></div>
-        <ul class="dlist2">${libDocs().slice(0, 3).map(d => `<li><span class="dt"><b>${esc(d.title)}</b><span>${DOC_STATUS[d.status]}</span></span>
+        <ul class="dlist2">${libDocs().slice(0, 4).map(d => `<li><span class="dt"><b>${esc(d.title)}</b><span>${DOC_STATUS[d.status]}</span></span>
           <span class="dn">${d.status === 'review' ? `${d.decided}/${d.findings}` : d.findings}</span></li>`).join('')}</ul></section>
     </div>`;
 }
