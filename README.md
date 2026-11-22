@@ -9,14 +9,14 @@ A review desk for regulatory documents. AI models and language tools read the do
 ## What the desk does
 
 - **One document, mistakes marked in place.** The desk renders the PDF itself with PDF.js, finds each finding's quoted text in it and tints that text with a see-through colour, so the words stay readable. A small numbered badge sits at the highlight's top corner (on a phone, in the margin beside its line), and the same number tags its card. Every finding has a key (`VD-01` …) the team can refer to.
-- **Findings float beside the page, like comments in Google Docs.** Each finding is a card level with its text that scrolls with the document. Folded, it shows its title, severity and who decided; opened, it shows the current text, the suggestion (the new wording, changes in green), any alternative wording from another tool, and the decisions. The cards around it move aside.
-- **Filters** by severity, type and the tool that found it, with counts, plus All / Open / Approved / Rejected and a search. They stay pinned at the top of the findings.
+- **Findings float beside the page, like comments in Google Docs.** Each finding is a card level with its text that scrolls with the document. Folded, it shows its title, severity and who decided; opened, it comes up just under the findings card and shows the current text, the suggestion (the new wording, changes in green), any alternative wording from another tool, and the decisions. The cards around it move aside.
+- **Filters** by severity, type and the tool that found it, with counts, plus a status dropdown (All, Open, Approved, Rejected) and a search. They stay pinned at the top of the findings.
 - **Team decisions.** Approve, reject or edit a suggestion; each decision records who made it and when, so one finding can be approved by one person and rejected by another.
 - **Connect your tools** (Claude, ChatGPT, Gemini, Grok, LanguageTool and team review) as **demo states**: connecting is simulated, no key is asked for, nothing is called.
 - **Dashboard** (progress, open findings by severity, recent decisions), **Reviews** (every finding and the full history of who approved, rejected or edited what) and **Documents**.
 - **Export** of every finding, or only the approved ones, with its decision and who made it, as CSV or as a Markdown report.
 - **Keyboard:** `j`/`k` next and previous, `a` approve, `x` reject, `e` edit, `/` search, `Esc` folds the open card. A bar under the page shows them with the page and zoom controls; it hides behind a small arrow.
-- **Phone:** the page at its full width, as phone PDF readers show it (+ or pinch to zoom in), each badge in the page's margin level with its line, the findings in a sheet that slides up, approve or reject from its peek.
+- **Phone:** the page at its full width, as phone PDF readers show it (pinch to zoom in), each badge in the page's margin level with its line, the findings in a sheet that slides up over the blurred page, approve or reject from its peek.
 
 | | |
 |---|---|
