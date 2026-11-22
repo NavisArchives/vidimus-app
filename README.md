@@ -8,7 +8,7 @@ A review desk for regulatory documents. AI models and language tools read the do
 
 ## What the desk does
 
-- **One document, mistakes marked in place.** The desk renders the PDF itself with PDF.js, finds each finding's quoted text in it and tints that text. Numbered markers sit in a gutter beside the page, never on the text. Every finding has a key (`VD-01` …) the team can refer to.
+- **One document, mistakes marked in place.** The desk renders the PDF itself with PDF.js, finds each finding's quoted text in it and tints that text with a see-through colour, so the words stay readable. A small numbered badge sits at the highlight's top corner, and the same number tags its card. Every finding has a key (`VD-01` …) the team can refer to.
 - **Findings float beside the page, like comments in Google Docs.** Each finding is a card level with its text that scrolls with the document. Folded, it shows its title, severity and who decided; opened, it shows the current text, the suggestion (the new wording, changes in green), any alternative wording from another tool, and the decisions. The cards around it move aside.
 - **Filters** by severity, type and the tool that found it, with counts, plus All / Open / Approved / Rejected and a search. They stay pinned at the top of the findings.
 - **Team decisions.** Approve, reject or edit a suggestion; each decision records who made it and when, so one finding can be approved by one person and rejected by another.
