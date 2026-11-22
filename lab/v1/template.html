@@ -363,6 +363,8 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 .cbox{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:5px;box-shadow:inset 0 0 0 1.5px var(--line-2);color:transparent;flex:none}
 .cbox .ic{width:12px;height:12px}
 [aria-checked="true"] > .cbox{background:var(--ink);box-shadow:none;color:#fff}
+[role="menuitemradio"] > .cbox{box-shadow:none;background:none}   /* one status at a time: a plain tick, not a box */
+[role="menuitemradio"][aria-checked="true"] > .cbox{background:none;color:var(--ink)}
 .mitem .lg{width:20px;height:20px}
 .mitem .lg svg,.mitem .lg .ic{width:12px;height:12px}
 
@@ -579,6 +581,7 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
 /* ---------- narrower screens ---------- */
 @media (max-width:1180px){
   :root{--col:372px;--lane:360px;--lane-gap:20px;--pad-x:8px}
+  #findhead .fbtn{padding:0 7px 0 9px;gap:4px}   /* the four dropdowns stay on one row in the narrower lane */
   #screen-review{gap:10px;padding:2px 16px 16px 10px}
   .prog .bar{width:84px}
   .rv{grid-template-columns:minmax(0,1fr)}
@@ -737,7 +740,7 @@ body.dock-off .dockshow:active{transform:translateX(-50%) scale(.94)}
             <div id="lanehead" class="lanehead"><section id="findhead" class="fcard" aria-label="Search and filter">
               <div class="fhead"><h2>Findings</h2><div data-searchbox></div></div>
               <div data-filters data-search="none"></div>
-              <div id="tabs" class="seg" role="tablist" aria-label="Status"></div>
+              <div id="tabs" class="fdrop"></div>
             </section></div>
             <ol id="cmts" class="cmts"></ol>
           </aside>

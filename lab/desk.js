@@ -573,14 +573,14 @@ document.addEventListener('click', e => {
     return;
   }
   const db = e.target.closest('[data-dropbtn]');
-  if (db){ openDrop = openDrop === db.dataset.dropbtn ? null : db.dataset.dropbtn; renderFilters();
+  if (db){ openDrop = openDrop === db.dataset.dropbtn ? null : db.dataset.dropbtn; renderDrops();
            if (openDrop) $(`[data-menu="${openDrop}"] button`)?.focus(); return; }
   if (e.target.closest('[data-clear]')){
     filt.sev.clear(); filt.type.clear(); filt.agent.clear(); query = '';
     $$('[data-q]').forEach(q => q.value = ''); openDrop = null; listTop = true; render();
     return;
   }
-  if (openDrop && !e.target.closest('.fmenu')){ openDrop = null; renderFilters(); }
+  if (openDrop && !e.target.closest('.fmenu')){ openDrop = null; renderDrops(); }
 });
 document.addEventListener('pointerdown', e => {
   for (const [m, b] of [['#usermenu', '#avatarbtn'], ['#wsmenu', '#wsbtn']]){
@@ -590,17 +590,26 @@ document.addEventListener('pointerdown', e => {
   if (document.body.classList.contains('nav-open') && !e.target.closest('#side,#sidebtn')) setNav(false);
 });
 
+/* the status (All, Open, Approved, Rejected) is a dropdown first in the filter row, named after the state it shows (Andy) */
+const TABS = [['all', 'All'], ['open', 'Open'], ['approved', 'Approved'], ['rejected', 'Rejected']];
 function renderTabs(){
   const host = $('#tabs'); if (!host) return;
+  const bar = $('.fbar', host.parentNode); if (bar && host.parentNode !== bar) bar.prepend(host);
   const base = F.filter(f => pass(f, 'tab'));
   const n = {all: base.length};
   for (const s of ['open', 'approved', 'rejected']) n[s] = base.filter(f => tabOf(f) === s).length;
-  host.innerHTML = [['all', 'All'], ['open', 'Open'], ['approved', 'Approved'], ['rejected', 'Rejected']].map(([k, l]) =>
-    `<button type="button" role="tab" aria-selected="${tab === k}" data-tab="${k}">${l}<span class="n">${n[k]}</span></button>`).join('');
+  const open = openDrop === 'tab', name = TABS.find(t => t[0] === tab)[1];
+  host.innerHTML = `<button type="button" class="fbtn${tab !== 'all' ? ' on' : ''}" aria-haspopup="true" aria-expanded="${open}" data-dropbtn="tab"
+      aria-label="Status: ${name}, ${n[tab]}"><span>${name}</span>${ic('caret-down', 'caret')}</button>
+    <div class="fmenu" role="menu" aria-label="Status" data-menu="tab"${open ? '' : ' hidden'}>${TABS.map(([k, l]) =>
+      `<button type="button" class="mitem" role="menuitemradio" aria-checked="${tab === k}" data-tab="${k}"${n[k] === 0 && tab !== k ? ' data-zero' : ''}>
+        <span class="cbox">${ic('check')}</span><span class="cl">${l}</span><span class="n">${n[k]}</span></button>`).join('')}</div>`;
   $$('[data-tab]', host).forEach(b => b.onclick = () => {
-    tab = b.dataset.tab; if (sel && !pass(byId[sel])) sel = null; listTop = true; render();
+    tab = b.dataset.tab; openDrop = null; if (sel && !pass(byId[sel])) sel = null; listTop = true; render();
+    $('[data-dropbtn="tab"]')?.focus();
   });
 }
+const renderDrops = () => { renderFilters(); renderTabs(); };
 
 const STATUS_ICON = {approved: 'check-circle', rejected: 'x-circle', split: 'warning-circle'};
 function votersHTML(f){
@@ -915,7 +924,7 @@ function placeToast(t){
 addEventListener('keydown', e => {
   if (e.key === 'Escape'){
     if ($('#toolsmodal') && !$('#toolsmodal').hidden) return closeTools();
-    if (openDrop){ openDrop = null; renderFilters(); return; }
+    if (openDrop){ openDrop = null; renderDrops(); return; }
     if ($('#usermenu') && !$('#usermenu').hidden){ closeMenus(); $('#avatarbtn')?.focus(); return; }
     if ($('#wsmenu') && !$('#wsmenu').hidden){ closeMenus(); $('#wsbtn')?.focus(); return; }
     if (document.body.classList.contains('nav-open')){ setNav(false); $('#sidebtn')?.focus(); return; }
