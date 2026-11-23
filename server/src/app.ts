@@ -102,6 +102,7 @@ export async function buildApp(
   });
 
   await app.register(helmet, {
+    hsts: config.cookieSecure ? undefined : false,
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
@@ -112,7 +113,8 @@ export async function buildApp(
         imgSrc: ["'self'", 'data:', 'blob:'],
         connectSrc: ["'self'"],
         objectSrc: ["'none'"],
-        frameAncestors: ["'none'"],
+        frameAncestors: ["'self'"],
+        upgradeInsecureRequests: config.cookieSecure ? [] : null,
       },
     },
     crossOriginEmbedderPolicy: false,
