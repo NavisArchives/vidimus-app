@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Avatar, Icon, IconSprite } from './Icons';
+import { Avatar, Icon, IconSprite, initialsOf } from './Icons';
 
 interface AppShellProps {
   crumb: React.ReactNode;
@@ -136,7 +136,7 @@ export function AppShell({ crumb, headerRight, children }: AppShellProps) {
                   className="avbtn"
                   aria-haspopup="menu"
                   aria-expanded={userMenuOpen}
-                  aria-label="Account menu"
+                  aria-label={`Account menu ${initialsOf(user.name)}`}
                   onClick={() => setUserMenuOpen((v) => !v)}
                 >
                   <Avatar name={user.name} index={user.avatarIndex} />

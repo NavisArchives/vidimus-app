@@ -1127,12 +1127,13 @@ html[data-theme="dark"] .iconbtn:hover { background: rgba(255, 255, 255, .08); }
 .empty b { color: var(--ink); font-weight: 500; }
 .toast {
   position: fixed;
-  left: 24px;
-  bottom: 20px;
-  max-width: 360px;
+  left: 50%;
+  bottom: 72px;
+  transform: translateX(-50%);
+  max-width: 380px;
   background: var(--ink);
   color: var(--logo-ink);
-  padding: 9px 15px;
+  padding: 9px 16px;
   border-radius: 999px;
   font-size: 13px;
   font-weight: 500;

@@ -96,7 +96,7 @@ export function Avatar({
   const colorIdx = ((index % 3) + 3) % 3;
   const vCls = verdict === 'approved' || verdict === 'rejected' ? ` v-${verdict}` : '';
   return (
-    <span className={`av av-${colorIdx}${size ? ' ' + size : ''}${vCls}`} title={name}>
+    <span className={`av av-${colorIdx}${size ? ' ' + size : ''}${vCls}`} title={name} aria-hidden="true">
       {initialsOf(name)}
     </span>
   );

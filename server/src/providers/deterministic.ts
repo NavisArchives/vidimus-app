@@ -173,8 +173,16 @@ const KNOWN_COMPLIANCE_RULES: RuleMatch[] = [
 ];
 
 const IMPOSSIBLE_DATES = /\b(31\s+(?:April|June|September|November)|3[01]\s+February|29\s+February\s+(?:2025|2026|2027))\b/gi;
-const REPEATED_WORDS = /\b([a-z]{2,12})\s+\1\b/gi;
+const REPEATED_WORDS = /\b([a-z]{2,12})\s+\1\b/g;
 const MALFORMED_MONEY = /([€$£]\s?\d{1,3}(?:,\d{3})*,\d{4})\b/g;
+
+function snippetAround(text: string, idx: number, len: number, pad = 16): string {
+  let start = Math.max(0, idx - pad);
+  let end = Math.min(text.length, idx + len + pad);
+  while (start > 0 && /\w/.test(text[start - 1])) start--;
+  while (end < text.length && /\w/.test(text[end])) end++;
+  return text.slice(start, end).replace(/\s+/g, ' ').trim();
+}
 
 function extractNumbers(text: string): string[] {
   return [...text.matchAll(/(?:[€$£]\s?\d[\d.,]*|\b\d+(?:[.,]\d+)?%|\b\d{2,}\b)/g)].map((m) =>
@@ -227,8 +235,14 @@ export const deterministicProvider: ReviewProvider = {
       sourceQuote?: string | null,
       altSuggestion?: string
     ) => {
-      const k = `${page}:${foldText(quote)}`;
+      const fq = foldText(quote);
+      const k = `${page}:${fq}`;
       if (seenOnPage.has(k)) return;
+      for (const prev of seenOnPage) {
+        if (!prev.startsWith(`${page}:`)) continue;
+        const pf = prev.slice(`${page}:`.length);
+        if (pf.length >= 6 && fq.length >= 6 && (pf.includes(fq) || fq.includes(pf))) return;
+      }
       seenOnPage.add(k);
       findings.push({
         page,
@@ -294,9 +308,12 @@ export const deterministicProvider: ReviewProvider = {
             const re = new RegExp(`\\b${bad.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
             const m = page.text.match(re);
             if (m && m.index != null) {
-              const start = Math.max(0, m.index - 12);
-              const end = Math.min(page.text.length, m.index + m[0].length + 12);
-              const quote = page.text.slice(start, end).trim();
+              const fBad = foldText(m[0]);
+              const alreadyCovered = [...seenOnPage].some(
+                (prev) => prev.startsWith(`${page.page}:`) && prev.slice(`${page.page}:`.length).includes(fBad)
+              );
+              if (alreadyCovered) continue;
+              const quote = snippetAround(page.text, m.index, m[0].length, 14);
               const suggestion = quote.replace(re, entry.preferredTerm);
               addFinding(
                 page.page,
@@ -317,8 +334,10 @@ export const deterministicProvider: ReviewProvider = {
       // 3. General deterministic checks for ANY arbitrary uploaded PDF
       for (const m of page.text.matchAll(IMPOSSIBLE_DATES)) {
         const matched = m[0];
+        const fMatch = foldText(matched);
+        if ([...seenOnPage].some((prev) => prev.startsWith(`${page.page}:`) && prev.includes(fMatch))) continue;
         const idx = m.index ?? 0;
-        const quote = page.text.slice(Math.max(0, idx - 12), Math.min(page.text.length, idx + matched.length + 8)).trim();
+        const quote = snippetAround(page.text, idx, matched.length, 12);
         const fixed = quote.replace(matched, matched.replace(/^31/, '30').replace(/^3[01]/, '28'));
         addFinding(
           page.page,
@@ -333,9 +352,11 @@ export const deterministicProvider: ReviewProvider = {
 
       for (const m of page.text.matchAll(REPEATED_WORDS)) {
         const matched = m[0];
+        const fMatch = foldText(matched);
+        if ([...seenOnPage].some((prev) => prev.startsWith(`${page.page}:`) && prev.includes(fMatch))) continue;
         const word = m[1];
         const idx = m.index ?? 0;
-        const quote = page.text.slice(Math.max(0, idx - 10), Math.min(page.text.length, idx + matched.length + 10)).trim();
+        const quote = snippetAround(page.text, idx, matched.length, 12);
         const fixed = quote.replace(matched, word);
         addFinding(
           page.page,

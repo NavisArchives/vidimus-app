@@ -1,110 +1,139 @@
 # Vidimus
 
-A review desk for regulatory documents. AI models and language tools read the document and flag what looks wrong; the team reads each finding beside the text it is about, and approves, edits or rejects it. Shown here on an invented four-page compliance note with 19 mistakes put in on purpose.
+A full-stack review desk for regulatory, legal, corporate, and translated documents. Connected models and language tools analyze uploaded PDFs and flag potential issues anchored to exact passages; human reviewers compare proposals, approve, edit, reject, defer, or comment on each finding, and export an auditable decision record.
 
-> A clean snapshot of a private repository, shared for review. Every name, figure and document in it is invented.
+**Core principle: Machines analyze. Humans decide.** Automated review surfaces candidate findings for qualified human judgment and does not certify legal or regulatory compliance.
 
-![The desk: the document with its findings floating beside it](screenshots/01-desk.jpg)
+![Vidimus dashboard](screenshots/v2/01-dashboard.png)
 
-## What the desk does
+## What Vidimus does
 
-- **One document, mistakes marked in place.** The desk renders the PDF itself with PDF.js, finds each finding's quoted text in it and tints that text with a see-through colour, so the words stay readable. A small numbered badge sits at the highlight's top corner (on a phone, in the margin beside its line), and the same number tags its card. Every finding has a key (`VD-01` …) the team can refer to.
-- **Findings float beside the page, like comments in Google Docs.** Each finding is a card level with its text that scrolls with the document. Folded, it shows its title, severity and who decided; opened, it comes up just under the findings card and shows the current text, the suggestion (the new wording, changes in green), any alternative wording from another tool, and the decisions. The cards around it move aside.
-- **Filters** by severity, type and the tool that found it, with counts, plus a status dropdown (All, Open, Approved, Rejected) and a search. They stay pinned at the top of the findings.
-- **Team decisions.** Approve, reject or edit a suggestion; each decision records who made it and when, so one finding can be approved by one person and rejected by another.
-- **Connect your tools** (Claude, ChatGPT, Gemini, Grok, LanguageTool and team review) as **demo states**: connecting is simulated, no key is asked for, nothing is called.
-- **Dashboard** (progress, open findings by severity, recent decisions), **Reviews** (every finding and the full history of who approved, rejected or edited what) and **Documents**.
-- **Export** of every finding, or only the approved ones, with its decision and who made it, as CSV or as a Markdown report.
-- **Keyboard:** `j`/`k` next and previous, `a` approve, `x` reject, `e` edit, `/` search, `Esc` folds the open card. A bar under the page shows them with the page and zoom controls; it hides behind a small arrow.
-- **Phone:** the page at its full width, as phone PDF readers show it (pinch to zoom in), each badge in the page's margin level with its line. The findings open as a full page under the top bar, with a "Document" button back to the page (nothing slides up); approve or reject from the bar at the page's foot.
+- **Real PDF ingestion and exact passage anchoring.** Uploaded PDFs are validated (`%PDF-` signature, size limit, safe private storage) and extracted with PDF.js. Every finding is matched strictly against its page text: unique matches receive page-relative highlight coordinates; ambiguous or missing quotes are flagged explicitly instead of guessing. Scanned PDFs with no extractable text are detected and marked `OCR required`.
+- **Paper review desk.** Preserves Vidimus's cool-neutral Paper interface: translucent severity-tinted PDF highlights with numbered corner badges, Google Docs-style floating finding cards level with their text on desktop, green word-level diffs for suggested wording, provider disagreement callouts, reviewer comments, full decision history, and keyboard shortcuts (`j`/`k`, `a`, `x`, `e`, `/`, `Esc`).
+- **Multi-provider analysis engine.** Supports Anthropic Claude (`@anthropic-ai/sdk`), OpenAI (`openai`), Google Gemini (`@google/genai`), LanguageTool (local or configured HTTP endpoint), and a built-in **local deterministic rule analyzer** for offline development and testing. Provider credentials live strictly in server environment variables and are never exposed to the browser.
+- **Translation and localization reviews.** Upload a source PDF alongside its translated PDF to compare passages side by side, detect untranslated text or numerical discrepancies, and enforce reusable terminology glossaries (preferred and forbidden terms).
+- **Dashboard, reviews, and exports.** Live workspace metrics, reviews requiring attention, document versioning, audit history, and real server-generated exports in **CSV**, **Markdown**, **JSON**, and **PDF Report** formats that separate unapproved tool suggestions from human-approved corrections.
+- **Mobile layout.** Full-width PDF with right-margin badges, a hugging bottom quick-action bar, and a full-page Findings screen with a `Document` back control.
 
 | | |
 |---|---|
-| ![An opened finding](screenshots/02-finding.jpg) | ![Connect your tools, demo states](screenshots/03-agents.jpg) |
-| ![Dashboard](screenshots/04-dashboard.jpg) | ![Reviews: every decision and who made it](screenshots/05-reviews.jpg) |
-| ![Export](screenshots/06-export.jpg) | ![On a phone](screenshots/07-phone.jpg) |
-
-**Sample states only.** The sign-in (three demo accounts), the connected tools and every decision are kept in the browser's local storage. Nothing leaves the page. The logos name the tools and remain their owners' trademarks; sources and licences are in `lab/assets/NOTICE.md`.
-
-## Run it
-
-```bash
-./start.command                     # opens http://localhost:8777/lab/v1/
-```
-
-or by hand:
-
-```bash
-python3 -m http.server 8777 --bind 127.0.0.1
-# http://localhost:8777/lab/v1/   (?as=sam opens it signed in as a demo account)
-```
-
-The desk is one static page with its data inlined, committed in `lab/v1/index.html`. To rebuild it:
-
-```bash
-python3 lab/sample/make_pdf.py      # note.html -> lab/sample/note.pdf (needs Chrome and network for the fonts)
-python3 lab/build.py                # checks every quote against the PDF, then builds lab/v1
-```
-
-The build refuses a finding whose quoted text it cannot find exactly once on its page, so a mark can never land on the wrong sentence.
-
-## Under the desk: the translation pipeline
-
-Vidimus started as a desk for translated web pages: a French site with Dutch and English versions. That pipeline is still here and feeds the first desk (`out/`).
-
-- **Aligns the languages.** A scraper reads every page of the site in each language and cuts it into text blocks by their place in the page, so French block 8 and Dutch block 8 are always the same sentence. It reports any page whose block counts differ between languages.
-- **Runs the checks.** Three readers, each its own script, each writing JSON:
-  - **LanguageTool** on every block of the translation (spelling, grammar, style), plus its language detection, which catches French left in a Dutch or English page.
-  - **The reviewer's findings**, a plain list with one full replacement per block. Before a finding reaches the desk the script checks that the block still says what the finding quotes, that it is the only finding on that block, and whether the mistake is still in the translator's PDF.
-  - **An external QA report** in plain text, parsed and matched to its block by the text it quotes, not by the number it gives (reports are often written against an older export).
-- **Merges them into one card per block**, with the most urgent severity of the readers and every proposed wording as a one-click variant.
-- **The first desk** shows the source and the translation side by side, PDFs in panes that scroll together, and hands off every approved correction as text or Markdown. Its interface is in Dutch, for a Dutch-speaking reviewer.
-
-| | |
-|---|---|
-| ![The first desk, Dutch review](screenshots/first-desk/01-desk-nl.jpg) | ![PDFs side by side](screenshots/first-desk/04-pdf-panes.jpg) |
-
-```bash
-python3 -m venv .venv && . .venv/bin/activate
-pip install -r requirements.txt
-languagetool-server --port 8081 &      # local LanguageTool
-./run.sh                               # sample site -> scrape -> checks -> out/review-nl.html, out/review-en.html
-# http://localhost:8777/out/review-nl.html
-```
-
-Settings, all optional:
-
-| | |
-|---|---|
-| `VIDIMUS_PROJECT` | another project file instead of `project.json` (site address, pages, languages, vocabulary) |
-| `VIDIMUS_AUTH` | `user:password` for a site behind basic auth; never stored in the repository |
-| `VIDIMUS_CHROME` | path to the browser that prints the PDFs |
-| `LT_SERVER`, `LT_DELAY` | another LanguageTool server, and seconds between calls for a rate-limited one |
-
-The sample in `out/` was checked against LanguageTool's public API (`LT_SERVER=https://api.languagetool.org/v2/check`, `LT_DELAY=3.2`), since the text is invented.
-
-## Why it's built this way
-
-- **Machines flag, a person decides.** Every tool only proposes. Nothing counts until someone approves it, and the export is exactly what was approved, with who approved it.
-- **A finding can't land on the wrong sentence.** Every finding carries the text it is about; the build and the scripts stop rather than guess.
-- **The finding sits next to its text.** Reading the page and deciding on its mistakes happen in one place, the way people already comment on documents.
-- **Private by default.** LanguageTool runs as a local server; the desk is a static page with no backend.
-- **No build step to open it.** One HTML file with its data inlined: it opens from any local web server and can be archived with the project.
+| ![Review desk with floating findings](screenshots/v2/03-review-desk.png) | ![Opened finding with diff and decisions](screenshots/v2/04-finding-open.png) |
+| ![Summary and export](screenshots/v2/05-export.png) | ![Mobile review desk](screenshots/v2/07-phone-review.png) |
 
 ## Stack
 
-- **JavaScript, HTML and CSS** for the desks: no framework, PDF.js 4.6.82 (Mozilla, Apache-2.0) vendored in `desk/vendor/`, Phosphor icons (MIT).
-- **Python 3** for the build and the pipeline: pypdf for reading PDFs, Beautiful Soup for scraping, the standard library for the rest.
-- **LanguageTool** (Java, run as a local HTTP server) for the language checks; **headless Chromium** to print PDFs.
+- **Frontend (`web/`):** React 19, TypeScript, Vite 6, React Router 7, PDF.js (`pdfjs-dist`), Phosphor icon sprite, Paper CSS tokens (light and dark themes).
+- **Backend (`server/`):** Node 22, TypeScript, Fastify 5, SQLite via Node built-in `node:sqlite` (WAL mode, foreign keys, versioned migrations), `pdfjs-dist` extraction, `pdf-lib` PDF report generation.
+- **Shared (`packages/shared/`):** TypeScript domain models, Zod validation schemas, text folding, word diffing, and multi-provider finding consolidation.
+- **Testing:** Vitest (unit, integration, RBAC, security, provider fixtures) and Playwright + axe-core (full-stack desktop & mobile E2E + accessibility).
 
-## Tests
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the full system architecture and data model.
+
+## Quick start
+
+Requires **Node.js 22+** and **npm 10+**.
 
 ```bash
-python3 -m unittest discover -s tests
+npm install
+npm run build
+npm start
+# Open http://127.0.0.1:8777
 ```
 
-For the desk: every planted quote found once on its page, the build refusing a finding it cannot place, every icon present in the sprite, and the built page up to date. For the pipeline: block extraction, the QA report parser, the PDF match and LanguageTool's auto-fix. The pipeline scripts also assert their own invariants on every run.
+For local development with hot reload (Fastify on `:8777`, Vite on `:5173`):
+
+```bash
+cp .env.example .env
+npm run dev
+# Open http://localhost:5173
+```
+
+### Development seed accounts
+
+When `VIDIMUS_SEED_DEMO=true` (enabled by default in local development, disable in production), Vidimus seeds the synthetic **Oeverlicht Custody** workspace with the invented 4-page compliance note (`lab/sample/note.pdf`) and four accounts (password: `vidimus-dev-password`):
+
+| Account | Role | Capabilities |
+|---|---|---|
+| `lena@example.com` | `admin` | Full access, workspace & provider settings |
+| `sam@example.com` | `reviewer` | Upload, configure reviews, decide, edit, comment |
+| `noah@example.com` | `reviewer` | Upload, configure reviews, decide, edit, comment |
+| `auditor@example.com` | `viewer` | Read-only access to documents, reviews, exports |
+
+You can also register new accounts with isolated private workspaces from the Sign in screen.
+
+## Environment variables & provider setup
+
+Copy `.env.example` to `.env`. Never commit `.env` or real API keys.
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `PORT` / `HOST` | `8777` / `127.0.0.1` | Server bind address |
+| `VIDIMUS_DB_PATH` | `./data/vidimus.sqlite` | SQLite database file |
+| `VIDIMUS_UPLOADS_DIR` | `./data/uploads` | Private PDF storage directory |
+| `SESSION_SECRET` | dev fallback | Cookie signing secret (set 32+ random chars in prod) |
+| `COOKIE_SECURE` | `false` | Set `true` behind HTTPS |
+| `MAX_UPLOAD_MB` | `25` | Maximum uploaded PDF size |
+| `VIDIMUS_SEED_DEMO` | `true` | Seed synthetic dev workspace when DB is empty |
+| `ANTHROPIC_API_KEY` | unset | Enables live Anthropic Claude API adapter |
+| `OPENAI_API_KEY` | unset | Enables live OpenAI API adapter |
+| `GEMINI_API_KEY` | unset | Enables live Google Gemini API adapter |
+| `LANGUAGETOOL_URL` | unset | Enables live LanguageTool HTTP adapter (e.g. `http://127.0.0.1:8081/v2/check`) |
+
+### Live vs local test adapters
+
+- **Live API providers** (`anthropic`, `openai`, `gemini`, `languagetool`) activate automatically when their server environment variable is present. Document text is only transmitted to external APIs when that provider is explicitly selected on the review configuration screen.
+- **Local deterministic rule analyzer (`deterministic`)** runs locally with zero external calls and is labeled `Local rule analyzer` in the UI and provenance records. It runs verifiable checks for figures, calendar dates, repeated words, glossary violations, and source-to-target parity on uploaded PDFs.
+
+## Database & migrations
+
+Migrations live in `server/src/db/migrations.ts` and run automatically on server startup, or manually via:
+
+```bash
+npm run migrate
+```
+
+## Testing
+
+```bash
+# Typecheck and production build
+npm run build
+
+# Unit, integration, security, RBAC, and provider-fixture tests
+npm test
+
+# Playwright full-stack E2E, responsive, and WCAG accessibility tests
+npm run test:e2e
+```
+
+## Security considerations
+
+- Passwords are hashed with per-user salted `scrypt` and verified in constant time.
+- Sessions use opaque random tokens stored as SHA-256 hashes in SQLite, issued via `HttpOnly; SameSite=Lax` cookies.
+- Mutating `/api/*` requests require a matching per-session `X-CSRF-Token` header.
+- Role-based access control (`admin`, `reviewer`, `viewer`) and workspace ownership are enforced server-side on every route, including PDF file streaming.
+- Uploaded files are verified by `%PDF-` signature, size limits, and UUID storage paths to prevent path traversal.
+- External model prompts isolate uploaded document text inside `<untrusted_document>` tags and validate all outputs with Zod before persistence.
+
+## Preserved static lab & translation pipeline
+
+The original static Paper demonstration (`lab/v1/index.html`) and the Python site-scraping translation pipeline (`pipeline/`, `desk/`, `out/`) remain preserved in the repository:
+
+```bash
+./start.command                         # Static lab at http://localhost:8777/lab/v1/
+python3 -m unittest discover -s tests   # Original Python lab/pipeline tests (requires requirements.txt)
+```
+
+## Known limitations & roadmap
+
+- **OCR for scanned PDFs:** Scanned image-only PDFs are detected and blocked with a clear `OCR required` state; an automated OCR pipeline stage (e.g. Tesseract or cloud OCR opt-in) is planned next.
+- **Live external provider verification:** All four external adapters (`anthropic`, `openai`, `gemini`, `languagetool`) are implemented and tested via schema/orchestration fixtures; live end-to-end calls require configuring API credentials in `.env`.
+- **Single-node SQLite:** Suitable for local-first and small-team deployments; migrating the repository layer to PostgreSQL and Redis/BullMQ would support multi-node horizontal scaling.
+- **Export format:** Exports generate structured review records (CSV, Markdown, JSON, PDF report) and intentionally do not overwrite or alter the original uploaded PDF.
+
+## Commit convention
+
+Conventional Commits: `type(scope): imperative lowercase summary` (max 72 characters, no trailing period).
 
 ## License
 
-All rights reserved — shared for review only.
+All rights reserved. Shared for review only.

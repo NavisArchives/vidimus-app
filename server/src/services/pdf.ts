@@ -92,7 +92,8 @@ async function getPdfJs() {
  */
 export async function extractPdf(buffer: Buffer): Promise<PdfExtractionResult> {
   const pdfjs = await getPdfJs();
-  const data = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+  // Copy into a fresh Uint8Array so PDF.js worker transfer never detaches the caller's Buffer
+  const data = new Uint8Array(buffer);
   const loadingTask = pdfjs.getDocument({
     data,
     useSystemFonts: true,

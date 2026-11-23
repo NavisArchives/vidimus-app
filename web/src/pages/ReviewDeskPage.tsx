@@ -61,7 +61,9 @@ export function ReviewDeskPage() {
   const [showSourcePane, setShowSourcePane] = useState(true);
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 760px)').matches);
-  const [maxPageWidth, setMaxPageWidth] = useState(740);
+  const [maxPageWidth, setMaxPageWidth] = useState(() =>
+    window.matchMedia('(max-width: 760px)').matches ? Math.max(260, window.innerWidth - 16) : 740
+  );
 
   const scrollerRef = useRef<HTMLDivElement>(null);
   const laneRef = useRef<HTMLElement>(null);
@@ -88,6 +90,7 @@ export function ReviewDeskPage() {
     if (!el) return;
     const measure = () => {
       const w = el.clientWidth;
+      if (!w) return;
       if (isMobile) {
         setMaxPageWidth(Math.max(260, w - 16));
       } else {
@@ -104,7 +107,7 @@ export function ReviewDeskPage() {
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [isMobile, review?.sourceVersionId, showSourcePane]);
+  }, [isMobile, review?.id, review?.status, review?.sourceVersionId, showSourcePane, loading]);
 
   const loadFindings = useCallback(async () => {
     if (!id) return;
@@ -221,10 +224,11 @@ export function ReviewDeskPage() {
     if (selIdx < 0) {
       stackDown(0);
     } else {
+      // Lift the open card close under the sticky findings filter card (Paper behavior)
       const sr = scrollerEl.getBoundingClientRect();
       const spot = sr.top + minTop - laneTop;
       const ay = items[selIdx].y;
-      tops[selIdx] = ay > spot && laneTop + ay < sr.bottom - 40 ? Math.max(minTop, spot) : ay;
+      tops[selIdx] = ay > spot && laneTop + ay < sr.bottom + 80 ? Math.max(minTop, spot) : ay;
       stackDown(selIdx + 1);
       for (let i = selIdx - 1; i >= 0; i--) {
         tops[i] = Math.min(items[i].y, tops[i + 1] - LANE_GAP - items[i].h);
@@ -250,8 +254,21 @@ export function ReviewDeskPage() {
 
   useLayoutEffect(() => {
     const raf = requestAnimationFrame(recomputeLane);
-    return () => cancelAnimationFrame(raf);
-  }, [recomputeLane, zoom, maxPageWidth, editingId, findings, showSourcePane]);
+    const t = window.setTimeout(recomputeLane, 80);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(t);
+    };
+  }, [recomputeLane, zoom, maxPageWidth, editingId, findings, showSourcePane, totalPages]);
+
+  // Recompute lane whenever the open card or filter header resizes
+  useEffect(() => {
+    if (isMobile) return;
+    const ro = new ResizeObserver(() => requestAnimationFrame(recomputeLane));
+    if (findheadRef.current) ro.observe(findheadRef.current);
+    if (selectedId && cardRefs.current[selectedId]) ro.observe(cardRefs.current[selectedId]!);
+    return () => ro.disconnect();
+  }, [isMobile, selectedId, recomputeLane]);
 
   const scrollToFinding = useCallback((f: FindingDTO) => {
     const scroller = scrollerRef.current;
@@ -272,7 +289,18 @@ export function ReviewDeskPage() {
       setSelectedId(fid);
       if (fid && from !== 'doc') {
         const f = findings.find((x) => x.id === fid);
-        if (f) scrollToFinding(f);
+        if (f) {
+          const scroller = scrollerRef.current;
+          const sheet = pageRefs.current[f.page];
+          if (scroller && sheet) {
+            const sr = scroller.getBoundingClientRect();
+            const r = f.anchor?.rects?.[0];
+            const hlY = sheet.getBoundingClientRect().top + (r ? r.y * sheet.clientHeight : 0);
+            if (hlY < sr.top + 40 || hlY > sr.bottom - 80) {
+              scrollToFinding(f);
+            }
+          }
+        }
       }
     },
     [editingId, findings, scrollToFinding]
