@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vidimus Visual QA Report</title>
+  <style>
+    :root { --bg:#F1F1F2; --surface:#fff; --ink:#18181B; --muted:#66666E; --line:#E4E4E7; --ok:#047857; --ok-soft:#ECFDF5; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 ui-sans-serif,system-ui,-apple-system,sans-serif; padding:28px; }
+    main { max-width:1280px; margin:0 auto; }
+    h1 { margin:0 0 6px; font-size:26px; letter-spacing:-.02em; }
+    p.sub { margin:0 0 22px; color:var(--muted); }
+    .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
+    .kpi { background:var(--surface); border-radius:14px; padding:16px 18px; box-shadow:0 0 0 1px rgba(0,0,0,.06); }
+    .kpi span { font-size:12px; color:var(--muted); display:block; }
+    .kpi b { font-size:26px; }
+    .kpi.ok b { color:var(--ok); }
+    .card { background:var(--surface); border-radius:16px; padding:20px; margin-bottom:18px; box-shadow:0 0 0 1px rgba(0,0,0,.06); }
+    .card h2 { margin:0 0 6px; font-size:16px; display:flex; align-items:center; gap:8px; }
+    .pill { font-size:11.5px; padding:2px 8px; border-radius:999px; background:var(--ok-soft); color:var(--ok); font-weight:600; }
+    .meta { font-size:12.5px; color:var(--muted); margin:0 0 14px; }
+    .pair { display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; }
+    figure { margin:0; }
+    figcaption { font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.04em; }
+    img { width:100%; border-radius:10px; border:1px solid var(--line); display:block; background:#fff; }
+    @media (max-width:860px) { .pair, .kpis { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Vidimus Visual QA Report</h1>
+    <p class="sub">Mission M-2026-11-002 · 14 viewports (320px to 1920px) · Light &amp; Dark themes · 100% to 200% zoom · Stress fixtures</p>
+    <div class="kpis">
+      <div class="kpi"><span>Viewport × Route Audits</span><b>84</b></div>
+      <div class="kpi"><span>Defects Found</span><b>10</b></div>
+      <div class="kpi ok"><span>Verified Fixed</span><b>10 / 10</b></div>
+      <div class="kpi ok"><span>Open P0/P1/P2/P3</span><b>0</b></div>
+    </div>
+
+    <section class="card">
+      <h2>VQA-001 &amp; VQA-002: Reviews &amp; Audit History on Mobile (390px) <span class="pill">Verified</span></h2>
+      <p class="meta">Replaced inline 2-column grid with responsive .reviews-grid and rebuilt Audit History with structured actor+timestamp metadata row.</p>
+      <div class="pair">
+        <figure><figcaption>Before (390px)</figcaption><img src="screenshots/before/reviews-390.png" alt="Reviews before at 390px" /></figure>
+        <figure><figcaption>After (390px)</figcaption><img src="screenshots/after/reviews-390.png" alt="Reviews after at 390px" /></figure>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>VQA-002 &amp; VQA-003: Audit History &amp; Long Titles (1024px) <span class="pill">Verified</span></h2>
+      <p class="meta">Human-readable activity verbs, clear hierarchy, verdict rings, and non-bleeding title truncation.</p>
+      <div class="pair">
+        <figure><figcaption>Before (1024px)</figcaption><img src="screenshots/before/reviews-1024.png" alt="Reviews before at 1024px" /></figure>
+        <figure><figcaption>After (1024px)</figcaption><img src="screenshots/after/reviews-1024.png" alt="Reviews after at 1024px" /></figure>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>VQA-004, VQA-009 &amp; VQA-010: Account Menu &amp; Desktop Dashboard (1440px) <span class="pill">Verified</span></h2>
+      <p class="meta">Viewport-clamped account menu with Escape focus return, 1:1 circular avatar, 2-line title clamp, and unclipped Recent Activity.</p>
+      <div class="pair">
+        <figure><figcaption>Before (1440px)</figcaption><img src="screenshots/before/account-menu-1440.png" alt="Account menu before at 1440px" /></figure>
+        <figure><figcaption>After (1440px)</figcaption><img src="screenshots/after/account-menu-1440.png" alt="Account menu after at 1440px" /></figure>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>VQA-005 &amp; VQA-007: Mobile Drawer &amp; Export (390px) <span class="pill">Verified</span></h2>
+      <p class="meta">Added drawer close control and mobile stacked export cards with compact format pills.</p>
+      <div class="pair">
+        <figure><figcaption>Drawer After (390px)</figcaption><img src="screenshots/after/reviews-sidebar-390.png" alt="Mobile drawer after" /></figure>
+        <figure><figcaption>Export After (390px)</figcaption><img src="screenshots/after/export-390.png" alt="Mobile export after" /></figure>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>VQA-008 &amp; Dark Theme Verification <span class="pill">Verified</span></h2>
+      <p class="meta">Compact 768px Review Desk dock and full dark theme visual check.</p>
+      <div class="pair">
+        <figure><figcaption>Review Desk After (768px)</figcaption><img src="screenshots/after/review-desk-768.png" alt="Review desk at 768px" /></figure>
+        <figure><figcaption>Dashboard Dark Theme (1440px)</figcaption><img src="screenshots/after/dashboard-dark-1440.png" alt="Dashboard dark theme" /></figure>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

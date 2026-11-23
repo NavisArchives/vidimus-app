@@ -103,7 +103,12 @@ npm test
 
 # Playwright full-stack E2E, responsive, and WCAG accessibility tests
 npm run test:e2e
+
+# Playwright visual QA & responsive layout defect detection (14 viewports, light/dark, 100%-200% zoom)
+npm run test:visual
 ```
+
+Visual QA reports and before/after comparisons are stored in `qa/visual/REPORT.md` and `qa/visual/report.html`.
 
 ## Security considerations
 

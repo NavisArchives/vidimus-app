@@ -12,7 +12,10 @@ data/
 .env.local
 .env.*.local
 playwright-report/
+qa/visual/playwright-report/
+qa/visual/run-*.json
 test-results/
+*.tsbuildinfo
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
