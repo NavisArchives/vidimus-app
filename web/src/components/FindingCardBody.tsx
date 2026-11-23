@@ -236,16 +236,6 @@ export function FindingCardBody({
             </button>
             <button
               type="button"
-              className="btn defer"
-              aria-pressed={myVerdict === 'deferred'}
-              title="Defer for later"
-              onClick={() => onDecide('deferred')}
-            >
-              <Icon name="clock-counter-clockwise" />
-              <span>{myVerdict === 'deferred' ? 'Deferred' : 'Defer'}</span>
-            </button>
-            <button
-              type="button"
               className="btn edit"
               aria-pressed={editing}
               title="Edit suggestion (E)"
