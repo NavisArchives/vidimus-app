@@ -987,11 +987,11 @@ export async function buildApp(
     await app.register(fastifyStatic, {
       root: webDist,
       prefix: '/',
-      wildcard: false,
+      wildcard: true,
     });
     app.setNotFoundHandler(async (req, reply) => {
-      if (req.url.startsWith('/api/')) {
-        return reply.code(404).send({ error: 'Endpoint not found' });
+      if (req.url.startsWith('/api/') || req.url.startsWith('/assets/')) {
+        return reply.code(404).send({ error: 'Not found' });
       }
       return reply.sendFile('index.html');
     });
