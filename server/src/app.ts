@@ -129,8 +129,9 @@ export async function buildApp(
     secret: config.sessionSecret,
   });
 
+  const rateMax = Number.parseInt(process.env.VIDIMUS_RATE_LIMIT_MAX || '', 10);
   await app.register(rateLimit, {
-    max: config.nodeEnv === 'test' ? 1000 : 240,
+    max: Number.isFinite(rateMax) ? rateMax : config.nodeEnv === 'test' ? 1000 : 240,
     timeWindow: '1 minute',
   });
 

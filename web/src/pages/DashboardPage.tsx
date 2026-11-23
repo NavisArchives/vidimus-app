@@ -3,28 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import type { DashboardDTO } from '@vidimus/shared';
 import { api } from '../api/client';
 import { AppShell } from '../components/AppShell';
-import { Avatar, formatTimeAgo, Icon } from '../components/Icons';
+import { AuditFeed } from '../components/AuditFeed';
+import { Icon } from '../components/Icons';
 import { useAuth } from '../context/AuthContext';
 
 function greeting(): string {
   const h = new Date().getHours();
   return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
-}
-
-function actionText(action: string, details: Record<string, unknown>): string {
-  const key = details.key ? String(details.key) : '';
-  if (action === 'decision.approved') return `approved ${key}`;
-  if (action === 'decision.rejected') return `rejected ${key}`;
-  if (action === 'decision.deferred') return `deferred ${key}`;
-  if (action === 'decision.reopened') return `reopened ${key}`;
-  if (action === 'suggestion.edited') return `edited the wording of ${key}`;
-  if (action === 'comment.added') return `commented on ${key}`;
-  if (action === 'document.uploaded') return `uploaded ${String(details.title || 'a document')}`;
-  if (action === 'review.started') return `started a review on ${String(details.documentTitle || 'a document')}`;
-  if (action === 'review.completed') return `completed analysis (${String(details.findingsCount ?? 0)} findings)`;
-  if (action === 'review.exported') return `exported ${String(details.format || '').toUpperCase()} report`;
-  if (action === 'auth.login') return 'signed in';
-  return action.replace('.', ' ');
 }
 
 export function DashboardPage() {
@@ -63,11 +48,6 @@ export function DashboardPage() {
       (d) => d.title.toLowerCase().includes(q) || d.subtitle.toLowerCase().includes(q)
     );
   }, [data, docSearch]);
-
-  const filteredActivity = useMemo(() => {
-    if (!data) return [];
-    return data.recentActivity.filter((ev) => ev.action !== 'auth.login').slice(0, 5);
-  }, [data]);
 
   const firstName = user?.name.split(' ')[0] || 'Reviewer';
   const canEdit = activeWorkspace?.role !== 'viewer';
@@ -163,8 +143,8 @@ export function DashboardPage() {
                       const pct = total ? Math.round((decided / total) * 100) : 0;
                       return (
                         <>
-                          <h2>{rev.documentTitle}</h2>
-                          <p className="dsub">
+                          <h2 title={rev.documentTitle}>{rev.documentTitle}</h2>
+                          <p className="dsub" title={rev.documentSubtitle || `${rev.reviewType} review`}>
                             {rev.documentSubtitle || `${rev.reviewType} review`}
                           </p>
                           <div className="dprog">
@@ -241,8 +221,8 @@ export function DashboardPage() {
                         {data.attentionReviews.slice(0, 3).map((r) => (
                           <li key={r.id}>
                             <span className="dt">
-                              <Link to={`/reviews/${r.id}`} style={{ textDecoration: 'none' }}>
-                                <b>{r.documentTitle}</b>
+                              <Link to={`/reviews/${r.id}`} className="dt-link" title={r.documentTitle}>
+                                {r.documentTitle}
                               </Link>
                               <span>
                                 {r.status === 'failed'
@@ -273,42 +253,7 @@ export function DashboardPage() {
                     </Link>
                   </div>
                   <div className="dash-scroll">
-                    {filteredActivity.length === 0 ? (
-                      <p className="dnone">No review activity recorded yet.</p>
-                    ) : (
-                      <ul className="alist">
-                        {filteredActivity.map((ev) => {
-                          const reviewId = ev.details.reviewId ? String(ev.details.reviewId) : null;
-                          const verdict = ev.action.startsWith('decision.')
-                            ? ev.action.split('.')[1]
-                            : undefined;
-                          return (
-                            <li key={ev.id}>
-                              <Avatar
-                                name={ev.actorName}
-                                index={ev.actorAvatarIndex}
-                                size="sm"
-                                verdict={verdict}
-                              />
-                              <span className="atext">
-                                <b>{ev.actorName}</b>{' '}
-                                {reviewId ? (
-                                  <Link to={`/reviews/${reviewId}`}>
-                                    {actionText(ev.action, ev.details)}
-                                  </Link>
-                                ) : (
-                                  actionText(ev.action, ev.details)
-                                )}
-                                {typeof ev.details.title === 'string' && ev.details.title && (
-                                  <span className="atitle">{ev.details.title}</span>
-                                )}
-                              </span>
-                              <time>{formatTimeAgo(ev.createdAt)}</time>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
+                    <AuditFeed events={data.recentActivity} limit={4} />
                   </div>
                 </section>
 

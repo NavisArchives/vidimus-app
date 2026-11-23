@@ -120,15 +120,14 @@ export function DocumentsPage() {
               <h1>Documents</h1>
               <p>Upload PDFs, compare versions, and launch structured reviews in {activeWorkspace?.name}.</p>
             </div>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div className="docs-toolbar">
               <input
-                className="input"
+                className="input docs-search"
                 type="search"
                 placeholder="Search documents..."
                 aria-label="Search documents"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                style={{ width: 220 }}
               />
               {canEdit && (
                 <button
@@ -212,8 +211,10 @@ export function DocumentsPage() {
                           </small>
                         </span>
                       </span>
-                      <span className="dt-n">{d.latestVersion?.pageCount || 0}</span>
-                      <span className="dt-n">
+                      <span className="dt-n dt-pages" data-label="Pages">
+                        {d.latestVersion?.pageCount || 0}
+                      </span>
+                      <span className="dt-n dt-findings" data-label="Findings">
                         {d.findingsCount ? `${d.decidedCount}/${d.findingsCount} decided` : 'None yet'}
                       </span>
                       <span>

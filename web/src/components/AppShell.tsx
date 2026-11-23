@@ -38,6 +38,8 @@ export function AppShell({ crumb, headerRight, children }: AppShellProps) {
   const [creatingWs, setCreatingWs] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
+  const avatarBtnRef = useRef<HTMLButtonElement>(null);
+  const sideBtnRef = useRef<HTMLButtonElement>(null);
   const wsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -53,9 +55,15 @@ export function AppShell({ crumb, headerRight, children }: AppShellProps) {
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setUserMenuOpen(false);
-        setWsMenuOpen(false);
-        setNavOpen(false);
+        if (userMenuOpen) {
+          setUserMenuOpen(false);
+          avatarBtnRef.current?.focus();
+        }
+        if (wsMenuOpen) setWsMenuOpen(false);
+        if (navOpen) {
+          setNavOpen(false);
+          sideBtnRef.current?.focus();
+        }
       }
     };
     document.addEventListener('pointerdown', onPointerDown);
@@ -64,7 +72,27 @@ export function AppShell({ crumb, headerRight, children }: AppShellProps) {
       document.removeEventListener('pointerdown', onPointerDown);
       document.removeEventListener('keydown', onKey);
     };
-  }, []);
+  }, [userMenuOpen, wsMenuOpen, navOpen]);
+
+  // Focus first item when Account Menu opens & support ArrowUp/ArrowDown navigation
+  useEffect(() => {
+    if (!userMenuOpen || !menuRef.current) return;
+    const first = menuRef.current.querySelector<HTMLButtonElement>('[role="menuitem"]');
+    first?.focus();
+  }, [userMenuOpen]);
+
+  const handleUserMenuKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    e.preventDefault();
+    const items = [...(menuRef.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') || [])];
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement as HTMLButtonElement);
+    const next =
+      e.key === 'ArrowDown'
+        ? items[(idx + 1) % items.length]
+        : items[(idx - 1 + items.length) % items.length];
+    next?.focus();
+  };
 
   const toggleSidebar = () => {
     if (window.matchMedia('(max-width: 760px)').matches) {
@@ -110,6 +138,7 @@ export function AppShell({ crumb, headerRight, children }: AppShellProps) {
       <div className={`app${sideOpen ? ' side-open' : ''}${navOpen ? ' nav-open' : ''}`}>
         <header className="top">
           <button
+            ref={sideBtnRef}
             type="button"
             className="iconbtn"
             aria-controls="side"
@@ -132,6 +161,7 @@ export function AppShell({ crumb, headerRight, children }: AppShellProps) {
             {user && (
               <div className="acct" ref={menuRef}>
                 <button
+                  ref={avatarBtnRef}
                   type="button"
                   className="avbtn"
                   aria-haspopup="menu"
@@ -142,12 +172,17 @@ export function AppShell({ crumb, headerRight, children }: AppShellProps) {
                   <Avatar name={user.name} index={user.avatarIndex} />
                 </button>
                 {userMenuOpen && (
-                  <div className="menu usermenu" role="menu">
+                  <div
+                    className="menu usermenu"
+                    role="menu"
+                    aria-label="Account"
+                    onKeyDown={handleUserMenuKeyDown}
+                  >
                     <div className="um-me">
                       <Avatar name={user.name} index={user.avatarIndex} size="big" />
                       <span>
-                        <b>{user.name}</b>
-                        <span>{user.email}</span>
+                        <b title={user.name}>{user.name}</b>
+                        <span title={user.email}>{user.email}</span>
                         <span>
                           {user.title} ({activeWorkspace?.role || user.role})
                         </span>
@@ -161,6 +196,7 @@ export function AppShell({ crumb, headerRight, children }: AppShellProps) {
                       onClick={() => {
                         toggleTheme();
                         setUserMenuOpen(false);
+                        avatarBtnRef.current?.focus();
                       }}
                     >
                       <Icon name="lightning" />
@@ -190,8 +226,19 @@ export function AppShell({ crumb, headerRight, children }: AppShellProps) {
 
         <nav id="side" className="side" aria-label="Main">
           <div className="side-in">
-            <div className="side-brand" aria-hidden="true">
+            <div className="side-brand">
               <span>Vidimus</span>
+              <button
+                type="button"
+                className="iconbtn side-close"
+                aria-label="Close navigation"
+                onClick={() => {
+                  setNavOpen(false);
+                  sideBtnRef.current?.focus();
+                }}
+              >
+                <Icon name="x" />
+              </button>
             </div>
             <ul className="side-nav">
               {navItems.map((item) => (

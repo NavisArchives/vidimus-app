@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import type { AuditEventDTO, ReviewDTO } from '@vidimus/shared';
 import { api } from '../api/client';
 import { AppShell } from '../components/AppShell';
-import { Avatar, formatTimeAgo, Icon } from '../components/Icons';
+import { AuditFeed } from '../components/AuditFeed';
+import { formatTimeAgo, Icon } from '../components/Icons';
 import { useAuth } from '../context/AuthContext';
 
 export function ReviewsPage() {
@@ -47,7 +48,7 @@ export function ReviewsPage() {
             <p>Every review run, its findings progress, and the full human decision audit trail.</p>
           </div>
 
-          <div className="dash" style={{ gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)' }}>
+          <div className="reviews-grid">
             <section className="dcard">
               <div className="dhead">
                 <h3>All reviews</h3>
@@ -94,33 +95,35 @@ export function ReviewsPage() {
                     return (
                       <li key={r.id}>
                         <span className="dt">
-                          <Link to={`/reviews/${r.id}`} style={{ textDecoration: 'none' }}>
-                            <b>{r.documentTitle}</b>
+                          <Link to={`/reviews/${r.id}`} className="dt-link" title={r.documentTitle}>
+                            {r.documentTitle}
                           </Link>
                           <span>
                             {r.reviewType} · {r.config.providers.join(', ')} · {formatTimeAgo(r.createdAt)}
                           </span>
                         </span>
-                        <span
-                          className={`stat ${
-                            r.status === 'failed'
-                              ? 'st-failed'
-                              : r.status === 'completed_with_errors'
-                                ? 'st-split'
-                                : r.status === 'completed' && total > 0 && decided === total
-                                  ? 'st-approved'
-                                  : 'st-open'
-                          }`}
-                        >
-                          {r.status === 'running'
-                            ? `${r.progressPct}%`
-                            : r.status === 'failed'
-                              ? 'Failed'
-                              : `${decided}/${total} decided`}
+                        <span className="dlist-end">
+                          <span
+                            className={`stat ${
+                              r.status === 'failed'
+                                ? 'st-failed'
+                                : r.status === 'completed_with_errors'
+                                  ? 'st-split'
+                                  : r.status === 'completed' && total > 0 && decided === total
+                                    ? 'st-approved'
+                                    : 'st-open'
+                            }`}
+                          >
+                            {r.status === 'running'
+                              ? `${r.progressPct}%`
+                              : r.status === 'failed'
+                                ? 'Failed'
+                                : `${decided}/${total} decided`}
+                          </span>
+                          <Link className="btn small" to={`/reviews/${r.id}`}>
+                            Open
+                          </Link>
                         </span>
-                        <Link className="btn small" to={`/reviews/${r.id}`}>
-                          Open
-                        </Link>
                       </li>
                     );
                   })}
@@ -132,34 +135,7 @@ export function ReviewsPage() {
               <div className="dhead">
                 <h3>Audit history</h3>
               </div>
-              {events.length === 0 ? (
-                <p className="dnone">No audit events recorded yet.</p>
-              ) : (
-                <ul className="alist">
-                  {events.slice(0, 20).map((ev) => {
-                    const revId = ev.details.reviewId ? String(ev.details.reviewId) : null;
-                    return (
-                      <li key={ev.id}>
-                        <Avatar name={ev.actorName} index={ev.actorAvatarIndex} size="sm" />
-                        <span className="atext">
-                          <b>{ev.actorName}</b> {ev.action.replace('.', ' ')}{' '}
-                          {ev.details.key ? (
-                            revId ? (
-                              <Link to={`/reviews/${revId}`}>{String(ev.details.key)}</Link>
-                            ) : (
-                              String(ev.details.key)
-                            )
-                          ) : null}
-                          {typeof ev.details.title === 'string' && (
-                            <span className="atitle">{ev.details.title}</span>
-                          )}
-                        </span>
-                        <time>{formatTimeAgo(ev.createdAt)}</time>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
+              <AuditFeed events={events} limit={25} emptyText="No audit events recorded yet." />
             </section>
           </div>
         </div>

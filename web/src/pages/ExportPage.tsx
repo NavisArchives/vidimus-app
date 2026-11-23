@@ -174,9 +174,9 @@ export function ExportPage() {
                       {(
                         [
                           ['csv', 'CSV'],
-                          ['md', 'Markdown'],
+                          ['md', 'MD'],
                           ['json', 'JSON'],
-                          ['pdf', 'PDF Report'],
+                          ['pdf', 'PDF'],
                         ] as const
                       ).map(([k, l]) => (
                         <button
