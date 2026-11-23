@@ -769,7 +769,7 @@ html[data-theme="dark"] .iconbtn:hover { background: rgba(255, 255, 255, .08); }
 .mitem[role="menuitemradio"] > .cbox { box-shadow: none; background: none; }
 .mitem[role="menuitemradio"][aria-checked="true"] > .cbox { background: none; color: var(--ink); }
 
-.cmts { position: relative; list-style: none; margin: 0; padding: 0; }
+.cmts { position: absolute; inset: 0; list-style: none; margin: 0; padding: 0; }
 .cmt {
   position: absolute;
   left: 0;

@@ -224,11 +224,10 @@ export function ReviewDeskPage() {
     if (selIdx < 0) {
       stackDown(0);
     } else {
-      // Lift the open card close under the sticky findings filter card (Paper behavior)
+      // Open comments always sit right under the sticky Findings filter card
       const sr = scrollerEl.getBoundingClientRect();
       const spot = sr.top + minTop - laneTop;
-      const ay = items[selIdx].y;
-      tops[selIdx] = ay > spot && laneTop + ay < sr.bottom + 80 ? Math.max(minTop, spot) : ay;
+      tops[selIdx] = Math.max(minTop, spot);
       stackDown(selIdx + 1);
       for (let i = selIdx - 1; i >= 0; i--) {
         tops[i] = Math.min(items[i].y, tops[i + 1] - LANE_GAP - items[i].h);
