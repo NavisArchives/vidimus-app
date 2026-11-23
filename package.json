@@ -1,0 +1,31 @@
+{
+  "name": "vidimus",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/shared",
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c green,cyan \"npm run dev -w server\" \"npm run dev -w web\"",
+    "build": "npm run build -w packages/shared && npm run build -w server && npm run build -w web",
+    "start": "npm run start -w server",
+    "typecheck": "npm run typecheck -w packages/shared && npm run typecheck -w server && npm run typecheck -w web",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "migrate": "npm run migrate -w server",
+    "seed": "npm run seed -w server"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.51.1",
+    "@types/node": "^22.13.10",
+    "concurrently": "^9.1.2",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.9"
+  }
+}
