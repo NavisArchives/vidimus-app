@@ -932,38 +932,77 @@ html[data-theme="dark"] .iconbtn:hover { background: rgba(255, 255, 255, .08); }
 .dhead h3 { margin: 0; font-size: 15px; font-weight: 600; }
 .dlabel { font-size: 12.5px; font-weight: 500; color: var(--muted); }
 
-/* Upgraded Dashboard grid */
+/* Upgraded Dashboard grid: fits cleanly in one desktop viewport with zero page scroll */
+.dash-screen {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.dash-page {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 6px 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.dash-page .pg-head-row { margin-bottom: 0; align-items: center; }
+.dash-page .pg-head h1 { font-size: 25px; margin: 2px 0 2px; }
+.dash-page .pg-head p { font-size: 13.5px; }
+
 .dash-kpis {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
-  margin-bottom: 16px;
+  flex: none;
 }
 .kpi-card {
   background: var(--surface);
   border-radius: var(--r-card);
   box-shadow: var(--float);
-  padding: 16px 18px;
+  padding: 12px 16px;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
-.kpi-card span { font-size: 12.5px; color: var(--muted); font-weight: 500; }
-.kpi-card b { font-size: 28px; font-weight: 600; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
-.kpi-card small { font-size: 12.5px; color: var(--muted); }
+.kpi-card span { font-size: 12px; color: var(--muted); font-weight: 500; }
+.kpi-val { display: flex; align-items: baseline; gap: 8px; }
+.kpi-card b { font-size: 24px; line-height: 1.15; font-weight: 600; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
+.kpi-card small { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .kpi-card.kpi-high b { color: var(--high); }
 .kpi-card.kpi-accent b { color: var(--accent); }
 
-.dash { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }
-.dcont h2 { font-size: 20px; font-weight: 600; letter-spacing: -.02em; margin: 6px 0 2px; }
-.dsub { margin: 0 0 16px; color: var(--muted); }
-.dprog { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+.dash {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+}
+.dash > .dcard {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.dash-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+.dcont h2 { font-size: 19px; font-weight: 600; letter-spacing: -.02em; margin: 4px 0 2px; }
+.dsub { margin: 0 0 12px; color: var(--muted); font-size: 13.5px; }
+.dprog { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); margin-bottom: 10px; }
 .dprog .bar { flex: 1; width: auto; height: 6px; border-radius: 3px; }
 .dprog b { color: var(--ink); }
-.dsev { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13.5px; color: var(--ink-2); margin-bottom: 18px; }
+.dsev { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 13px; color: var(--ink-2); margin-bottom: 14px; }
 .dsev span { display: inline-flex; align-items: center; gap: 7px; }
 .dsev b { font-weight: 600; color: var(--ink); margin-left: 2px; }
-.dsev small { color: var(--muted); font-size: 12.5px; }
+.dsev small { color: var(--muted); font-size: 12px; }
 
 .alist { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
 .alist li { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; color: var(--ink-2); min-width: 0; }
@@ -1171,9 +1210,15 @@ html[data-theme="dark"] .iconbtn:hover { background: rgba(255, 255, 255, .08); }
   .dt-head span:nth-child(5), .dt-row .dt-updated { display: none; }
 }
 
+@media (max-width: 1020px), (max-height: 680px) {
+  .dash-screen { overflow: auto; }
+  .dash-page { height: auto; flex: none; padding: 10px 18px 36px; }
+  .dash { grid-template-columns: 1fr; grid-template-rows: auto; flex: none; }
+  .dash > .dcard { overflow: visible; }
+  .dash-scroll { overflow: visible; }
+}
 @media (max-width: 960px) {
   .prog, .cr-sub { display: none; }
-  .dash { grid-template-columns: 1fr; }
   .ex-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .toolsgrid { grid-template-columns: 1fr; }
 }

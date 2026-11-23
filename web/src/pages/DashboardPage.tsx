@@ -23,6 +23,7 @@ function actionText(action: string, details: Record<string, unknown>): string {
   if (action === 'review.started') return `started a review on ${String(details.documentTitle || 'a document')}`;
   if (action === 'review.completed') return `completed analysis (${String(details.findingsCount ?? 0)} findings)`;
   if (action === 'review.exported') return `exported ${String(details.format || '').toUpperCase()} report`;
+  if (action === 'auth.login') return 'signed in';
   return action.replace('.', ' ');
 }
 
@@ -63,13 +64,18 @@ export function DashboardPage() {
     );
   }, [data, docSearch]);
 
+  const filteredActivity = useMemo(() => {
+    if (!data) return [];
+    return data.recentActivity.filter((ev) => ev.action !== 'auth.login').slice(0, 5);
+  }, [data]);
+
   const firstName = user?.name.split(' ')[0] || 'Reviewer';
   const canEdit = activeWorkspace?.role !== 'viewer';
 
   return (
     <AppShell crumb={<b>Dashboard</b>}>
-      <main className="scroll-screen">
-        <div className="page">
+      <main className="dash-screen">
+        <div className="dash-page">
           <div className="pg-head-row">
             <div className="pg-head">
               <h1>
@@ -115,25 +121,33 @@ export function DashboardPage() {
               <section className="dash-kpis" aria-label="Workspace metrics">
                 <div className="kpi-card">
                   <span>Documents</span>
-                  <b>{data.metrics.documentsCount}</b>
-                  <small>stored in workspace</small>
+                  <div className="kpi-val">
+                    <b>{data.metrics.documentsCount}</b>
+                    <small>in workspace</small>
+                  </div>
                 </div>
                 <div className="kpi-card">
                   <span>Active reviews</span>
-                  <b>{data.metrics.activeReviewsCount}</b>
-                  <small>{data.metrics.completedReviewsCount} fully decided</small>
+                  <div className="kpi-val">
+                    <b>{data.metrics.activeReviewsCount}</b>
+                    <small>{data.metrics.completedReviewsCount} fully decided</small>
+                  </div>
                 </div>
                 <div className="kpi-card">
                   <span>Pending decisions</span>
-                  <b>{data.metrics.pendingDecisionsCount}</b>
-                  <small>open across active reviews</small>
+                  <div className="kpi-val">
+                    <b>{data.metrics.pendingDecisionsCount}</b>
+                    <small>awaiting review</small>
+                  </div>
                 </div>
                 <div className={`kpi-card${data.metrics.highSeverityOpenCount > 0 ? ' kpi-high' : ' kpi-accent'}`}>
                   <span>High severity open</span>
-                  <b>{data.metrics.highSeverityOpenCount}</b>
-                  <small>
-                    {data.metrics.connectedProvidersCount} of {data.metrics.totalProvidersCount} providers ready
-                  </small>
+                  <div className="kpi-val">
+                    <b>{data.metrics.highSeverityOpenCount}</b>
+                    <small>
+                      {data.metrics.connectedProvidersCount}/{data.metrics.totalProvidersCount} providers ready
+                    </small>
+                  </div>
                 </div>
               </section>
 
@@ -178,7 +192,7 @@ export function DashboardPage() {
                               <small>open</small>
                             </span>
                           </div>
-                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 'auto' }}>
                             <Link className="btn primary" to={`/reviews/${rev.id}`}>
                               <span>Continue review</span>
                               <Icon name="arrow-right" />
@@ -192,7 +206,7 @@ export function DashboardPage() {
                       );
                     })()
                   ) : (
-                    <div className="empty" style={{ padding: '24px 8px' }}>
+                    <div className="empty" style={{ padding: '20px 8px' }}>
                       <Icon name="file-text" />
                       <b>No reviews started yet</b>
                       <span>Upload a PDF document and configure a review to get started.</span>
@@ -217,35 +231,37 @@ export function DashboardPage() {
                       All reviews
                     </Link>
                   </div>
-                  {data.attentionReviews.length === 0 ? (
-                    <p className="dnone">
-                      No high-severity findings, split decisions, or failed runs right now.
-                    </p>
-                  ) : (
-                    <ul className="dlist2">
-                      {data.attentionReviews.map((r) => (
-                        <li key={r.id}>
-                          <span className="dt">
-                            <Link to={`/reviews/${r.id}`} style={{ textDecoration: 'none' }}>
-                              <b>{r.documentTitle}</b>
-                            </Link>
-                            <span>
-                              {r.status === 'failed'
-                                ? 'Analysis failed'
-                                : r.status === 'completed_with_errors'
-                                  ? 'Completed with provider error'
-                                  : `${r.counts?.high || 0} high open${
-                                      (r.counts?.split || 0) > 0 ? `, ${r.counts?.split} split` : ''
-                                    }`}
+                  <div className="dash-scroll">
+                    {data.attentionReviews.length === 0 ? (
+                      <p className="dnone">
+                        No high-severity findings, split decisions, or failed runs right now.
+                      </p>
+                    ) : (
+                      <ul className="dlist2">
+                        {data.attentionReviews.slice(0, 3).map((r) => (
+                          <li key={r.id}>
+                            <span className="dt">
+                              <Link to={`/reviews/${r.id}`} style={{ textDecoration: 'none' }}>
+                                <b>{r.documentTitle}</b>
+                              </Link>
+                              <span>
+                                {r.status === 'failed'
+                                  ? 'Analysis failed'
+                                  : r.status === 'completed_with_errors'
+                                    ? 'Completed with provider error'
+                                    : `${r.counts?.high || 0} high open${
+                                        (r.counts?.split || 0) > 0 ? `, ${r.counts?.split} split` : ''
+                                      }`}
+                              </span>
                             </span>
-                          </span>
-                          <Link className="btn small" to={`/reviews/${r.id}`}>
-                            Open
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                            <Link className="btn small" to={`/reviews/${r.id}`}>
+                              Open
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 </section>
 
                 {/* Recent activity */}
@@ -256,42 +272,44 @@ export function DashboardPage() {
                       Full history
                     </Link>
                   </div>
-                  {data.recentActivity.length === 0 ? (
-                    <p className="dnone">No review activity recorded yet.</p>
-                  ) : (
-                    <ul className="alist">
-                      {data.recentActivity.map((ev) => {
-                        const reviewId = ev.details.reviewId ? String(ev.details.reviewId) : null;
-                        const verdict = ev.action.startsWith('decision.')
-                          ? ev.action.split('.')[1]
-                          : undefined;
-                        return (
-                          <li key={ev.id}>
-                            <Avatar
-                              name={ev.actorName}
-                              index={ev.actorAvatarIndex}
-                              size="sm"
-                              verdict={verdict}
-                            />
-                            <span className="atext">
-                              <b>{ev.actorName}</b>{' '}
-                              {reviewId ? (
-                                <Link to={`/reviews/${reviewId}`}>
-                                  {actionText(ev.action, ev.details)}
-                                </Link>
-                              ) : (
-                                actionText(ev.action, ev.details)
-                              )}
-                              {typeof ev.details.title === 'string' && ev.details.title && (
-                                <span className="atitle">{ev.details.title}</span>
-                              )}
-                            </span>
-                            <time>{formatTimeAgo(ev.createdAt)}</time>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
+                  <div className="dash-scroll">
+                    {filteredActivity.length === 0 ? (
+                      <p className="dnone">No review activity recorded yet.</p>
+                    ) : (
+                      <ul className="alist">
+                        {filteredActivity.map((ev) => {
+                          const reviewId = ev.details.reviewId ? String(ev.details.reviewId) : null;
+                          const verdict = ev.action.startsWith('decision.')
+                            ? ev.action.split('.')[1]
+                            : undefined;
+                          return (
+                            <li key={ev.id}>
+                              <Avatar
+                                name={ev.actorName}
+                                index={ev.actorAvatarIndex}
+                                size="sm"
+                                verdict={verdict}
+                              />
+                              <span className="atext">
+                                <b>{ev.actorName}</b>{' '}
+                                {reviewId ? (
+                                  <Link to={`/reviews/${reviewId}`}>
+                                    {actionText(ev.action, ev.details)}
+                                  </Link>
+                                ) : (
+                                  actionText(ev.action, ev.details)
+                                )}
+                                {typeof ev.details.title === 'string' && ev.details.title && (
+                                  <span className="atitle">{ev.details.title}</span>
+                                )}
+                              </span>
+                              <time>{formatTimeAgo(ev.createdAt)}</time>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </div>
                 </section>
 
                 {/* Recent documents with inline search */}
@@ -302,7 +320,7 @@ export function DashboardPage() {
                       All documents
                     </Link>
                   </div>
-                  <div style={{ marginBottom: 10 }}>
+                  <div style={{ marginBottom: 8 }}>
                     <input
                       className="input"
                       type="search"
@@ -310,44 +328,47 @@ export function DashboardPage() {
                       aria-label="Filter recent documents"
                       value={docSearch}
                       onChange={(e) => setDocSearch(e.target.value)}
+                      style={{ padding: '6px 10px' }}
                     />
                   </div>
-                  {filteredDocs.length === 0 ? (
-                    <p className="dnone">No documents match your filter.</p>
-                  ) : (
-                    <ul className="dlist2">
-                      {filteredDocs.map((d) => (
-                        <li key={d.id}>
-                          <span className="dt">
-                            <b>{d.title}</b>
-                            <span>
-                              {d.latestVersion?.pageCount || 0} pages ·{' '}
-                              {d.kind === 'translation'
-                                ? `${d.sourceLang.toUpperCase()} to ${(d.targetLang || '').toUpperCase()}`
-                                : d.sourceLang.toUpperCase()}
+                  <div className="dash-scroll">
+                    {filteredDocs.length === 0 ? (
+                      <p className="dnone">No documents match your filter.</p>
+                    ) : (
+                      <ul className="dlist2">
+                        {filteredDocs.slice(0, 4).map((d) => (
+                          <li key={d.id}>
+                            <span className="dt">
+                              <b>{d.title}</b>
+                              <span>
+                                {d.latestVersion?.pageCount || 0} pages ·{' '}
+                                {d.kind === 'translation'
+                                  ? `${d.sourceLang.toUpperCase()} to ${(d.targetLang || '').toUpperCase()}`
+                                  : d.sourceLang.toUpperCase()}
+                              </span>
                             </span>
-                          </span>
-                          <span className="dn">
-                            {d.findingsCount
-                              ? `${d.decidedCount}/${d.findingsCount}`
-                              : d.latestVersion?.extractionStatus === 'ocr_required'
-                                ? 'OCR needed'
-                                : 'Ready'}
-                          </span>
-                          <Link
-                            className="btn small"
-                            to={
-                              d.latestReviewId
-                                ? `/reviews/${d.latestReviewId}`
-                                : `/documents/${d.id}/configure`
-                            }
-                          >
-                            {d.latestReviewId ? 'Review' : 'Configure'}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                            <span className="dn">
+                              {d.findingsCount
+                                ? `${d.decidedCount}/${d.findingsCount}`
+                                : d.latestVersion?.extractionStatus === 'ocr_required'
+                                  ? 'OCR needed'
+                                  : 'Ready'}
+                            </span>
+                            <Link
+                              className="btn small"
+                              to={
+                                d.latestReviewId
+                                  ? `/reviews/${d.latestReviewId}`
+                                  : `/documents/${d.id}/configure`
+                              }
+                            >
+                              {d.latestReviewId ? 'Review' : 'Configure'}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 </section>
               </div>
             </>

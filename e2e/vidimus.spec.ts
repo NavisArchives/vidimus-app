@@ -72,10 +72,15 @@ test('full desktop workflow: auth, upload, review, highlight, decisions, persist
   await page.getByLabel('Password').fill('vidimus-dev-password');
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
 
-  // 3. Dashboard loads real persistent metrics
+  // 3. Dashboard loads real persistent metrics and fits in one viewport without vertical scroll
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.getByRole('heading', { name: /Lena/ })).toBeVisible();
   await expect(page.getByText('Continue reviewing')).toBeVisible();
+  const dashScrolls = await page.evaluate(() => {
+    const main = document.querySelector('.dash-screen');
+    return main ? main.scrollHeight > main.clientHeight + 1 : true;
+  });
+  expect(dashScrolls).toBe(false);
   await page.screenshot({ path: path.join(SHOT_DIR, '01-dashboard.png') });
 
   // Accessibility check on Dashboard
